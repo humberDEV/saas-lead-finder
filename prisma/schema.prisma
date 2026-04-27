@@ -1,0 +1,41 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// NOTA: Para activar el sistema de planes, ejecuta la migración:
+//   npx prisma migrate dev --name "add_plan_fields"
+// y descomenta los campos: plan, resetAt, stripeId
+model User {
+  id        String   @id @default(uuid())
+  clerkId   String   @unique
+  email     String?
+  tokens    Int      @default(3)
+  // plan      String   @default("free")
+  // resetAt   DateTime?
+  // stripeId  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  savedLeads SavedLead[]
+}
+
+model SavedLead {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  name      String
+  address   String
+  phone     String?
+  score     Int
+  status    String   @default("PENDIENTE") // PENDIENTE | EN_CONTACTO | CERRADO | DESCARTADO
+  notes     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+}
