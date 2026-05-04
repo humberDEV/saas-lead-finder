@@ -4,6 +4,7 @@ import { db } from "@/lib/db";
 import { getOrCreateUser } from "@/lib/tokens";
 import { calculateOpportunityScore } from "@/lib/score";
 import { generateContactMessage } from "@/lib/message";
+import { trackEvent } from "@/lib/events";
 import { parsePhoneNumber } from "libphonenumber-js/max";
 
 const CACHE_DAYS = 7; // Re-use results for 7 days before hitting Google again
@@ -161,11 +162,30 @@ export async function GET(request: Request) {
 
     // Descontar crédito solo si hay leads reales (sin web + contactables)
     const hasOpportunities = uniquePlaces.some((p: any) => p.score >= 40);
+    const now = new Date().toISOString();
+
     if (hasOpportunities) {
+      // Decrement token + update activity fields
       await db.user.update({
         where: { clerkId: userId },
-        data: { tokens: { decrement: 1 } },
+        data: {
+          tokens: { decrement: 1 },
+          searches_count_increment: true,
+          last_search_at: now,
+          ...(!user.firstSearchAt ? { first_search_at: now } : {}),
+        },
       });
+
+      // Re-read tokens to check if free user just hit 0
+      if (user.plan === "free" && user.tokens <= 1 && !user.firstLimitReachedAt) {
+        await db.user.update({
+          where: { clerkId: userId },
+          data: { first_limit_reached_at: now },
+        });
+        await trackEvent(user.id, "free_limit_reached");
+      }
+
+      await trackEvent(user.id, "search_completed", { niche, city, resultCount: uniquePlaces.length });
     }
 
     // Guardar en historial y devolver el ID para que el cliente pueda mutar los results

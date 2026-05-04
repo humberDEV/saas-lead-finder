@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { CheckCircle, ArrowRight, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
@@ -11,6 +11,15 @@ export default function Pricing() {
   const tPlans = useTranslations("plans");
   const { plan: currentPlan, credits: remaining } = useSidebar();
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
+
+  // Track paywall_viewed
+  useEffect(() => {
+    fetch("/api/events", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ event: "paywall_viewed", properties: { source: "pricing_page" } }),
+    }).catch(() => {});
+  }, []);
 
   const PLANS = [
     {
@@ -27,23 +36,33 @@ export default function Pricing() {
       popular: false,
     },
     {
-      name: tPlans("starter.name"),
+      name: tPlans("go.name"),
+      price: "$9",
+      period: "/mes",
+      desc: tPlans("go.desc"),
+      features: (tPlans.raw("go.features") as string[]).map((text: string) => ({ text, ok: true })),
+      cta: tPlans("go.cta"),
+      planKey: "go",
+      popular: false,
+    },
+    {
+      name: tPlans("pro.name"),
       price: "$19",
       period: "/mes",
-      desc: tPlans("starter.desc"),
-      features: (tPlans.raw("starter.features") as string[]).map((text: string) => ({ text, ok: true })),
-      cta: tPlans("starter.cta"),
-      planKey: "starter",
+      desc: tPlans("pro.desc"),
+      features: (tPlans.raw("pro.features") as string[]).map((text: string) => ({ text, ok: true })),
+      cta: tPlans("pro.cta"),
+      planKey: "pro",
       popular: true,
     },
     {
       name: tPlans("agency.name"),
-      price: "$49",
+      price: "$39",
       period: "/mes",
       desc: tPlans("agency.desc"),
       features: (tPlans.raw("agency.features") as string[]).map((text: string) => ({ text, ok: true })),
       cta: tPlans("agency.cta"),
-      planKey: "pro",
+      planKey: "agency",
       popular: false,
     },
   ];
@@ -71,7 +90,7 @@ export default function Pricing() {
 
   return (
     <div className="h-full overflow-y-auto bg-[#0d0d14] text-white antialiased">
-      <main className="max-w-5xl mx-auto px-6 py-20">
+      <main className="max-w-6xl mx-auto px-6 py-20">
         <div className="text-center mb-14">
           <p className="text-xs font-mono text-indigo-500 uppercase tracking-wide mb-3">{t("label")}</p>
           <h1 className="text-4xl md:text-5xl font-black tracking-tighter text-white mb-4">
@@ -90,7 +109,7 @@ export default function Pricing() {
           )}
         </div>
 
-        <div className="grid md:grid-cols-3 gap-4 items-start">
+        <div className="grid md:grid-cols-4 gap-4 items-start">
           {PLANS.map((plan) => {
             const isCurrentPlan = currentPlan === plan.planKey;
             const isLoading = loadingPlan === plan.planKey;

@@ -68,17 +68,26 @@ export default async function LandingPage() {
       popular: false,
     },
     {
-      name: tPlans("starter.name"),
+      name: tPlans("go.name"),
+      price: "$9",
+      period: "/mes",
+      desc: tPlans("go.desc"),
+      features: (tPlans.raw("go.features") as string[]).map((text: string) => ({ text, ok: true })),
+      cta: tPlans("go.cta"),
+      popular: false,
+    },
+    {
+      name: tPlans("pro.name"),
       price: "$19",
       period: "/mes",
-      desc: tPlans("starter.desc"),
-      features: (tPlans.raw("starter.features") as string[]).map((text: string) => ({ text, ok: true })),
-      cta: tPlans("starter.cta"),
+      desc: tPlans("pro.desc"),
+      features: (tPlans.raw("pro.features") as string[]).map((text: string) => ({ text, ok: true })),
+      cta: tPlans("pro.cta"),
       popular: true,
     },
     {
       name: tPlans("agency.name"),
-      price: "$49",
+      price: "$39",
       period: "/mes",
       desc: tPlans("agency.desc"),
       features: (tPlans.raw("agency.features") as string[]).map((text: string) => ({ text, ok: true })),
@@ -99,7 +108,7 @@ export default async function LandingPage() {
             "@type": "SoftwareApplication",
             name: "Huntly",
             applicationCategory: "BusinessApplication",
-            offers: { "@type": "AggregateOffer", lowPrice: "0", highPrice: "49", priceCurrency: "USD" },
+            offers: { "@type": "AggregateOffer", lowPrice: "0", highPrice: "39", priceCurrency: "USD" },
           }),
         }}
       />
@@ -502,7 +511,7 @@ export default async function LandingPage() {
                 </p>
               </div>
 
-              <div className="grid md:grid-cols-3 gap-4 items-start">
+              <div className="grid md:grid-cols-4 gap-4 items-start">
                 {PLANS.map((plan, i) => (
                   <div
                     key={i}

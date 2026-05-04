@@ -125,12 +125,12 @@
         "Search history"
       ]
     },
-    "starter": {
-      "name": "Starter",
-      "desc": "For freelancers who want to find opportunities every week.",
-      "cta": "Get Starter",
+    "go": {
+      "name": "Go",
+      "desc": "Just enough to start reaching out to businesses every week.",
+      "cta": "Get Go",
       "features": [
-        "120 searches/month",
+        "40 searches/month",
         "Opportunity score on every lead",
         "WhatsApp and direct call",
         "Save leads to portfolio",
@@ -138,15 +138,25 @@
         "Email support"
       ]
     },
+    "pro": {
+      "name": "Pro",
+      "desc": "For freelancers who prospect every week.",
+      "cta": "Get Pro",
+      "features": [
+        "100 searches/month",
+        "Everything in Go",
+        "Priority support",
+        "Beta access to new features"
+      ]
+    },
     "agency": {
       "name": "Agency",
       "desc": "For agencies or teams doing prospecting at scale.",
       "cta": "Get Agency",
       "features": [
-        "400 searches/month",
-        "Everything in Starter",
+        "250 searches/month",
+        "Everything in Pro",
         "Priority support",
-        "Beta access to new features",
         "Built for high volume"
       ]
     }
@@ -232,6 +242,13 @@
       "cityHint": "Type a specific neighborhood or zone for better results.",
       "outOfSearches": "You've used all your searches this month.",
       "viewPlans": "View plans",
+      "paywallTitle": "You used your free searches",
+      "paywallBody": "Unlock more searches and keep finding real businesses to contact.",
+      "paywallCta": "Continue with {plan}",
+      "paywallMonth": "/mo",
+      "paywallSearches": "{count} searches/mo",
+      "paywallPopular": "Most popular",
+      "paywallEasiest": "Easiest to start",
       "scanning": "Scanning Zone...",
       "extractLeads": "Extract Leads",
       "remaining": "({count} remaining)"
@@ -243,6 +260,14 @@
       "noResultsTip": "Try a more specific neighborhood or a different niche.",
       "emptyTitle": "Find businesses that need a website.",
       "emptyTip": "Pick a niche and a zone to discover sales opportunities.",
+      "emptyFirstTitle": "Find your first potential clients",
+      "emptyFirstTip": "Try one of these searches to get started:",
+      "emptyExample1Niche": "Barbershops",
+      "emptyExample1City": "Valencia",
+      "emptyExample2Niche": "Beauty Centers",
+      "emptyExample2City": "Madrid",
+      "emptyExample3Niche": "Restaurants & Cafés",
+      "emptyExample3City": "Bogotá",
       "salesOpportunities": "sales opportunities",
       "otherOpportunities": "Other opportunities",
       "reviews": "reviews",

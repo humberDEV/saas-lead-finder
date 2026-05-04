@@ -1,10 +1,8 @@
 import { supabase } from "./supabase";
+import { PLAN_LIMITS } from "./plans";
 
-export const PLAN_LIMITS: Record<string, number> = {
-  free: 3,
-  starter: 120,
-  pro: 400, // plan key "pro" = producto Agency
-};
+// Re-export so existing imports still work
+export { PLAN_LIMITS };
 
 function toUser(row: any) {
   if (!row) return null;
@@ -12,11 +10,18 @@ function toUser(row: any) {
     id: row.id,
     clerkId: row.clerk_id,
     email: row.email ?? null,
+    name: row.name ?? null,
     tokens: row.tokens ?? 3,
     plan: row.plan ?? "free",
     tokensResetAt: row.tokens_reset_at ?? row.created_at,
     stripeCustomerId: row.stripe_customer_id ?? null,
     stripeSubscriptionId: row.stripe_subscription_id ?? null,
+    searchesCount: row.searches_count ?? 0,
+    firstSearchAt: row.first_search_at ?? null,
+    lastSearchAt: row.last_search_at ?? null,
+    firstLimitReachedAt: row.first_limit_reached_at ?? null,
+    checkoutStartedAt: row.checkout_started_at ?? null,
+    lastLoginAt: row.last_login_at ?? null,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   };
@@ -59,12 +64,13 @@ export const db = {
       return toUser(data);
     },
 
-    async create({ data }: { data: { clerkId: string; tokens?: number; email?: string } }) {
+    async create({ data }: { data: { clerkId: string; tokens?: number; email?: string; name?: string } }) {
       const { data: row, error } = await supabase
         .from("users")
         .insert({
           clerk_id: data.clerkId,
           email: data.email ?? null,
+          name: data.name ?? null,
           tokens: data.tokens ?? 3,
           plan: "free",
           tokens_reset_at: new Date().toISOString(),
@@ -92,9 +98,17 @@ export const db = {
       data: {
         tokens?: { decrement: number } | number;
         plan?: string;
+        email?: string;
+        name?: string;
         tokens_reset_at?: string;
         stripe_customer_id?: string;
         stripe_subscription_id?: string | null;
+        searches_count_increment?: boolean;
+        first_search_at?: string;
+        last_search_at?: string;
+        first_limit_reached_at?: string;
+        checkout_started_at?: string;
+        last_login_at?: string;
       };
     }) {
       const column = where.clerkId ? "clerk_id" : "id";
@@ -103,9 +117,26 @@ export const db = {
       const patch: Record<string, any> = {};
 
       if (data.plan !== undefined) patch.plan = data.plan;
+      if (data.email !== undefined) patch.email = data.email;
+      if (data.name !== undefined) patch.name = data.name;
       if (data.tokens_reset_at !== undefined) patch.tokens_reset_at = data.tokens_reset_at;
       if (data.stripe_customer_id !== undefined) patch.stripe_customer_id = data.stripe_customer_id;
       if (data.stripe_subscription_id !== undefined) patch.stripe_subscription_id = data.stripe_subscription_id;
+      if (data.first_search_at !== undefined) patch.first_search_at = data.first_search_at;
+      if (data.last_search_at !== undefined) patch.last_search_at = data.last_search_at;
+      if (data.first_limit_reached_at !== undefined) patch.first_limit_reached_at = data.first_limit_reached_at;
+      if (data.checkout_started_at !== undefined) patch.checkout_started_at = data.checkout_started_at;
+      if (data.last_login_at !== undefined) patch.last_login_at = data.last_login_at;
+
+      // Handle searches_count increment
+      if (data.searches_count_increment) {
+        const { data: current } = await supabase
+          .from("users")
+          .select("searches_count")
+          .eq(column, value)
+          .single();
+        patch.searches_count = (current?.searches_count ?? 0) + 1;
+      }
 
       if (typeof data.tokens === "object" && data.tokens !== null && "decrement" in data.tokens) {
         const { data: current } = await supabase

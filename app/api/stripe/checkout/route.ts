@@ -4,6 +4,7 @@ import { auth, currentUser } from "@clerk/nextjs/server";
 import { stripe, STRIPE_PLANS } from "@/lib/stripe";
 import { getOrCreateUser } from "@/lib/tokens";
 import { db } from "@/lib/db";
+import { trackEvent } from "@/lib/events";
 
 export async function POST(request: Request) {
   const { userId } = await auth();
@@ -56,6 +57,13 @@ export async function POST(request: Request) {
       metadata: { clerkId: userId, planKey },
     },
   });
+
+  // Track checkout started
+  await db.user.update({
+    where: { clerkId: userId },
+    data: { checkout_started_at: new Date().toISOString() },
+  }).catch(() => {});
+  await trackEvent(user.id, "checkout_started", { planKey }).catch(() => {});
 
   return NextResponse.json({ url: session.url });
 }

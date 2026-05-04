@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 import { headers } from "next/headers";
 import { stripe, STRIPE_PLANS } from "@/lib/stripe";
-import { db } from "@/lib/db";
-import { PLAN_LIMITS } from "@/lib/db";
+import { db, PLAN_LIMITS } from "@/lib/db";
+import { trackEvent } from "@/lib/events";
 import type Stripe from "stripe";
 
 export const runtime = "nodejs";
@@ -14,20 +14,33 @@ async function upgradeUser(clerkId: string, planKey: string, subscriptionId: str
   const planConfig = STRIPE_PLANS[planKey];
   if (!planConfig) return;
 
+  const user = await db.user.findUnique({ where: { clerkId } });
+  const previousPlan = user?.plan ?? "free";
+
   await db.user.update({
     where: { clerkId },
     data: {
       plan: planConfig.plan,
-      tokens: PLAN_LIMITS[planConfig.plan],
+      tokens: PLAN_LIMITS[planConfig.plan] ?? planConfig.searches,
       tokens_reset_at: new Date().toISOString(),
       stripe_subscription_id: subscriptionId,
     },
   });
+
+  if (user) {
+    if (previousPlan === "free") {
+      await trackEvent(user.id, "subscription_started", { planKey });
+    } else if (previousPlan !== planKey) {
+      await trackEvent(user.id, "plan_changed", { from: previousPlan, to: planKey });
+    }
+  }
 }
 
 async function downgradeUser(stripeCustomerId: string) {
   const user = await db.user.findByStripeCustomerId(stripeCustomerId);
   if (!user) return;
+
+  const previousPlan = user.plan;
 
   await db.user.update({
     where: { clerkId: user.clerkId },
@@ -38,6 +51,8 @@ async function downgradeUser(stripeCustomerId: string) {
       stripe_subscription_id: null,
     },
   });
+
+  await trackEvent(user.id, "subscription_cancelled", { previousPlan });
 }
 
 export async function POST(request: Request) {

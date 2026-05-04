@@ -125,12 +125,12 @@
         "Historial de búsquedas"
       ]
     },
-    "starter": {
-      "name": "Starter",
-      "desc": "Para freelancers que quieren buscar oportunidades cada semana.",
-      "cta": "Contratar Starter",
+    "go": {
+      "name": "Go",
+      "desc": "Lo justo para empezar a contactar negocios cada semana.",
+      "cta": "Contratar Go",
       "features": [
-        "120 búsquedas/mes",
+        "40 búsquedas/mes",
         "Score de oportunidad en cada lead",
         "WhatsApp y llamada directa",
         "Guardar leads en cartera",
@@ -138,15 +138,25 @@
         "Soporte por email"
       ]
     },
+    "pro": {
+      "name": "Pro",
+      "desc": "Para freelancers que hacen prospección cada semana.",
+      "cta": "Contratar Pro",
+      "features": [
+        "100 búsquedas/mes",
+        "Todo lo de Go",
+        "Soporte prioritario",
+        "Acceso beta a nuevas funciones"
+      ]
+    },
     "agency": {
       "name": "Agency",
-      "desc": "Para agencias o equipos que hacen prospección de forma constante.",
+      "desc": "Para agencias o equipos con alto volumen de prospección.",
       "cta": "Contratar Agency",
       "features": [
-        "400 búsquedas/mes",
-        "Todo lo de Starter",
+        "250 búsquedas/mes",
+        "Todo lo de Pro",
         "Soporte prioritario",
-        "Acceso beta a nuevas funciones",
         "Pensado para alto volumen"
       ]
     }
@@ -232,6 +242,13 @@
       "cityHint": "Escribe un barrio o zona concreta para mejores resultados.",
       "outOfSearches": "Has usado todas tus búsquedas del mes.",
       "viewPlans": "Ver planes",
+      "paywallTitle": "Usaste tus búsquedas gratis",
+      "paywallBody": "Desbloquea más búsquedas y sigue encontrando negocios reales a los que contactar.",
+      "paywallCta": "Continuar con {plan}",
+      "paywallMonth": "/mes",
+      "paywallSearches": "{count} búsquedas/mes",
+      "paywallPopular": "Más popular",
+      "paywallEasiest": "Más fácil para empezar",
       "scanning": "Rastreando Zona...",
       "extractLeads": "Extraer Leads",
       "remaining": "({count} restantes)"
@@ -241,8 +258,16 @@
       "reviewResults": "Revisa los resultados abajo",
       "noResultsTitle": "Sin resultados en esa zona.",
       "noResultsTip": "Prueba con un barrio más concreto o un nicho diferente.",
-      "emptyTitle": "Encuentra negocios que necesitan una web.",
+      "emptyTitle": "Encuentra tus primeros clientes potenciales",
       "emptyTip": "Elige un nicho y una zona para descubrir oportunidades de venta.",
+      "emptyFirstTitle": "Encuentra tus primeros clientes potenciales",
+      "emptyFirstTip": "Prueba una de estas búsquedas para empezar:",
+      "emptyExample1Niche": "Barberías",
+      "emptyExample1City": "Valencia",
+      "emptyExample2Niche": "Centros de Estética",
+      "emptyExample2City": "Madrid",
+      "emptyExample3Niche": "Restaurantes y Cafeterías",
+      "emptyExample3City": "Bogotá",
       "salesOpportunities": "oportunidades de venta",
       "otherOpportunities": "Otras oportunidades",
       "reviews": "reseñas",

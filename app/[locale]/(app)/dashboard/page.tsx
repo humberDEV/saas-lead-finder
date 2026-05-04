@@ -29,6 +29,90 @@ function useTimeAgo() {
 
 const RANDOM_CITIES = CITIES;
 
+const PAYWALL_PLANS = [
+  { key: "go", name: "Go", price: 9, searches: 40, highlight: "easiest" as const },
+  { key: "pro", name: "Pro", price: 19, searches: 100, highlight: "popular" as const },
+  { key: "agency", name: "Agency", price: 39, searches: 250, highlight: null },
+];
+
+function PaywallBanner({ tSearch }: { tSearch: ReturnType<typeof useTranslations> }) {
+  const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetch("/api/events", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ event: "paywall_viewed", properties: { source: "dashboard" } }),
+    }).catch(() => {});
+  }, []);
+
+  async function handleCheckout(planKey: string) {
+    setLoadingPlan(planKey);
+    try {
+      const res = await fetch("/api/stripe/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ planKey }),
+      });
+      const data = await res.json();
+      if (data.url) window.location.href = data.url;
+      else setLoadingPlan(null);
+    } catch {
+      setLoadingPlan(null);
+    }
+  }
+
+  return (
+    <div className="mb-12 rounded-2xl border border-amber-500/20 bg-amber-500/5 p-8 text-center backdrop-blur-xl">
+      <h3 className="text-xl font-black text-white mb-2">
+        {tSearch("paywallTitle")}
+      </h3>
+      <p className="text-sm text-zinc-400 mb-8 max-w-md mx-auto">
+        {tSearch("paywallBody")}
+      </p>
+      <div className="grid sm:grid-cols-3 gap-4 max-w-2xl mx-auto">
+        {PAYWALL_PLANS.map((p) => (
+          <div
+            key={p.key}
+            className={`relative rounded-xl border p-4 flex flex-col items-center gap-2 ${
+              p.highlight === "popular"
+                ? "border-indigo-500/40 bg-indigo-950/20"
+                : "border-white/[0.07] bg-white/[0.02]"
+            }`}
+          >
+            {p.highlight === "popular" && (
+              <span className="absolute -top-2.5 text-[10px] font-bold uppercase tracking-widest bg-indigo-600 text-white px-2.5 py-0.5 rounded-full">
+                {tSearch("paywallPopular")}
+              </span>
+            )}
+            {p.highlight === "easiest" && (
+              <span className="absolute -top-2.5 text-[10px] font-bold uppercase tracking-widest bg-emerald-600 text-white px-2.5 py-0.5 rounded-full">
+                {tSearch("paywallEasiest")}
+              </span>
+            )}
+            <span className="text-lg font-black text-white">{p.name}</span>
+            <span className="text-2xl font-black text-white">${p.price}<span className="text-sm text-zinc-500 font-normal">{tSearch("paywallMonth")}</span></span>
+            <span className="text-xs text-zinc-400">{tSearch("paywallSearches", { count: p.searches })}</span>
+            <button
+              onClick={() => handleCheckout(p.key)}
+              disabled={!!loadingPlan}
+              className={`mt-2 w-full py-2 rounded-lg text-sm font-bold transition-colors disabled:opacity-60 ${
+                p.highlight === "popular"
+                  ? "bg-indigo-600 hover:bg-indigo-500 text-white"
+                  : p.highlight === "easiest"
+                  ? "bg-emerald-600 hover:bg-emerald-500 text-white"
+                  : "bg-white/10 hover:bg-white/15 text-white"
+              }`}
+            >
+              {loadingPlan === p.key ? "..." : tSearch("paywallCta", { plan: p.name })}
+            </button>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export default function Dashboard() {
   const t = useTranslations("dashboard");
   const tResults = useTranslations("dashboard.results");
@@ -669,19 +753,7 @@ export default function Dashboard() {
                 </div>
 
                 <div className="pt-2">
-                  {credits === 0 ? (
-                    <div className="w-full text-center">
-                      <p className="text-amber-400 font-bold text-sm mb-3">
-                        {tSearch("outOfSearches")}
-                      </p>
-                      <Link
-                        href="/pricing"
-                        className="inline-flex items-center gap-2 px-8 py-4 bg-amber-500 hover:bg-amber-400 text-black font-black text-sm uppercase tracking-wider rounded-xl transition-all"
-                      >
-                        <Sparkles className="w-4 h-4" /> {tSearch("viewPlans")}
-                      </Link>
-                    </div>
-                  ) : (
+                  {credits === 0 ? null : (
                     <button
                       onClick={() => handleSearch()}
                       disabled={loading || (!niche && !customNiche) || !city}
@@ -705,6 +777,11 @@ export default function Dashboard() {
             </div>
           </motion.div>}
 
+          {/* Paywall: shown when 0 credits */}
+          {credits === 0 && !historyContext && (
+            <PaywallBanner tSearch={tSearch} />
+          )}
+
           {error && (
             <div className="bg-red-500/10 text-red-400 p-4 rounded-xl text-center mb-12 border border-red-500/20 font-bold">
               {error}
@@ -723,10 +800,25 @@ export default function Dashboard() {
                 </>
               ) : (
                 <>
-                  <p className="text-lg font-medium text-slate-400">{tResults("emptyTitle")}</p>
-                  <p className="text-sm mt-2 text-zinc-600">
-                    {tResults("emptyTip")}
+                  <p className="text-lg font-medium text-slate-400">{tResults("emptyFirstTitle")}</p>
+                  <p className="text-sm mt-2 text-zinc-600 mb-6">
+                    {tResults("emptyFirstTip")}
                   </p>
+                  <div className="flex flex-wrap justify-center gap-3">
+                    {[
+                      { niche: tResults("emptyExample1Niche"), city: tResults("emptyExample1City") },
+                      { niche: tResults("emptyExample2Niche"), city: tResults("emptyExample2City") },
+                      { niche: tResults("emptyExample3Niche"), city: tResults("emptyExample3City") },
+                    ].map((ex) => (
+                      <button
+                        key={ex.niche + ex.city}
+                        onClick={() => handleSearch(undefined, ex.niche, ex.city)}
+                        className="px-4 py-2.5 bg-neutral-800/60 hover:bg-indigo-600/20 border border-neutral-700/50 hover:border-indigo-500/30 rounded-xl text-sm text-zinc-300 hover:text-white transition-all font-medium"
+                      >
+                        {ex.niche} en {ex.city}
+                      </button>
+                    ))}
+                  </div>
                 </>
               )}
             </div>
