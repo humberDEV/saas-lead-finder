@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { MapPin, Navigation2, CheckCircle, Clock, CalendarDays, Copy, CopyCheck, Map, Globe, Star, Lock } from "lucide-react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { useSidebar } from "../SidebarContext";
 
 type Lead = {
@@ -25,6 +26,7 @@ type Lead = {
 };
 
 export default function CRM() {
+  const t = useTranslations("crm");
   const { plan } = useSidebar();
   const [leads, setLeads] = useState<Lead[]>([]);
   const [loading, setLoading] = useState(true);
@@ -45,15 +47,15 @@ export default function CRM() {
       <div className="h-full flex items-center justify-center bg-[#0d0d14]">
         <div className="text-center max-w-sm">
           <Lock className="w-10 h-10 text-zinc-600 mx-auto mb-4" />
-          <h2 className="text-xl font-bold text-white mb-2">Mi Cartera</h2>
+          <h2 className="text-xl font-bold text-white mb-2">{t("title")}</h2>
           <p className="text-sm text-zinc-500 mb-6">
-            Guarda oportunidades y gestiona tus ventas con un plan de pago.
+            {t("locked")}
           </p>
           <Link
             href="/pricing"
             className="inline-flex items-center gap-2 px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm rounded-xl transition-colors"
           >
-            Ver planes
+            {t("viewPlans")}
           </Link>
         </div>
       </div>
@@ -86,7 +88,6 @@ export default function CRM() {
 
     return (
       <div className="bg-neutral-900 border border-neutral-800 p-5 rounded-2xl flex flex-col gap-4">
-        {/* Header */}
         <div>
           <div className="flex items-start justify-between gap-2 mb-2">
             <h3 className="font-bold text-white text-base leading-snug">{lead.name}</h3>
@@ -116,20 +117,19 @@ export default function CRM() {
             {lead.rating > 0 && (
               <span className="flex items-center gap-1.5">
                 <Star className="w-3 h-3 shrink-0 text-emerald-400" />
-                {lead.rating} <span className="text-zinc-600">({lead.reviewCount} reseñas)</span>
+                {lead.rating} <span className="text-zinc-600">({lead.reviewCount} {t("reviews")})</span>
               </span>
             )}
             <span className="flex items-center gap-1.5">
               <Globe className="w-3 h-3 shrink-0 text-zinc-600" />
               {lead.hasWebsite
-                ? <span className="text-zinc-500 truncate">{lead.website || "Tiene web"}</span>
-                : <span className="text-emerald-400 font-semibold">Sin web ✓</span>
+                ? <span className="text-zinc-500 truncate">{lead.website || t("hasWeb")}</span>
+                : <span className="text-emerald-400 font-semibold">{t("noWeb")}</span>
               }
             </span>
           </div>
         </div>
 
-        {/* Action buttons — call/WA only when PENDIENTE or has phone */}
         {lead.phone && (
           <div className="flex gap-2">
             {lead.hasWhatsapp && (lead.suggestedMessage || lead.notes) && (
@@ -149,12 +149,11 @@ export default function CRM() {
               href={`tel:${cleanPhone}`}
               className="flex-1 flex items-center justify-center gap-1.5 py-2 bg-neutral-800 hover:bg-neutral-700 text-white text-xs font-bold rounded-lg transition-all"
             >
-              Llamar
+              {t("call")}
             </a>
           </div>
         )}
 
-        {/* Maps + status */}
         <div className="flex gap-2 items-center border-t border-neutral-800/50 pt-3">
           <a
             href={mapsUrl}
@@ -169,10 +168,10 @@ export default function CRM() {
             value={lead.status}
             onChange={(e) => updateStatus(lead.id, e.target.value)}
           >
-            <option value="PENDIENTE">⏳ En lista</option>
-            <option value="EN_CONTACTO">💬 Contactado</option>
-            <option value="CERRADO">✅ Aceptado</option>
-            <option value="DESCARTADO">✕ Descartado</option>
+            <option value="PENDIENTE">{t("statusPending")}</option>
+            <option value="EN_CONTACTO">{t("statusContacted")}</option>
+            <option value="CERRADO">{t("statusAccepted")}</option>
+            <option value="DESCARTADO">{t("statusDiscarded")}</option>
           </select>
         </div>
       </div>
@@ -183,46 +182,46 @@ export default function CRM() {
     <div className="h-full overflow-y-auto bg-[#0A0A0A] bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(120,119,198,0.1),rgba(255,255,255,0))]">
       <main className="max-w-6xl mx-auto p-6 md:p-12 pb-24">
         <header className="mb-12">
-          <h1 className="text-4xl font-black text-white mb-2">Mi Cartera</h1>
-          <p className="text-zinc-400 font-medium">Gestiona tus oportunidades de venta.</p>
+          <h1 className="text-4xl font-black text-white mb-2">{t("title")}</h1>
+          <p className="text-zinc-400 font-medium">{t("subtitle")}</p>
         </header>
 
         {loading ? (
-          <div className="text-zinc-500 text-center py-20 font-medium">Cargando...</div>
+          <div className="text-zinc-500 text-center py-20 font-medium">{t("loading")}</div>
         ) : (
           <div className="grid md:grid-cols-3 gap-8">
             <section>
               <h2 className="text-sm font-black text-white mb-4 uppercase tracking-wider flex items-center gap-2">
-                <Clock className="text-amber-500 w-4 h-4" /> En lista ({pendingLeads.length})
+                <Clock className="text-amber-500 w-4 h-4" /> {t("columnPending")} ({pendingLeads.length})
               </h2>
               <div className="space-y-4">
                 {pendingLeads.map(l => <LeadCard key={l.id} lead={l} />)}
                 {pendingLeads.length === 0 && (
-                  <p className="text-xs text-zinc-600 border border-neutral-800 border-dashed rounded-xl p-8 text-center">Busca negocios sin web y guárdalos aquí</p>
+                  <p className="text-xs text-zinc-600 border border-neutral-800 border-dashed rounded-xl p-8 text-center">{t("emptyPending")}</p>
                 )}
               </div>
             </section>
 
             <section>
               <h2 className="text-sm font-black text-white mb-4 uppercase tracking-wider flex items-center gap-2">
-                <Navigation2 className="text-indigo-400 w-4 h-4" /> Contactados ({inContactLeads.length})
+                <Navigation2 className="text-indigo-400 w-4 h-4" /> {t("columnContacted")} ({inContactLeads.length})
               </h2>
               <div className="space-y-4">
                 {inContactLeads.map(l => <LeadCard key={l.id} lead={l} />)}
                 {inContactLeads.length === 0 && (
-                  <p className="text-xs text-zinc-600 border border-neutral-800 border-dashed rounded-xl p-8 text-center">Mueve aquí los que ya hayas contactado</p>
+                  <p className="text-xs text-zinc-600 border border-neutral-800 border-dashed rounded-xl p-8 text-center">{t("emptyContacted")}</p>
                 )}
               </div>
             </section>
 
             <section>
               <h2 className="text-sm font-black text-white mb-4 uppercase tracking-wider flex items-center gap-2">
-                <CheckCircle className="text-emerald-500 w-4 h-4" /> Aceptados ({closedLeads.length})
+                <CheckCircle className="text-emerald-500 w-4 h-4" /> {t("columnAccepted")} ({closedLeads.length})
               </h2>
               <div className="space-y-4">
                 {closedLeads.map(l => <LeadCard key={l.id} lead={l} />)}
                 {closedLeads.length === 0 && (
-                  <p className="text-xs text-zinc-600 border border-neutral-800 border-dashed rounded-xl p-8 text-center">Tus clientes conseguidos</p>
+                  <p className="text-xs text-zinc-600 border border-neutral-800 border-dashed rounded-xl p-8 text-center">{t("emptyAccepted")}</p>
                 )}
               </div>
             </section>

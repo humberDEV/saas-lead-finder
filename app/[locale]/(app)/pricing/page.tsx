@@ -3,65 +3,50 @@
 import { useState } from "react";
 import { CheckCircle, ArrowRight, Loader2 } from "lucide-react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { useSidebar } from "../SidebarContext";
 
-const PLANS = [
-  {
-    name: "Gratis",
-    price: "$0",
-    period: "/mes",
-    desc: "Para probar Huntly y encontrar tus primeros leads.",
-    features: [
-      { text: "3 búsquedas gratis", ok: true },
-      { text: "Score de oportunidad en cada lead", ok: true },
-      { text: "WhatsApp y llamada directa", ok: true },
-      { text: "Ver en Google Maps", ok: true },
-      { text: "Sin tarjeta", ok: true },
-      { text: "Guardar leads en cartera", ok: false },
-      { text: "Historial de búsquedas", ok: false },
-    ],
-    cta: "Plan actual",
-    planKey: "free",
-    popular: false,
-  },
-  {
-    name: "Starter",
-    price: "$19",
-    period: "/mes",
-    desc: "Para freelancers que quieren buscar oportunidades cada semana.",
-    features: [
-      { text: "120 búsquedas/mes", ok: true },
-      { text: "Score de oportunidad en cada lead", ok: true },
-      { text: "WhatsApp y llamada directa", ok: true },
-      { text: "Guardar leads en cartera", ok: true },
-      { text: "Historial de búsquedas", ok: true },
-      { text: "Soporte por email", ok: true },
-    ],
-    cta: "Contratar Starter",
-    planKey: "starter",
-    popular: true,
-  },
-  {
-    name: "Agency",
-    price: "$49",
-    period: "/mes",
-    desc: "Para agencias o equipos que hacen prospección de forma constante.",
-    features: [
-      { text: "400 búsquedas/mes", ok: true },
-      { text: "Todo lo de Starter", ok: true },
-      { text: "Soporte prioritario", ok: true },
-      { text: "Acceso beta a nuevas funciones", ok: true },
-      { text: "Pensado para alto volumen", ok: true },
-    ],
-    cta: "Contratar Agency",
-    planKey: "pro",
-    popular: false,
-  },
-];
-
 export default function Pricing() {
+  const t = useTranslations("pricing");
+  const tPlans = useTranslations("plans");
   const { plan: currentPlan, credits: remaining } = useSidebar();
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
+
+  const PLANS = [
+    {
+      name: tPlans("free.name"),
+      price: "$0",
+      period: "/mes",
+      desc: tPlans("free.desc"),
+      features: [
+        ...((tPlans.raw("free.features") as string[]).map((text: string) => ({ text, ok: true }))),
+        ...((tPlans.raw("free.disabledFeatures") as string[]).map((text: string) => ({ text, ok: false }))),
+      ],
+      cta: t("activePlan"),
+      planKey: "free",
+      popular: false,
+    },
+    {
+      name: tPlans("starter.name"),
+      price: "$19",
+      period: "/mes",
+      desc: tPlans("starter.desc"),
+      features: (tPlans.raw("starter.features") as string[]).map((text: string) => ({ text, ok: true })),
+      cta: tPlans("starter.cta"),
+      planKey: "starter",
+      popular: true,
+    },
+    {
+      name: tPlans("agency.name"),
+      price: "$49",
+      period: "/mes",
+      desc: tPlans("agency.desc"),
+      features: (tPlans.raw("agency.features") as string[]).map((text: string) => ({ text, ok: true })),
+      cta: tPlans("agency.cta"),
+      planKey: "pro",
+      popular: false,
+    },
+  ];
 
   async function handleCheckout(planKey: string) {
     setLoadingPlan(planKey);
@@ -88,19 +73,19 @@ export default function Pricing() {
     <div className="h-full overflow-y-auto bg-[#0d0d14] text-white antialiased">
       <main className="max-w-5xl mx-auto px-6 py-20">
         <div className="text-center mb-14">
-          <p className="text-xs font-mono text-indigo-500 uppercase tracking-wide mb-3">Precios</p>
+          <p className="text-xs font-mono text-indigo-500 uppercase tracking-wide mb-3">{t("label")}</p>
           <h1 className="text-4xl md:text-5xl font-black tracking-tighter text-white mb-4">
-            Sin permanencia.<span className="text-indigo-400"> Cancela cuando quieras.</span>
+            {t("title")}<span className="text-indigo-400">{t("titleHighlight")}</span>
           </h1>
           <p className="text-zinc-400 text-base max-w-md mx-auto">
-            Un cliente web puede valer mucho más que un mes de Huntly.
+            {t("subtitle")}
           </p>
           {remaining !== null && (
             <div className="inline-flex items-center gap-2 mt-5 bg-indigo-500/10 border border-indigo-500/20 px-4 py-2 rounded-full text-sm">
-              <span className="text-indigo-300 font-medium">Plan actual:</span>
+              <span className="text-indigo-300 font-medium">{t("currentPlan")}</span>
               <span className="text-white font-bold capitalize">{currentPlan}</span>
               <span className="text-zinc-500">·</span>
-              <span className="text-zinc-300">{remaining} búsquedas restantes este mes</span>
+              <span className="text-zinc-300">{t("searchesRemaining", { count: remaining })}</span>
             </div>
           )}
         </div>
@@ -120,12 +105,12 @@ export default function Pricing() {
               >
                 {plan.popular && (
                   <div className="absolute -top-3 left-5 bg-indigo-600 text-white text-[10px] font-semibold uppercase tracking-widest px-2.5 py-1 rounded-full">
-                    Más popular
+                    {t("mostPopular")}
                   </div>
                 )}
                 {isCurrentPlan && (
                   <div className="absolute -top-3 right-5 bg-emerald-600 text-white text-[10px] font-semibold uppercase tracking-widest px-2.5 py-1 rounded-full">
-                    Tu plan
+                    {t("yourPlan")}
                   </div>
                 )}
                 <div className="mb-4">
@@ -154,14 +139,14 @@ export default function Pricing() {
                     href="/dashboard"
                     className="block text-center w-full py-2.5 rounded-xl text-sm font-semibold bg-white/[0.06] text-zinc-400 border border-white/[0.08] cursor-default"
                   >
-                    Plan activo
+                    {t("activePlan")}
                   </Link>
                 ) : plan.planKey === "free" ? (
                   <Link
                     href="/dashboard"
                     className="block text-center w-full py-2.5 rounded-xl text-sm font-semibold bg-white/[0.06] hover:bg-white/[0.10] text-white border border-white/[0.08] transition-colors"
                   >
-                    Ir al dashboard
+                    {t("goToDashboard")}
                   </Link>
                 ) : (
                   <button
@@ -188,7 +173,7 @@ export default function Pricing() {
         </div>
 
         <p className="text-center text-xs text-zinc-600 mt-8">
-          ¿Dudas? Escríbenos a{" "}
+          {t("contactUs")}{" "}
           <a href="mailto:hola@huntly.app" className="text-zinc-400 hover:text-white transition-colors">
             hola@huntly.app
           </a>

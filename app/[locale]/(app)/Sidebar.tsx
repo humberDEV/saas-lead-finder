@@ -8,6 +8,7 @@ import {
   Sparkles, ChevronLeft, ChevronRight, Plus,
   Clock, Briefcase, Zap, Search, CreditCard,
 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useSidebar } from "./SidebarContext";
 
 interface HistoryItem {
@@ -23,23 +24,28 @@ interface SidebarProps {
   onToggle: () => void;
 }
 
-function timeAgo(dateStr: string): string {
-  const diff = Date.now() - new Date(dateStr).getTime();
-  const mins = Math.floor(diff / 60000);
-  const hours = Math.floor(diff / 3600000);
-  const days = Math.floor(diff / 86400000);
-  if (mins < 60) return `hace ${mins}m`;
-  if (hours < 24) return `hace ${hours}h`;
-  if (days < 7) return `hace ${days}d`;
-  return `hace ${Math.floor(days / 7)}sem`;
+function useTimeAgo() {
+  const t = useTranslations("dashboard.timeAgo");
+  return (dateStr: string): string => {
+    const diff = Date.now() - new Date(dateStr).getTime();
+    const mins = Math.floor(diff / 60000);
+    const hours = Math.floor(diff / 3600000);
+    const days = Math.floor(diff / 86400000);
+    if (mins < 60) return t("minutes", { count: mins });
+    if (hours < 24) return t("hours", { count: hours });
+    if (days < 7) return t("days", { count: days });
+    return t("weeks", { count: Math.floor(days / 7) });
+  };
 }
 
 export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
+  const t = useTranslations("sidebar");
   const { user } = useUser();
   const { credits, plan, historyVersion, setPendingHistoryId, triggerNewSearch } = useSidebar();
   const [history, setHistory] = useState<HistoryItem[]>([]);
   const router = useRouter();
   const pathname = usePathname();
+  const timeAgo = useTimeAgo();
 
   useEffect(() => {
     fetch("/api/history")
@@ -48,11 +54,11 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
       .catch(() => setHistory([]));
   }, [historyVersion]);
 
-  const displayName = user?.firstName || user?.username || "Usuario";
+  const displayName = user?.firstName || user?.username || "User";
   const outOfCredits = credits !== null && credits <= 0;
 
   const handleNewSearch = () => {
-    if (pathname === "/dashboard") {
+    if (pathname.endsWith("/dashboard")) {
       triggerNewSearch();
     } else {
       router.push("/dashboard");
@@ -61,7 +67,7 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
 
   const handleSelectHistory = (id: string) => {
     setPendingHistoryId(id);
-    if (pathname !== "/dashboard") {
+    if (!pathname.endsWith("/dashboard")) {
       router.push("/dashboard");
     }
   };
@@ -88,7 +94,7 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
         <button
           onClick={onToggle}
           className={`p-1.5 rounded-lg hover:bg-white/5 transition-colors text-zinc-500 hover:text-white shrink-0 ${!isOpen && "mx-auto"}`}
-          title={isOpen ? "Contraer" : "Expandir"}
+          title={isOpen ? t("collapse") : t("expand")}
         >
           {isOpen ? <ChevronLeft className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
         </button>
@@ -106,7 +112,6 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
             <div className="min-w-0 flex-1">
               <p className="text-sm font-semibold text-white truncate leading-tight">{displayName}</p>
               <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
-                {/* Plan badge */}
                 <span
                   className={`text-[10px] font-bold uppercase px-1.5 py-0.5 rounded leading-none ${
                     plan === "free"
@@ -117,7 +122,6 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
                   {plan}
                 </span>
 
-                {/* Credits badge */}
                 {credits !== null && (
                   <span
                     className={`flex items-center gap-1 text-xs font-bold px-2 py-1 rounded-md ${
@@ -127,7 +131,7 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
                     }`}
                   >
                     <Search className="w-3 h-3 shrink-0" />
-                    {credits} búsquedas
+                    {credits} {t("searches")}
                   </span>
                 )}
               </div>
@@ -149,30 +153,30 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
           className={`flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl transition-colors font-semibold text-sm ${
             isOpen ? "w-full px-4 py-2.5" : "w-10 h-10 justify-center mx-auto"
           }`}
-          title="Nueva búsqueda"
+          title={t("newSearch")}
         >
           <Plus className="w-4 h-4 shrink-0" />
-          {isOpen && <span>Nueva búsqueda</span>}
+          {isOpen && <span>{t("newSearch")}</span>}
         </button>
       </div>
 
-      {/* ── Historial ── */}
+      {/* ─��� Historial ── */}
       <div className="flex-1 overflow-y-auto min-h-0 px-2 pb-2">
         {isOpen ? (
           <>
             <p className="text-[10px] font-bold text-zinc-600 uppercase tracking-wider px-2 mb-1.5">
-              Historial
+              {t("history")}
             </p>
             {plan === "free" ? (
               <Link
                 href="/pricing"
                 className="block text-xs text-amber-400/80 px-2 py-6 text-center leading-relaxed hover:text-amber-300 transition-colors"
               >
-                🔒 Historial disponible en planes de pago
+                {t("historyLocked")}
               </Link>
             ) : history.length === 0 ? (
               <p className="text-xs text-zinc-600 px-2 py-6 text-center leading-relaxed">
-                Tus búsquedas anteriores aparecerán aquí
+                {t("historyEmpty")}
               </p>
             ) : (
               history.map((item) => (
@@ -196,7 +200,7 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
           <button
             onClick={onToggle}
             className="w-10 h-10 flex items-center justify-center rounded-xl hover:bg-white/5 transition-colors mx-auto text-zinc-600 hover:text-white"
-            title="Ver historial"
+            title={t("viewHistory")}
           >
             <Clock className="w-4 h-4" />
           </button>
@@ -208,10 +212,10 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
         <Link
           href="/crm"
           className={`flex items-center gap-2.5 px-2 py-2 rounded-lg hover:bg-white/5 transition-colors text-zinc-400 hover:text-white ${!isOpen && "justify-center"}`}
-          title="Mi Cartera"
+          title={t("portfolio")}
         >
           <Briefcase className="w-4 h-4 shrink-0" />
-          {isOpen && <span className="text-sm">Mi Cartera</span>}
+          {isOpen && <span className="text-sm">{t("portfolio")}</span>}
         </Link>
         {plan !== "free" ? (
           <button
@@ -221,19 +225,19 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
               if (data.url) window.location.href = data.url;
             }}
             className={`w-full flex items-center gap-2.5 px-2 py-2 rounded-lg hover:bg-white/5 transition-colors text-zinc-400 hover:text-white ${!isOpen && "justify-center"}`}
-            title="Gestionar suscripción"
+            title={t("managePlan")}
           >
             <CreditCard className="w-4 h-4 shrink-0" />
-            {isOpen && <span className="text-sm">Gestionar plan</span>}
+            {isOpen && <span className="text-sm">{t("managePlan")}</span>}
           </button>
         ) : (
           <Link
             href="/pricing"
             className={`flex items-center gap-2.5 px-2 py-2 rounded-lg hover:bg-white/5 transition-colors text-amber-400 hover:text-amber-300 ${!isOpen && "justify-center"}`}
-            title="Upgrade"
+            title={t("upgrade")}
           >
             <Zap className="w-4 h-4 shrink-0" />
-            {isOpen && <span className="text-sm font-semibold">Upgrade</span>}
+            {isOpen && <span className="text-sm font-semibold">{t("upgrade")}</span>}
           </Link>
         )}
       </div>
@@ -248,12 +252,12 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
                 ? "px-3 py-2.5 bg-red-500/10 border border-red-500/20 hover:bg-red-500/15"
                 : "w-10 h-10 justify-center mx-auto bg-red-500/10 border border-red-500/20 hover:bg-red-500/15"
             }`}
-            title="Sin búsquedas — Upgrade"
+            title={t("noSearches")}
           >
             {isOpen ? (
               <>
-                <span className="text-xs font-bold text-red-400">Sin búsquedas</span>
-                <span className="text-xs font-bold text-red-300 whitespace-nowrap">Upgrade →</span>
+                <span className="text-xs font-bold text-red-400">{t("noSearches")}</span>
+                <span className="text-xs font-bold text-red-300 whitespace-nowrap">{t("upgrade")} →</span>
               </>
             ) : (
               <Zap className="w-3.5 h-3.5 text-red-400" />

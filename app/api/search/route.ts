@@ -159,8 +159,9 @@ export async function GET(request: Request) {
     );
     uniquePlaces.sort((a: any, b: any) => b.score - a.score);
 
-    // Descontar crédito solo si Google devolvió resultados útiles
-    if (uniquePlaces.length > 0) {
+    // Descontar crédito solo si hay leads reales (sin web + contactables)
+    const hasOpportunities = uniquePlaces.some((p: any) => p.score >= 40);
+    if (hasOpportunities) {
       await db.user.update({
         where: { clerkId: userId },
         data: { tokens: { decrement: 1 } },

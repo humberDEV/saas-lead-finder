@@ -1,0 +1,329 @@
+{
+  "metadata": {
+    "title": "Huntly - Encuentra negocios sin web | Prospección local automática",
+    "description": "Encuentra negocios locales sin página web en 2 minutos. Exporta leads con teléfono directo. Ideal para agencias web. Prueba gratis.",
+    "keywords": "prospección negocios, leads locales, negocios sin web, agencia web, google maps leads, España",
+    "ogTitle": "Huntly - Encuentra negocios sin web",
+    "ogDescription": "Prospección local en 2 minutos. 3 búsquedas gratis."
+  },
+  "landing": {
+    "nav": {
+      "howItWorks": "Cómo funciona",
+      "pricing": "Precios",
+      "signIn": "Entrar",
+      "dashboard": "Dashboard"
+    },
+    "hero": {
+      "title1": "Encuentra negocios",
+      "title2": "locales a los que",
+      "title3": "venderles una web.",
+      "subtitle": "Busca por nicho y ciudad. Huntly encuentra negocios sin web, con teléfono disponible y señales claras para contactar.",
+      "ctaPrimary": "Encontrar mis primeros leads gratis",
+      "ctaDashboard": "Ir al Dashboard",
+      "ctaDemo": "Ver cómo funciona",
+      "freeNote": "3 búsquedas gratis · Sin tarjeta · Sin permanencia"
+    },
+    "browserDemo": {
+      "search": "Buscar",
+      "opportunitiesFound": "3 oportunidades encontradas",
+      "noWeb": "SIN WEB",
+      "highProbability": "Alta probabilidad",
+      "call": "Llamar"
+    },
+    "ticker": {
+      "noWeb": "SIN WEB"
+    },
+    "statBar": {
+      "stat1": "Búsquedas por ciudad y nicho",
+      "stat2": "Resultados en segundos",
+      "stat3": "Teléfonos disponibles"
+    },
+    "problem": {
+      "label": "El problema",
+      "title1": "Buscar clientes a mano",
+      "title2": "es tiempo que no factura.",
+      "subtitle": "Cada hora revisando Google Maps es una hora que no estás vendiendo webs ni entregando proyectos.",
+      "stat1": "3–4 h/semana",
+      "detail1": "buscando negocios, revisando webs y copiando teléfonos a mano",
+      "stat2": "Mucho ruido",
+      "detail2": "negocios con web, sin teléfono o sin señales claras de oportunidad",
+      "stat3": "Sin seguimiento",
+      "detail3": "leads perdidos entre notas, WhatsApp, hojas de cálculo y capturas"
+    },
+    "demo": {
+      "label": "Producto real",
+      "title": "Así encuentras clientes.",
+      "subtitle": "Busca un nicho y una ciudad. Huntly detecta negocios sin web, prioriza oportunidades y te deja contactarlos en segundos.",
+      "ctaQuestion": "¿Quieres probarlo con tu ciudad?",
+      "ctaButton": "Buscar mis primeros leads gratis"
+    },
+    "howItWorks": {
+      "label": "Cómo funciona",
+      "title": "Tres pasos.",
+      "titleHighlight": " Nada más.",
+      "step1Title": "Elige nicho y ciudad",
+      "step1Note": "Barberías en Madrid, clínicas en Valencia o cualquier sector local.",
+      "step2Title": "Huntly filtra oportunidades",
+      "step2Note": "Detecta negocios sin web, con teléfono disponible y señales de actividad.",
+      "step3Title": "Contacta y guarda el seguimiento",
+      "step3Note": "Envía un WhatsApp, llama o guarda el lead en tu cartera para hacer seguimiento.",
+      "step3Message": "Mensaje generado:",
+      "step3Preview": "\"Me dedico al diseño web y vi que tienen 47 reseñas pero no tienen página...\"",
+      "call": "Llamar"
+    },
+    "audience": {
+      "label": "Para quién es",
+      "title": "Hecho para gente que vende webs.",
+      "audience1Title": "Freelancers web",
+      "audience1Desc": "Encuentra negocios locales sin perder horas revisando Google Maps.",
+      "audience2Title": "Agencias pequeñas",
+      "audience2Desc": "Llena tu cartera con búsquedas por ciudad, sector y oportunidad.",
+      "audience3Title": "Creadores con IA",
+      "audience3Desc": "Si ya sabes crear webs rápido, Huntly te ayuda a encontrar a quién venderlas."
+    },
+    "pricingSection": {
+      "label": "Precios",
+      "title": "Sin permanencia.",
+      "titleHighlight": " Cancela cuando quieras.",
+      "valueNote": "Un cliente web puede valer mucho más que un mes de Huntly.",
+      "valueHighlight": "Con cerrar uno, el plan se paga solo.",
+      "mostPopular": "Más popular"
+    },
+    "faq": {
+      "label": "FAQ",
+      "title": "Preguntas frecuentes"
+    },
+    "finalCta": {
+      "title1": "Tu próximo cliente web",
+      "title2": "puede estar en Google Maps.",
+      "subtitle": "Huntly te ayuda a encontrarlo, contactarlo y hacer seguimiento.",
+      "freeNote": "3 búsquedas gratis · Sin tarjeta · Sin permanencia",
+      "ctaButton": "Encontrar mis primeros leads gratis",
+      "ctaDashboard": "Ir al Dashboard",
+      "viewPlans": "Ver planes y precios →"
+    },
+    "footer": {
+      "howItWorks": "Cómo funciona",
+      "pricing": "Precios",
+      "contact": "Contacto"
+    }
+  },
+  "plans": {
+    "free": {
+      "name": "Gratis",
+      "desc": "Para probar Huntly y encontrar tus primeros leads.",
+      "cta": "Empezar gratis",
+      "features": [
+        "3 búsquedas gratis",
+        "Score de oportunidad en cada lead",
+        "WhatsApp y llamada directa",
+        "Ver en Google Maps",
+        "Sin tarjeta"
+      ],
+      "disabledFeatures": [
+        "Guardar en Mi Cartera",
+        "Historial de búsquedas"
+      ]
+    },
+    "starter": {
+      "name": "Starter",
+      "desc": "Para freelancers que quieren buscar oportunidades cada semana.",
+      "cta": "Contratar Starter",
+      "features": [
+        "120 búsquedas/mes",
+        "Score de oportunidad en cada lead",
+        "WhatsApp y llamada directa",
+        "Guardar leads en cartera",
+        "Historial de búsquedas",
+        "Soporte por email"
+      ]
+    },
+    "agency": {
+      "name": "Agency",
+      "desc": "Para agencias o equipos que hacen prospección de forma constante.",
+      "cta": "Contratar Agency",
+      "features": [
+        "400 búsquedas/mes",
+        "Todo lo de Starter",
+        "Soporte prioritario",
+        "Acceso beta a nuevas funciones",
+        "Pensado para alto volumen"
+      ]
+    }
+  },
+  "faqs": [
+    {
+      "q": "¿Huntly garantiza que voy a conseguir clientes?",
+      "a": "No. Huntly te ayuda a encontrar negocios con señales de oportunidad, pero cerrar clientes depende de tu oferta, mensaje y seguimiento."
+    },
+    {
+      "q": "¿De dónde salen los resultados?",
+      "a": "Huntly usa datos públicos de negocios locales y los organiza para que puedas detectar oportunidades más rápido."
+    },
+    {
+      "q": "¿Los teléfonos están verificados?",
+      "a": "Huntly muestra teléfonos disponibles en las fichas de negocio. Aun así, siempre recomendamos revisar el lead antes de contactar."
+    },
+    {
+      "q": "¿Puedo buscar cualquier nicho?",
+      "a": "Sí. Puedes usar nichos predefinidos o escribir el sector que quieras."
+    },
+    {
+      "q": "¿Necesito saber programar?",
+      "a": "No. Huntly está pensado para freelancers, agencias pequeñas y creadores que venden webs con IA, WordPress, Webflow, Framer o código."
+    },
+    {
+      "q": "¿Qué pasa si un negocio ya tiene web?",
+      "a": "Huntly intenta priorizar negocios sin web o con señales de oportunidad, pero puede haber casos donde debas revisar el lead manualmente."
+    }
+  ],
+  "dashboard": {
+    "niches": [
+      "Abogados y Asesorías",
+      "Academias de Baile",
+      "Academias de Idiomas",
+      "Agencias de Marketing Digital",
+      "Agencias Inmobiliarias",
+      "Arquitectos e Interioristas",
+      "Barberías",
+      "Carpintería y Ebanistería",
+      "Centros de Estética",
+      "Centros Veterinarios",
+      "Clínicas Dentales",
+      "Contabilidad y Fiscalidad",
+      "Electricistas",
+      "Escuelas de Conducir",
+      "Fisioterapeutas",
+      "Fontaneros",
+      "Fotógrafos",
+      "Gestorías",
+      "Gimnasios y CrossFit",
+      "Guarderías y Educación Infantil",
+      "Instaladores de Alarmas",
+      "Instaladores Placas Solares",
+      "Joyerías",
+      "Lavanderías y Tintorerías",
+      "Mudanzas y Transporte",
+      "Nutricionistas y Dietistas",
+      "Ópticas",
+      "Peluquerías",
+      "Personal Trainer",
+      "Psicólogos y Terapeutas",
+      "Reformas y Construcción",
+      "Restaurantes y Cafeterías",
+      "Seguros",
+      "Talleres Mecánicos",
+      "Yoga y Pilates"
+    ],
+    "timeAgo": {
+      "minutes": "hace {count}m",
+      "hours": "hace {count}h",
+      "days": "hace {count}d",
+      "weeks": "hace {count}sem"
+    },
+    "search": {
+      "nicheLabel": "1. Nicho",
+      "randomNiche": "NICHO RANDOM",
+      "zoneLabel": "2. Barrio / Zona",
+      "randomZone": "ZONA RANDOM",
+      "customNiche": "✍️ Escribir manualmente",
+      "customNichePlaceholder": "Ej: Talleres de chapa y pintura",
+      "cityPlaceholder": "Ej: Gràcia, Barcelona",
+      "cityHint": "Escribe un barrio o zona concreta para mejores resultados.",
+      "outOfSearches": "Has usado todas tus búsquedas del mes.",
+      "viewPlans": "Ver planes",
+      "scanning": "Rastreando Zona...",
+      "extractLeads": "Extraer Leads",
+      "remaining": "({count} restantes)"
+    },
+    "results": {
+      "businessesFound": "{count} negocios encontrados",
+      "reviewResults": "Revisa los resultados abajo",
+      "noResultsTitle": "Sin resultados en esa zona.",
+      "noResultsTip": "Prueba con un barrio más concreto o un nicho diferente.",
+      "emptyTitle": "Encuentra negocios que necesitan una web.",
+      "emptyTip": "Elige un nicho y una zona para descubrir oportunidades de venta.",
+      "salesOpportunities": "oportunidades de venta",
+      "otherOpportunities": "Otras oportunidades",
+      "reviews": "reseñas",
+      "hasWeb": "Tiene web",
+      "noWeb": "Sin web",
+      "openingMessage": "Mensaje de apertura",
+      "waDirect": "WA DIRECTO",
+      "callDirect": "Llamar Directo",
+      "savePro": "🔒 Guardar (Pro)",
+      "saveToPortfolio": "Guardar en mi cartera",
+      "dismiss": "Borrar"
+    },
+    "upgrade": {
+      "planActivated": "¡Plan {plan} activado!",
+      "fullAccess": "Ya tienes acceso completo. Recarga la página si los créditos no se actualizan.",
+      "paymentReceived": "¡Pago recibido!",
+      "activating": "Activando tu plan… puede tardar unos segundos."
+    },
+    "history": {
+      "newSearch": "← Nueva búsqueda",
+      "loadError": "No se pudieron cargar los resultados del historial.",
+      "serverError": "Error del servidor ({status}). Recarga la página e inténtalo de nuevo."
+    }
+  },
+  "sidebar": {
+    "collapse": "Contraer",
+    "expand": "Expandir",
+    "newSearch": "Nueva búsqueda",
+    "history": "Historial",
+    "historyLocked": "🔒 Historial disponible en planes de pago",
+    "historyEmpty": "Tus búsquedas anteriores aparecerán aquí",
+    "searches": "búsquedas",
+    "portfolio": "Mi Cartera",
+    "managePlan": "Gestionar plan",
+    "upgrade": "Upgrade",
+    "noSearches": "Sin búsquedas",
+    "viewHistory": "Ver historial"
+  },
+  "pricing": {
+    "label": "Precios",
+    "title": "Sin permanencia.",
+    "titleHighlight": " Cancela cuando quieras.",
+    "subtitle": "Un cliente web puede valer mucho más que un mes de Huntly.",
+    "currentPlan": "Plan actual:",
+    "searchesRemaining": "{count} búsquedas restantes este mes",
+    "mostPopular": "Más popular",
+    "yourPlan": "Tu plan",
+    "activePlan": "Plan activo",
+    "goToDashboard": "Ir al dashboard",
+    "contactUs": "¿Dudas? Escríbenos a"
+  },
+  "crm": {
+    "title": "Mi Cartera",
+    "subtitle": "Gestiona tus oportunidades de venta.",
+    "locked": "Guarda oportunidades y gestiona tus ventas con un plan de pago.",
+    "viewPlans": "Ver planes",
+    "loading": "Cargando...",
+    "reviews": "reseñas",
+    "hasWeb": "Tiene web",
+    "noWeb": "Sin web ✓",
+    "call": "Llamar",
+    "columnPending": "En lista",
+    "columnContacted": "Contactados",
+    "columnAccepted": "Aceptados",
+    "emptyPending": "Busca negocios sin web y guárdalos aquí",
+    "emptyContacted": "Mueve aquí los que ya hayas contactado",
+    "emptyAccepted": "Tus clientes conseguidos",
+    "statusPending": "⏳ En lista",
+    "statusContacted": "💬 Contactado",
+    "statusAccepted": "✅ Aceptado",
+    "statusDiscarded": "✕ Descartado"
+  },
+  "messages": {
+    "greetings": [
+      "Hola, ¿qué tal?",
+      "Hola, ¿cómo están?",
+      "Hola, buenas tardes",
+      "Hola, ¿todo bien?",
+      "Buenas, ¿cómo les va?",
+      "Hola, buenas",
+      "Hola 👋"
+    ]
+  }
+}

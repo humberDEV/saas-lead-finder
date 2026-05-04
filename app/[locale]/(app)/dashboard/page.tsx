@@ -8,62 +8,37 @@ import {
   Navigation2, Search, CheckCircle2, Clock, PartyPopper, Map,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useTranslations } from "next-intl";
 import type { Place } from "@/types";
 import { useSidebar } from "../SidebarContext";
 import CITIES from "@/lib/cities";
 
-function timeAgo(dateStr: string): string {
-  const diff = Date.now() - new Date(dateStr).getTime();
-  const mins = Math.floor(diff / 60000);
-  const hours = Math.floor(diff / 3600000);
-  const days = Math.floor(diff / 86400000);
-  if (mins < 60) return `hace ${mins}m`;
-  if (hours < 24) return `hace ${hours}h`;
-  if (days < 7) return `hace ${days}d`;
-  return `hace ${Math.floor(days / 7)}sem`;
+function useTimeAgo() {
+  const t = useTranslations("dashboard.timeAgo");
+  return (dateStr: string): string => {
+    const diff = Date.now() - new Date(dateStr).getTime();
+    const mins = Math.floor(diff / 60000);
+    const hours = Math.floor(diff / 3600000);
+    const days = Math.floor(diff / 86400000);
+    if (mins < 60) return t("minutes", { count: mins });
+    if (hours < 24) return t("hours", { count: hours });
+    if (days < 7) return t("days", { count: days });
+    return t("weeks", { count: Math.floor(days / 7) });
+  };
 }
-
-const VALIDATED_NICHES = [
-  "Abogados y Asesorías",
-  "Academias de Baile",
-  "Academias de Idiomas",
-  "Agencias de Marketing Digital",
-  "Agencias Inmobiliarias",
-  "Arquitectos e Interioristas",
-  "Barberías",
-  "Carpintería y Ebanistería",
-  "Centros de Estética",
-  "Centros Veterinarios",
-  "Clínicas Dentales",
-  "Contabilidad y Fiscalidad",
-  "Electricistas",
-  "Escuelas de Conducir",
-  "Fisioterapeutas",
-  "Fontaneros",
-  "Fotógrafos",
-  "Gestorías",
-  "Gimnasios y CrossFit",
-  "Guarderías y Educación Infantil",
-  "Instaladores de Alarmas",
-  "Instaladores Placas Solares",
-  "Joyerías",
-  "Lavanderías y Tintorerías",
-  "Mudanzas y Transporte",
-  "Nutricionistas y Dietistas",
-  "Ópticas",
-  "Peluquerías",
-  "Personal Trainer",
-  "Psicólogos y Terapeutas",
-  "Reformas y Construcción",
-  "Restaurantes y Cafeterías",
-  "Seguros",
-  "Talleres Mecánicos",
-  "Yoga y Pilates",
-];
 
 const RANDOM_CITIES = CITIES;
 
 export default function Dashboard() {
+  const t = useTranslations("dashboard");
+  const tResults = useTranslations("dashboard.results");
+  const tSearch = useTranslations("dashboard.search");
+  const tUpgrade = useTranslations("dashboard.upgrade");
+  const tHistory = useTranslations("dashboard.history");
+  const timeAgo = useTimeAgo();
+
+  const VALIDATED_NICHES = t.raw("niches") as string[];
+
   const {
     credits,
     plan,
@@ -94,7 +69,7 @@ export default function Dashboard() {
           clearInterval(interval);
         }
       } catch {}
-      if (attempts >= 8) clearInterval(interval); // stop after ~16s
+      if (attempts >= 8) clearInterval(interval);
     }, 2000);
     return () => clearInterval(interval);
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -134,7 +109,7 @@ export default function Dashboard() {
     }
   }, [newSearchVersion]);
 
-  // Watch for history selection from sidebar — load results directly from DB, no Google call
+  // Watch for history selection from sidebar
   useEffect(() => {
     if (!pendingHistoryId) return;
     const id = pendingHistoryId;
@@ -161,7 +136,7 @@ export default function Dashboard() {
           }, 150);
         }
       })
-      .catch(() => setError("No se pudieron cargar los resultados del historial."))
+      .catch(() => setError(tHistory("loadError")))
       .finally(() => setLoading(false));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pendingHistoryId]);
@@ -203,7 +178,7 @@ export default function Dashboard() {
       try {
         data = await res.json();
       } catch {
-        throw new Error(`Error del servidor (${res.status}). Recarga la página e inténtalo de nuevo.`);
+        throw new Error(tHistory("serverError", { status: res.status }));
       }
 
       if (!res.ok) throw new Error(data?.error || `Error ${res.status}`);
@@ -320,7 +295,7 @@ export default function Dashboard() {
         }),
       });
     } catch {
-      // silencioso
+      // silent
     }
   };
 
@@ -366,7 +341,7 @@ export default function Dashboard() {
               <span className="flex items-center gap-2">
                 <Star className="w-4 h-4 text-emerald-400 shrink-0" />
                 {place.rating}{" "}
-                <span className="text-slate-500">({place.user_ratings_total} reseñas)</span>
+                <span className="text-slate-500">({place.user_ratings_total} {tResults("reviews")})</span>
               </span>
               {place.phone && (
                 <span className="flex items-center gap-2 text-slate-300">
@@ -377,10 +352,10 @@ export default function Dashboard() {
               <span className="flex items-center gap-2">
                 <Globe className="w-4 h-4 text-slate-500 shrink-0" />
                 {place.has_website ? (
-                  <span className="text-slate-500 truncate">{place.website || "Tiene web"}</span>
+                  <span className="text-slate-500 truncate">{place.website || tResults("hasWeb")}</span>
                 ) : (
                   <span className="text-emerald-400 font-bold bg-emerald-400/10 px-2 py-0.5 rounded">
-                    Sin web
+                    {tResults("noWeb")}
                   </span>
                 )}
               </span>
@@ -448,7 +423,7 @@ export default function Dashboard() {
         {(place.score >= 40 || !place.has_website) && place.phone && (
           <div className="mt-8 pt-6 border-t border-neutral-800/50">
             <label className="block text-xs font-black text-indigo-400 uppercase tracking-wider mb-3">
-              Mensaje de apertura
+              {tResults("openingMessage")}
             </label>
             <div className="relative mb-4">
               <textarea
@@ -464,14 +439,14 @@ export default function Dashboard() {
                   className="group relative flex items-center gap-2 px-6 py-3 bg-emerald-500 hover:bg-emerald-400 text-black text-sm font-black rounded-xl transition-all shadow-[0_0_20px_rgba(16,185,129,0.2)] hover:shadow-[0_0_30px_rgba(16,185,129,0.4)]"
                 >
                   {copiedIndex === index ? <CopyCheck className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-                  WA DIRECTO
+                  {tResults("waDirect")}
                 </button>
               )}
               <button
                 onClick={() => copyAndAction(place.suggestedMessage, index, place.phone, "call")}
                 className="flex items-center gap-2 px-6 py-3 bg-neutral-800 hover:bg-neutral-700 text-white text-sm font-bold rounded-xl transition-all"
               >
-                Llamar Directo
+                {tResults("callDirect")}
               </button>
             </div>
             <div className="flex border-t border-neutral-800/60 pt-4 mt-4 gap-2">
@@ -480,14 +455,14 @@ export default function Dashboard() {
                   href="/pricing"
                   className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 bg-amber-500/10 hover:bg-amber-500/20 rounded-lg text-xs font-semibold transition-all text-amber-400 border border-amber-500/20 hover:border-amber-500/40"
                 >
-                  🔒 Guardar (Pro)
+                  {tResults("savePro")}
                 </Link>
               ) : (
                 <button
                   onClick={() => handleSaveLead(index, place)}
                   className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 bg-indigo-600/20 hover:bg-indigo-600/30 rounded-lg text-xs font-semibold transition-all text-indigo-300 border border-indigo-500/20 hover:border-indigo-500/40"
                 >
-                  Guardar en mi cartera
+                  {tResults("saveToPortfolio")}
                 </button>
               )}
               <a
@@ -502,7 +477,7 @@ export default function Dashboard() {
                 onClick={() => handleDismiss(index, place)}
                 className="px-3 py-2 bg-neutral-800/50 hover:bg-neutral-700/50 rounded-lg text-xs font-semibold transition-all text-zinc-500 hover:text-zinc-300"
               >
-                Borrar
+                {tResults("dismiss")}
               </button>
             </div>
           </div>
@@ -536,8 +511,8 @@ export default function Dashboard() {
                 <CheckCircle2 className="w-4 h-4 text-emerald-400" />
               </div>
               <div>
-                <p className="text-sm font-black text-white">{toastCount} negocios encontrados</p>
-                <p className="text-xs text-slate-400 font-medium">Revisa los resultados abajo</p>
+                <p className="text-sm font-black text-white">{tResults("businessesFound", { count: toastCount })}</p>
+                <p className="text-xs text-slate-400 font-medium">{tResults("reviewResults")}</p>
               </div>
               <motion.div
                 className="absolute bottom-0 left-0 h-0.5 bg-emerald-500/60 rounded-full"
@@ -566,17 +541,17 @@ export default function Dashboard() {
                     {upgradedPlan ? (
                       <>
                         <p className="text-sm font-bold text-white">
-                          ¡Plan <span className="capitalize">{upgradedPlan}</span> activado!
+                          {tUpgrade("planActivated", { plan: upgradedPlan })}
                         </p>
                         <p className="text-xs text-indigo-300 mt-0.5">
-                          Ya tienes acceso completo. Recarga la página si los créditos no se actualizan.
+                          {tUpgrade("fullAccess")}
                         </p>
                       </>
                     ) : (
                       <>
-                        <p className="text-sm font-bold text-white">¡Pago recibido!</p>
+                        <p className="text-sm font-bold text-white">{tUpgrade("paymentReceived")}</p>
                         <p className="text-xs text-indigo-300 mt-0.5">
-                          Activando tu plan… puede tardar unos segundos.
+                          {tUpgrade("activating")}
                         </p>
                       </>
                     )}
@@ -609,13 +584,13 @@ export default function Dashboard() {
                 <div className="grid md:grid-cols-2 gap-6">
                   <div>
                     <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 flex justify-between items-center">
-                      <span>1. Nicho</span>
+                      <span>{tSearch("nicheLabel")}</span>
                       <button
                         type="button"
                         onClick={getRandomNiche}
                         className="text-indigo-400 hover:text-indigo-300 text-[10px] flex items-center gap-1"
                       >
-                        🎲 NICHO RANDOM
+                        🎲 {tSearch("randomNiche")}
                       </button>
                     </label>
                     <select
@@ -633,13 +608,13 @@ export default function Dashboard() {
                       {VALIDATED_NICHES.map((n) => (
                         <option key={n} value={n}>{n}</option>
                       ))}
-                      <option value="custom">✍️ Escribir manualmente</option>
+                      <option value="custom">{tSearch("customNiche")}</option>
                     </select>
                     {(customNiche !== "" || niche === "custom") && (
                       <input
                         type="text"
                         autoFocus
-                        placeholder="Ej: Talleres de chapa y pintura"
+                        placeholder={tSearch("customNichePlaceholder")}
                         className="w-full mt-3 bg-black border border-indigo-500/30 text-white rounded-xl px-4 py-3.5 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 font-medium"
                         value={customNiche}
                         onChange={(e) => setCustomNiche(e.target.value)}
@@ -649,20 +624,20 @@ export default function Dashboard() {
 
                   <div>
                     <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 flex justify-between items-center">
-                      <span>2. Barrio / Zona</span>
+                      <span>{tSearch("zoneLabel")}</span>
                       <button
                         type="button"
                         onClick={getRandomCity}
                         className="text-indigo-400 hover:text-indigo-300 text-[10px] flex items-center gap-1"
                       >
-                        🎲 ZONA RANDOM
+                        🎲 {tSearch("randomZone")}
                       </button>
                     </label>
                     <div className="relative">
                       <input
                         ref={cityInputRef}
                         type="text"
-                        placeholder="Ej: Gràcia, Barcelona"
+                        placeholder={tSearch("cityPlaceholder")}
                         className="w-full bg-black border border-neutral-800 text-white rounded-xl px-4 py-3.5 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 font-medium placeholder:text-zinc-600"
                         value={city}
                         onChange={(e) => handleCityChange(e.target.value)}
@@ -688,7 +663,7 @@ export default function Dashboard() {
                       )}
                     </div>
                     <p className="text-[10px] text-zinc-600 mt-1.5">
-                      Escribe un barrio o zona concreta para mejores resultados.
+                      {tSearch("cityHint")}
                     </p>
                   </div>
                 </div>
@@ -697,13 +672,13 @@ export default function Dashboard() {
                   {credits === 0 ? (
                     <div className="w-full text-center">
                       <p className="text-amber-400 font-bold text-sm mb-3">
-                        Has usado todas tus búsquedas del mes.
+                        {tSearch("outOfSearches")}
                       </p>
                       <Link
                         href="/pricing"
                         className="inline-flex items-center gap-2 px-8 py-4 bg-amber-500 hover:bg-amber-400 text-black font-black text-sm uppercase tracking-wider rounded-xl transition-all"
                       >
-                        <Sparkles className="w-4 h-4" /> Ver planes
+                        <Sparkles className="w-4 h-4" /> {tSearch("viewPlans")}
                       </Link>
                     </div>
                   ) : (
@@ -715,12 +690,12 @@ export default function Dashboard() {
                       {loading ? (
                         <span className="flex items-center gap-2">
                           <div className="w-5 h-5 border-2 border-black/20 border-t-black rounded-full animate-spin" />
-                          Rastreando Zona...
+                          {tSearch("scanning")}
                         </span>
                       ) : (
                         <>
                           <Search className="w-5 h-5 group-hover:scale-110 transition-transform" />
-                          Extraer Leads {credits !== null ? `(${credits} restantes)` : ""}
+                          {tSearch("extractLeads")} {credits !== null ? tSearch("remaining", { count: credits }) : ""}
                         </>
                       )}
                     </button>
@@ -741,16 +716,16 @@ export default function Dashboard() {
               <Search className="w-12 h-12 mx-auto text-neutral-700 mb-4" />
               {hasSearched ? (
                 <>
-                  <p className="text-lg font-medium text-slate-400">Sin resultados en esa zona.</p>
+                  <p className="text-lg font-medium text-slate-400">{tResults("noResultsTitle")}</p>
                   <p className="text-sm mt-2 text-zinc-600">
-                    Prueba con un barrio más concreto o un nicho diferente.
+                    {tResults("noResultsTip")}
                   </p>
                 </>
               ) : (
                 <>
-                  <p className="text-lg font-medium text-slate-400">Encuentra negocios que necesitan una web.</p>
+                  <p className="text-lg font-medium text-slate-400">{tResults("emptyTitle")}</p>
                   <p className="text-sm mt-2 text-zinc-600">
-                    Elige un nicho y una zona para descubrir oportunidades de venta.
+                    {tResults("emptyTip")}
                   </p>
                 </>
               )}
@@ -779,7 +754,7 @@ export default function Dashboard() {
                 }}
                 className="text-xs text-indigo-400 hover:text-indigo-300 font-semibold shrink-0 transition-colors"
               >
-                ← Nueva búsqueda
+                {tHistory("newSearch")}
               </button>
             </div>
           )}
@@ -790,7 +765,7 @@ export default function Dashboard() {
                 <h2 className="text-2xl md:text-3xl font-black text-white tracking-tight flex items-center gap-3">
                   <span className="text-3xl">🚨</span>
                   {topOpportunities.filter((p) => !hiddenIndexes.includes(topOpportunities.indexOf(p))).length}{" "}
-                  oportunidades de venta
+                  {tResults("salesOpportunities")}
                 </h2>
                 <div className="flex items-center gap-2 text-xs font-bold text-emerald-500 uppercase tracking-wider bg-emerald-500/10 px-3 py-1.5 rounded-lg border border-emerald-500/20">
                   <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
@@ -810,7 +785,7 @@ export default function Dashboard() {
               <div className="flex items-center gap-4 mb-8 mt-16">
                 <div className="h-px bg-neutral-800 flex-1" />
                 <h2 className="text-sm font-black text-neutral-500 uppercase tracking-widest">
-                  Otras oportunidades
+                  {tResults("otherOpportunities")}
                 </h2>
                 <div className="h-px bg-neutral-800 flex-1" />
               </div>

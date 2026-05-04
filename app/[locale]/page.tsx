@@ -1,104 +1,12 @@
-import type { Metadata } from "next";
 import Link from "next/link";
 import { SignedIn, SignedOut, SignInButton } from "@clerk/nextjs";
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import {
   ArrowRight, CheckCircle, LogIn, MapPin,
   Sparkles, ArrowUpRight, Search, ChevronDown, Copy,
 } from "lucide-react";
-
-export const metadata: Metadata = {
-  title: "Huntly — Encuentra negocios locales a los que venderles una web",
-  description:
-    "Busca por nicho y ciudad. Huntly detecta negocios sin web, con teléfono disponible y señales claras de oportunidad. 3 búsquedas gratis.",
-  keywords: "vender páginas web, conseguir clientes agencia web, negocios sin web, leads locales, freelance web, prospección web",
-  openGraph: {
-    title: "Huntly — Encuentra negocios locales a los que venderles una web",
-    description: "Busca por nicho y ciudad. Detecta oportunidades reales. 3 búsquedas gratis.",
-    images: ["/og-image.png"],
-  },
-};
-
-const PLANS = [
-  {
-    name: "Gratis",
-    price: "$0",
-    period: "/mes",
-    desc: "Para probar Huntly y encontrar tus primeros leads.",
-    features: [
-      { text: "3 búsquedas gratis", ok: true },
-      { text: "Score de oportunidad en cada lead", ok: true },
-      { text: "WhatsApp y llamada directa", ok: true },
-      { text: "Ver en Google Maps", ok: true },
-      { text: "Sin tarjeta", ok: true },
-      { text: "Guardar en Mi Cartera", ok: false },
-      { text: "Historial de búsquedas", ok: false },
-    ],
-    cta: "Empezar gratis",
-    popular: false,
-  },
-  {
-    name: "Starter",
-    price: "$19",
-    period: "/mes",
-    desc: "Para freelancers que quieren buscar oportunidades cada semana.",
-    features: [
-      { text: "120 búsquedas/mes", ok: true },
-      { text: "Score de oportunidad en cada lead", ok: true },
-      { text: "WhatsApp y llamada directa", ok: true },
-      { text: "Guardar leads en cartera", ok: true },
-      { text: "Historial de búsquedas", ok: true },
-      { text: "Soporte por email", ok: true },
-    ],
-    cta: "Contratar Starter",
-    popular: true,
-  },
-  {
-    name: "Agency",
-    price: "$49",
-    period: "/mes",
-    desc: "Para agencias o equipos que hacen prospección de forma constante.",
-    features: [
-      { text: "400 búsquedas/mes", ok: true },
-      { text: "Todo lo de Starter", ok: true },
-      { text: "Soporte prioritario", ok: true },
-      { text: "Acceso beta a nuevas funciones", ok: true },
-      { text: "Pensado para alto volumen", ok: true },
-    ],
-    cta: "Contratar Agency",
-    popular: false,
-  },
-];
-
-const FAQS = [
-  {
-    q: "¿Huntly garantiza que voy a conseguir clientes?",
-    a: "No. Huntly te ayuda a encontrar negocios con señales de oportunidad, pero cerrar clientes depende de tu oferta, mensaje y seguimiento.",
-  },
-  {
-    q: "¿De dónde salen los resultados?",
-    a: "Huntly usa datos públicos de negocios locales y los organiza para que puedas detectar oportunidades más rápido.",
-  },
-  {
-    q: "¿Los teléfonos están verificados?",
-    a: "Huntly muestra teléfonos disponibles en las fichas de negocio. Aun así, siempre recomendamos revisar el lead antes de contactar.",
-  },
-  {
-    q: "¿Puedo buscar cualquier nicho?",
-    a: "Sí. Puedes usar nichos predefinidos o escribir el sector que quieras.",
-  },
-  {
-    q: "¿Necesito saber programar?",
-    a: "No. Huntly está pensado para freelancers, agencias pequeñas y creadores que venden webs con IA, WordPress, Webflow, Framer o código.",
-  },
-  {
-    q: "¿Qué pasa si un negocio ya tiene web?",
-    a: "Huntly intenta priorizar negocios sin web o con señales de oportunidad, pero puede haber casos donde debas revisar el lead manualmente.",
-  },
-];
-
-const GRAIN_SVG = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`;
 
 const TICKER_ITEMS = [
   { name: "Barbería El Rincón", city: "Madrid", phone: "+34 612 345 678", rating: "4.8" },
@@ -111,13 +19,14 @@ const TICKER_ITEMS = [
   { name: "CrossFit Zona Sur", city: "Murcia", phone: "+34 968 445 877", rating: "4.4" },
 ];
 
+const GRAIN_SVG = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`;
+
 function BrowserFrame({ children }: { children: React.ReactNode }) {
   return (
     <div
       className="rounded-xl overflow-hidden border border-white/[0.08]"
       style={{ boxShadow: "0 32px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.04)" }}
     >
-      {/* Browser chrome */}
       <div className="bg-[#16162a] px-4 py-3 flex items-center gap-3 border-b border-white/[0.06]">
         <div className="flex gap-1.5 shrink-0">
           <div className="w-2.5 h-2.5 rounded-full bg-[#ff5f57]" />
@@ -140,6 +49,45 @@ function BrowserFrame({ children }: { children: React.ReactNode }) {
 export default async function LandingPage() {
   const { userId } = await auth();
   if (userId) redirect("/dashboard");
+
+  const t = await getTranslations("landing");
+  const tPlans = await getTranslations("plans");
+  const tFaqs = await getTranslations();
+
+  const PLANS = [
+    {
+      name: tPlans("free.name"),
+      price: "$0",
+      period: "/mes",
+      desc: tPlans("free.desc"),
+      features: [
+        ...((tPlans.raw("free.features") as string[]).map((text: string) => ({ text, ok: true }))),
+        ...((tPlans.raw("free.disabledFeatures") as string[]).map((text: string) => ({ text, ok: false }))),
+      ],
+      cta: tPlans("free.cta"),
+      popular: false,
+    },
+    {
+      name: tPlans("starter.name"),
+      price: "$19",
+      period: "/mes",
+      desc: tPlans("starter.desc"),
+      features: (tPlans.raw("starter.features") as string[]).map((text: string) => ({ text, ok: true })),
+      cta: tPlans("starter.cta"),
+      popular: true,
+    },
+    {
+      name: tPlans("agency.name"),
+      price: "$49",
+      period: "/mes",
+      desc: tPlans("agency.desc"),
+      features: (tPlans.raw("agency.features") as string[]).map((text: string) => ({ text, ok: true })),
+      cta: tPlans("agency.cta"),
+      popular: false,
+    },
+  ];
+
+  const FAQS = tFaqs.raw("faqs") as Array<{ q: string; a: string }>;
 
   return (
     <div className="min-h-screen bg-[#0d0d14] text-white antialiased">
@@ -176,21 +124,21 @@ export default async function LandingPage() {
             </div>
             <div className="flex items-center gap-6">
               <Link href="#como-funciona" className="text-sm text-zinc-300 hover:text-white transition-colors hidden md:block">
-                Cómo funciona
+                {t("nav.howItWorks")}
               </Link>
               <Link href="#precios" className="text-sm text-zinc-300 hover:text-white transition-colors hidden md:block">
-                Precios
+                {t("nav.pricing")}
               </Link>
               <SignedOut>
                 <SignInButton mode="modal">
                   <button className="flex items-center gap-1.5 text-sm text-zinc-400 hover:text-white transition-colors">
-                    <LogIn className="w-3.5 h-3.5" /> Entrar
+                    <LogIn className="w-3.5 h-3.5" /> {t("nav.signIn")}
                   </button>
                 </SignInButton>
               </SignedOut>
               <SignedIn>
                 <Link href="/dashboard" className="flex items-center gap-1.5 text-sm font-medium px-4 py-1.5 bg-indigo-600 hover:bg-indigo-500 rounded-lg transition-colors">
-                  Dashboard <ArrowRight className="w-3.5 h-3.5" />
+                  {t("nav.dashboard")} <ArrowRight className="w-3.5 h-3.5" />
                 </Link>
               </SignedIn>
             </div>
@@ -212,37 +160,37 @@ export default async function LandingPage() {
               {/* LEFT */}
               <div>
                 <h1 className="text-5xl md:text-[60px] font-black leading-[1.0] tracking-tighter mb-5">
-                  Encuentra negocios
+                  {t("hero.title1")}
                   <br />
-                  locales a los que
+                  {t("hero.title2")}
                   <br />
-                  <span className="bg-gradient-to-r from-indigo-400 via-violet-400 to-purple-400 bg-clip-text text-transparent">venderles una web.</span>
+                  <span className="bg-gradient-to-r from-indigo-400 via-violet-400 to-purple-400 bg-clip-text text-transparent">{t("hero.title3")}</span>
                 </h1>
                 <p className="text-[18px] text-[#94a3b8] leading-relaxed mb-8 max-w-sm">
-                  Busca por nicho y ciudad. Huntly encuentra negocios sin web, con teléfono disponible y señales claras para contactar.
+                  {t("hero.subtitle")}
                 </p>
                 <div className="flex flex-wrap items-center gap-3 mb-6">
                   <SignedOut>
                     <SignInButton mode="modal">
                       <button className="flex items-center gap-2 px-5 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-xl transition-colors text-sm shadow-[0_0_32px_rgba(99,102,241,0.3)]">
-                        Encontrar mis primeros leads gratis
+                        {t("hero.ctaPrimary")}
                         <ArrowRight className="w-4 h-4" />
                       </button>
                     </SignInButton>
                   </SignedOut>
                   <SignedIn>
                     <Link href="/dashboard" className="flex items-center gap-2 px-5 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-xl transition-colors text-sm shadow-[0_0_32px_rgba(99,102,241,0.3)]">
-                      Ir al Dashboard <ArrowRight className="w-4 h-4" />
+                      {t("hero.ctaDashboard")} <ArrowRight className="w-4 h-4" />
                     </Link>
                   </SignedIn>
                   <Link
                     href="#demo"
                     className="flex items-center gap-1.5 px-5 py-3 text-sm text-zinc-400 hover:text-white transition-colors rounded-xl border border-white/[0.08] hover:border-white/20"
                   >
-                    Ver cómo funciona
+                    {t("hero.ctaDemo")}
                   </Link>
                 </div>
-                <p className="text-xs text-zinc-400">3 búsquedas gratis · Sin tarjeta · Sin permanencia</p>
+                <p className="text-xs text-zinc-400">{t("hero.freeNote")}</p>
               </div>
 
               {/* RIGHT — browser frame with mini dashboard */}
@@ -260,14 +208,14 @@ export default async function LandingPage() {
                         <span>Madrid, Centro</span>
                       </div>
                       <button className="px-4 py-2 bg-white text-black text-xs font-black rounded-lg whitespace-nowrap flex items-center gap-1">
-                        <Search className="w-3 h-3" /> Buscar
+                        <Search className="w-3 h-3" /> {t("browserDemo.search")}
                       </button>
                     </div>
 
                     {/* Results header */}
                     <div className="flex items-center gap-2 mb-3 px-1">
                       <span className="text-sm">🚨</span>
-                      <span className="text-xs font-bold text-white">3 oportunidades encontradas</span>
+                      <span className="text-xs font-bold text-white">{t("browserDemo.opportunitiesFound")}</span>
                       <div className="ml-auto flex items-center gap-1 text-[10px] text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-full">
                         <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
                         Live
@@ -294,18 +242,18 @@ export default async function LandingPage() {
                             <span className="text-[10px] text-yellow-400">★ {b.rating}</span>
                             <span className="text-[9px] text-zinc-600">({b.reviews})</span>
                             <span className="text-[9px] font-bold text-emerald-400 bg-emerald-400/8 border border-emerald-500/20 px-1.5 py-0.5 rounded">
-                              SIN WEB
+                              {t("browserDemo.noWeb")}
                             </span>
                           </div>
                           <div className="bg-emerald-500/6 border border-emerald-500/15 rounded-lg p-1.5 mb-2">
                             <div className="flex items-center gap-1.5">
                               <span className="w-2 h-2 rounded-full bg-emerald-400 shrink-0" />
-                              <span className="text-[9px] font-bold text-emerald-400">Alta probabilidad</span>
+                              <span className="text-[9px] font-bold text-emerald-400">{t("browserDemo.highProbability")}</span>
                             </div>
                           </div>
                           <div className="flex gap-1">
                             <button className="flex-1 bg-emerald-500 text-black text-[9px] font-bold py-1.5 rounded">WA</button>
-                            <button className="flex-1 bg-white/6 border border-white/10 text-white text-[9px] py-1.5 rounded">Llamar</button>
+                            <button className="flex-1 bg-white/6 border border-white/10 text-white text-[9px] py-1.5 rounded">{t("browserDemo.call")}</button>
                           </div>
                         </div>
                       ))}
@@ -326,7 +274,7 @@ export default async function LandingPage() {
                   <span className="text-zinc-700">·</span>
                   <span>{item.city}</span>
                   <span className="text-zinc-700">·</span>
-                  <span className="text-emerald-400 font-semibold">SIN WEB</span>
+                  <span className="text-emerald-400 font-semibold">{t("ticker.noWeb")}</span>
                   <span className="text-zinc-700">·</span>
                   <span className="font-mono text-zinc-400">{item.phone}</span>
                   <span className="text-zinc-700">·</span>
@@ -339,11 +287,11 @@ export default async function LandingPage() {
           {/* ── STAT BAR ── */}
           <div className="bg-[#0f1117] border-y border-white/[0.04]">
             <div className="max-w-4xl mx-auto px-6 py-4 flex flex-wrap items-center justify-center gap-x-8 gap-y-2 text-sm text-zinc-200">
-              <span>Búsquedas por ciudad y nicho</span>
+              <span>{t("statBar.stat1")}</span>
               <span className="text-zinc-700 hidden sm:inline">·</span>
-              <span>Resultados en segundos</span>
+              <span>{t("statBar.stat2")}</span>
               <span className="text-zinc-700 hidden sm:inline">·</span>
-              <span>Teléfonos disponibles</span>
+              <span>{t("statBar.stat3")}</span>
             </div>
           </div>
 
@@ -352,26 +300,26 @@ export default async function LandingPage() {
             <div className="max-w-6xl mx-auto px-6 py-24">
               <div className="grid md:grid-cols-[1.3fr_1fr] gap-16 items-start">
                 <div>
-                  <p className="text-xs font-mono text-indigo-500 uppercase tracking-wide mb-5">El problema</p>
+                  <p className="text-xs font-mono text-indigo-500 uppercase tracking-wide mb-5">{t("problem.label")}</p>
                   <h2 className="text-4xl md:text-5xl font-black tracking-tighter leading-tight text-white mb-5">
-                    Buscar clientes a mano
+                    {t("problem.title1")}
                     <br />
                     <span
                       className="text-red-400"
                       style={{ textShadow: "0 0 40px rgba(248,113,113,0.5)" }}
                     >
-                      es tiempo que no factura.
+                      {t("problem.title2")}
                     </span>
                   </h2>
                   <p className="text-zinc-300 text-base leading-relaxed max-w-sm">
-                    Cada hora revisando Google Maps es una hora que no estás vendiendo webs ni entregando proyectos.
+                    {t("problem.subtitle")}
                   </p>
                 </div>
                 <div className="divide-y divide-white/[0.05]">
                   {[
-                    { stat: "3–4 h/semana", detail: "buscando negocios, revisando webs y copiando teléfonos a mano" },
-                    { stat: "Mucho ruido", detail: "negocios con web, sin teléfono o sin señales claras de oportunidad" },
-                    { stat: "Sin seguimiento", detail: "leads perdidos entre notas, WhatsApp, hojas de cálculo y capturas" },
+                    { stat: t("problem.stat1"), detail: t("problem.detail1") },
+                    { stat: t("problem.stat2"), detail: t("problem.detail2") },
+                    { stat: t("problem.stat3"), detail: t("problem.detail3") },
                   ].map((item) => (
                     <div key={item.stat} className="py-5 flex items-center gap-5">
                       <div className="w-1 h-10 rounded-full bg-red-500 shrink-0" style={{ boxShadow: "0 0 8px rgba(239,68,68,0.6)" }} />
@@ -390,12 +338,12 @@ export default async function LandingPage() {
           <section id="demo" className="bg-[#0f1117]">
             <div className="max-w-6xl mx-auto px-6 py-24">
               <div className="mb-10">
-                <p className="text-xs font-mono text-indigo-500 uppercase tracking-wide mb-3">Producto real</p>
+                <p className="text-xs font-mono text-indigo-500 uppercase tracking-wide mb-3">{t("demo.label")}</p>
                 <h2 className="text-3xl md:text-4xl font-black tracking-tighter text-white">
-                  Así encuentras clientes.
+                  {t("demo.title")}
                 </h2>
                 <p className="text-zinc-300 text-sm mt-2 max-w-lg">
-                  Busca un nicho y una ciudad. Huntly detecta negocios sin web, prioriza oportunidades y te deja contactarlos en segundos.
+                  {t("demo.subtitle")}
                 </p>
               </div>
 
@@ -418,11 +366,11 @@ export default async function LandingPage() {
 
               {/* CTA */}
               <div className="mt-10 text-center">
-                <p className="text-zinc-400 text-sm mb-4">¿Quieres probarlo con tu ciudad?</p>
+                <p className="text-zinc-400 text-sm mb-4">{t("demo.ctaQuestion")}</p>
                 <SignedOut>
                   <SignInButton mode="modal">
                     <button className="inline-flex items-center gap-2 px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-xl transition-colors text-sm shadow-[0_0_32px_rgba(99,102,241,0.25)]">
-                      Buscar mis primeros leads gratis
+                      {t("demo.ctaButton")}
                       <ArrowRight className="w-4 h-4" />
                     </button>
                   </SignInButton>
@@ -432,7 +380,7 @@ export default async function LandingPage() {
                     href="/dashboard"
                     className="inline-flex items-center gap-2 px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-xl transition-colors text-sm shadow-[0_0_32px_rgba(99,102,241,0.25)]"
                   >
-                    Buscar mis primeros leads gratis
+                    {t("demo.ctaButton")}
                     <ArrowRight className="w-4 h-4" />
                   </Link>
                 </SignedIn>
@@ -443,17 +391,17 @@ export default async function LandingPage() {
           {/* ── CÓMO FUNCIONA ── */}
           <section id="como-funciona" className="bg-[#0d0d14]">
             <div className="max-w-5xl mx-auto px-6 py-24">
-              <p className="text-xs font-mono text-indigo-500 uppercase tracking-wide mb-4">Cómo funciona</p>
+              <p className="text-xs font-mono text-indigo-500 uppercase tracking-wide mb-4">{t("howItWorks.label")}</p>
               <h2 className="text-3xl md:text-4xl font-black tracking-tighter text-white mb-14">
-                Tres pasos.<span className="text-indigo-400"> Nada más.</span>
+                {t("howItWorks.title")}<span className="text-indigo-400">{t("howItWorks.titleHighlight")}</span>
               </h2>
 
               <div className="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-white/[0.06] border border-white/[0.06] rounded-2xl overflow-hidden">
                 {[
                   {
                     n: "01",
-                    title: "Elige nicho y ciudad",
-                    note: "Barberías en Madrid, clínicas en Valencia o cualquier sector local.",
+                    title: t("howItWorks.step1Title"),
+                    note: t("howItWorks.step1Note"),
                     preview: (
                       <div className="mt-4 bg-black/40 rounded-xl p-3 border border-white/[0.05]">
                         <div className="bg-black/60 border border-white/[0.07] rounded-lg px-3 py-2 text-[10px] text-zinc-400 flex items-center justify-between mb-2">
@@ -467,8 +415,8 @@ export default async function LandingPage() {
                   },
                   {
                     n: "02",
-                    title: "Huntly filtra oportunidades",
-                    note: "Detecta negocios sin web, con teléfono disponible y señales de actividad.",
+                    title: t("howItWorks.step2Title"),
+                    note: t("howItWorks.step2Note"),
                     preview: (
                       <div className="mt-4 bg-black/40 rounded-xl p-3 border border-white/[0.05] space-y-1.5">
                         {["🟢 Barbería El Rincón · SIN WEB", "🟢 Peluquería Nova · SIN WEB", "🟡 Barbería Cortex · Revisando"].map((line, i) => (
@@ -482,17 +430,17 @@ export default async function LandingPage() {
                   },
                   {
                     n: "03",
-                    title: "Contacta y guarda el seguimiento",
-                    note: "Envía un WhatsApp, llama o guarda el lead en tu cartera para hacer seguimiento.",
+                    title: t("howItWorks.step3Title"),
+                    note: t("howItWorks.step3Note"),
                     preview: (
                       <div className="mt-4 bg-black/40 rounded-xl p-3 border border-white/[0.05]">
-                        <div className="text-[10px] text-zinc-600 mb-2">Mensaje generado:</div>
+                        <div className="text-[10px] text-zinc-600 mb-2">{t("howItWorks.step3Message")}</div>
                         <div className="text-[10px] text-zinc-300 leading-relaxed mb-2 line-clamp-2">
-                          "Me dedico al diseño web y vi que tienen 47 reseñas pero no tienen página..."
+                          {t("howItWorks.step3Preview")}
                         </div>
                         <div className="flex gap-1.5">
                           <div className="flex-1 bg-emerald-500/20 border border-emerald-500/30 rounded text-[9px] text-emerald-400 font-bold py-1 text-center">WA</div>
-                          <div className="flex-1 bg-white/5 border border-white/10 rounded text-[9px] text-white py-1 text-center">Llamar</div>
+                          <div className="flex-1 bg-white/5 border border-white/10 rounded text-[9px] text-white py-1 text-center">{t("howItWorks.call")}</div>
                           <div className="w-7 bg-white/5 border border-white/10 rounded text-[9px] text-zinc-400 py-1 flex items-center justify-center">
                             <Copy className="w-2.5 h-2.5" />
                           </div>
@@ -515,25 +463,16 @@ export default async function LandingPage() {
           {/* ── PARA QUIÉN ES ── */}
           <section className="bg-[#0f1117]">
             <div className="max-w-5xl mx-auto px-6 py-24">
-              <p className="text-xs font-mono text-indigo-500 uppercase tracking-wide mb-4">Para quién es</p>
+              <p className="text-xs font-mono text-indigo-500 uppercase tracking-wide mb-4">{t("audience.label")}</p>
               <h2 className="text-3xl md:text-4xl font-black tracking-tighter text-white mb-14">
-                Hecho para gente que vende webs.
+                {t("audience.title")}
               </h2>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {[
-                  {
-                    title: "Freelancers web",
-                    desc: "Encuentra negocios locales sin perder horas revisando Google Maps.",
-                  },
-                  {
-                    title: "Agencias pequeñas",
-                    desc: "Llena tu cartera con búsquedas por ciudad, sector y oportunidad.",
-                  },
-                  {
-                    title: "Creadores con IA",
-                    desc: "Si ya sabes crear webs rápido, Huntly te ayuda a encontrar a quién venderlas.",
-                  },
+                  { title: t("audience.audience1Title"), desc: t("audience.audience1Desc") },
+                  { title: t("audience.audience2Title"), desc: t("audience.audience2Desc") },
+                  { title: t("audience.audience3Title"), desc: t("audience.audience3Desc") },
                 ].map((item) => (
                   <div
                     key={item.title}
@@ -550,16 +489,16 @@ export default async function LandingPage() {
           {/* ── PRICING ── */}
           <section id="precios" className="bg-[#0f1117]">
             <div className="max-w-5xl mx-auto px-6 py-24">
-              <p className="text-xs font-mono text-indigo-500 uppercase tracking-wide mb-4">Precios</p>
+              <p className="text-xs font-mono text-indigo-500 uppercase tracking-wide mb-4">{t("pricingSection.label")}</p>
               <h2 className="text-3xl md:text-4xl font-black tracking-tighter text-white mb-5">
-                Sin permanencia.<span className="text-indigo-400"> Cancela cuando quieras.</span>
+                {t("pricingSection.title")}<span className="text-indigo-400">{t("pricingSection.titleHighlight")}</span>
               </h2>
 
               <div className="flex items-start gap-3 bg-white/[0.03] border border-white/[0.07] rounded-xl px-5 py-4 mb-10 max-w-lg">
                 <ArrowUpRight className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
                 <p className="text-sm text-zinc-400 leading-relaxed">
-                  <span className="text-white font-medium">Un cliente web puede valer mucho más que un mes de Huntly.</span>{" "}
-                  <span className="text-emerald-400">Con cerrar uno, el plan se paga solo.</span>
+                  <span className="text-white font-medium">{t("pricingSection.valueNote")}</span>{" "}
+                  <span className="text-emerald-400">{t("pricingSection.valueHighlight")}</span>
                 </p>
               </div>
 
@@ -574,7 +513,7 @@ export default async function LandingPage() {
                   >
                     {plan.popular && (
                       <div className="absolute -top-3 left-5 bg-indigo-600 text-white text-[10px] font-semibold uppercase tracking-widest px-2.5 py-1 rounded-full">
-                        Más popular
+                        {t("pricingSection.mostPopular")}
                       </div>
                     )}
                     <div className="mb-4">
@@ -627,8 +566,8 @@ export default async function LandingPage() {
           {/* ── FAQ ── */}
           <section className="bg-[#0d0d14]">
             <div className="max-w-2xl mx-auto px-6 py-24">
-              <p className="text-xs font-mono text-indigo-500 uppercase tracking-wide mb-4">FAQ</p>
-              <h2 className="text-3xl font-black tracking-tighter text-white mb-10">Preguntas frecuentes</h2>
+              <p className="text-xs font-mono text-indigo-500 uppercase tracking-wide mb-4">{t("faq.label")}</p>
+              <h2 className="text-3xl font-black tracking-tighter text-white mb-10">{t("faq.title")}</h2>
               <div itemScope itemType="https://schema.org/FAQPage" className="space-y-2">
                 {FAQS.map((faq, i) => (
                   <details
@@ -670,32 +609,32 @@ export default async function LandingPage() {
               <div className="grid md:grid-cols-[1fr_auto] gap-10 items-center">
                 <div>
                   <h2 className="text-4xl md:text-5xl font-black tracking-tighter leading-[1.0] text-white mb-4">
-                    Tu próximo cliente web
+                    {t("finalCta.title1")}
                     <br />
-                    <span className="text-indigo-400">puede estar en Google Maps.</span>
+                    <span className="text-indigo-400">{t("finalCta.title2")}</span>
                   </h2>
                   <p className="text-zinc-400 text-sm mt-2">
-                    Huntly te ayuda a encontrarlo, contactarlo y hacer seguimiento.
+                    {t("finalCta.subtitle")}
                   </p>
-                  <p className="text-zinc-500 text-xs mt-3">3 búsquedas gratis · Sin tarjeta · Sin permanencia</p>
+                  <p className="text-zinc-500 text-xs mt-3">{t("finalCta.freeNote")}</p>
                 </div>
                 <div className="flex flex-col gap-3 min-w-[220px]">
                   <SignedOut>
                     <SignInButton mode="modal">
                       <button className="group flex items-center justify-center gap-2 w-full px-7 py-3.5 bg-white text-[#0d0d14] text-sm font-bold rounded-xl hover:bg-zinc-100 transition-colors">
-                        Encontrar mis primeros leads gratis
+                        {t("finalCta.ctaButton")}
                         <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
                       </button>
                     </SignInButton>
                   </SignedOut>
                   <SignedIn>
                     <Link href="/dashboard" className="group flex items-center justify-center gap-2 w-full px-7 py-3.5 bg-white text-[#0d0d14] text-sm font-bold rounded-xl hover:bg-zinc-100 transition-colors">
-                      Ir al Dashboard
+                      {t("finalCta.ctaDashboard")}
                       <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
                     </Link>
                   </SignedIn>
                   <Link href="#precios" className="text-center text-xs text-zinc-400 hover:text-white transition-colors py-2">
-                    Ver planes y precios →
+                    {t("finalCta.viewPlans")}
                   </Link>
                 </div>
               </div>
@@ -710,9 +649,9 @@ export default async function LandingPage() {
                 <span className="text-sm font-semibold text-zinc-500">Huntly</span>
               </div>
               <div className="flex items-center gap-6 text-sm text-zinc-700">
-                <Link href="#como-funciona" className="hover:text-zinc-400 transition-colors">Cómo funciona</Link>
-                <Link href="#precios" className="hover:text-zinc-400 transition-colors">Precios</Link>
-                <Link href="mailto:hola@huntly.app" className="hover:text-zinc-400 transition-colors">Contacto</Link>
+                <Link href="#como-funciona" className="hover:text-zinc-400 transition-colors">{t("footer.howItWorks")}</Link>
+                <Link href="#precios" className="hover:text-zinc-400 transition-colors">{t("footer.pricing")}</Link>
+                <Link href="mailto:hola@huntly.app" className="hover:text-zinc-400 transition-colors">{t("footer.contact")}</Link>
               </div>
               <p className="text-sm text-zinc-700">© {new Date().getFullYear()} Huntly</p>
             </div>
