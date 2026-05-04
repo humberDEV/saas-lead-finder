@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { cookies } from "next/headers";
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { stripe, STRIPE_PLANS } from "@/lib/stripe";
 import { getOrCreateUser } from "@/lib/tokens";
@@ -37,13 +38,20 @@ export async function POST(request: Request) {
 
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
 
+  const cookieStore = await cookies();
+
   const session = await stripe.checkout.sessions.create({
     customer: stripeCustomerId,
     mode: "subscription",
     line_items: [{ price: planConfig.priceId, quantity: 1 }],
     success_url: `${baseUrl}/dashboard?upgraded=1`,
     cancel_url: `${baseUrl}/pricing`,
-    metadata: { clerkId: userId, planKey },
+    metadata: {
+      clerkId: userId,
+      planKey,
+      datafast_visitor_id: cookieStore.get("datafast_visitor_id")?.value ?? "",
+      datafast_session_id: cookieStore.get("datafast_session_id")?.value ?? "",
+    },
     subscription_data: {
       metadata: { clerkId: userId, planKey },
     },
