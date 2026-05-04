@@ -279,7 +279,8 @@
     "managePlan": "Gestionar plan",
     "upgrade": "Upgrade",
     "noSearches": "Sin búsquedas",
-    "viewHistory": "Ver historial"
+    "viewHistory": "Ver historial",
+    "feedback": "Envíanos tu feedback"
   },
   "pricing": {
     "label": "Precios",

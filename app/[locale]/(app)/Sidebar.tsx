@@ -6,7 +6,7 @@ import { useRouter, usePathname } from "next/navigation";
 import { useUser, UserButton } from "@clerk/nextjs";
 import {
   Sparkles, ChevronLeft, ChevronRight, Plus,
-  Clock, Briefcase, Zap, Search, CreditCard,
+  Clock, Briefcase, Zap, Search, CreditCard, MessageCircle,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useSidebar } from "./SidebarContext";
@@ -240,6 +240,18 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
             {isOpen && <span className="text-sm font-semibold">{t("upgrade")}</span>}
           </Link>
         )}
+      </div>
+
+      {/* ── Feedback ── */}
+      <div className={`border-t border-white/[0.05] py-2 px-2 shrink-0`}>
+        <a
+          href="mailto:huntly@outlook.com?subject=Feedback%20Huntly"
+          className={`flex items-center gap-2.5 px-2 py-2 rounded-lg hover:bg-white/5 transition-colors text-zinc-500 hover:text-zinc-300 ${!isOpen && "justify-center"}`}
+          title={t("feedback")}
+        >
+          <MessageCircle className="w-4 h-4 shrink-0" />
+          {isOpen && <span className="text-xs">{t("feedback")}</span>}
+        </a>
       </div>
 
       {/* ── Bottom: show CTA only when out of credits ── */}

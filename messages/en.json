@@ -279,7 +279,8 @@
     "managePlan": "Manage plan",
     "upgrade": "Upgrade",
     "noSearches": "No searches",
-    "viewHistory": "View history"
+    "viewHistory": "View history",
+    "feedback": "Send us feedback"
   },
   "pricing": {
     "label": "Pricing",
