@@ -1,17 +1,19 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, lazy, Suspense } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import {
   Copy, MapPin, Star, Globe, TrendingUp, CopyCheck, Sparkles,
-  Navigation2, Search, CheckCircle2, Clock, PartyPopper, Map,
+  Navigation2, Search, CheckCircle2, Clock, PartyPopper, Map, MapPin as MapPinIcon, X,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTranslations } from "next-intl";
 import type { Place } from "@/types";
 import { useSidebar } from "../SidebarContext";
 import CITIES from "@/lib/cities";
+
+const MapPickerModal = lazy(() => import("@/components/MapPickerModal"));
 
 function useTimeAgo() {
   const t = useTranslations("dashboard.timeAgo");
@@ -30,21 +32,17 @@ function useTimeAgo() {
 const RANDOM_CITIES = CITIES;
 
 const PAYWALL_PLANS = [
-  { key: "go", name: "Go", price: 9, searches: 40, highlight: "easiest" as const },
-  { key: "pro", name: "Pro", price: 19, searches: 100, highlight: "popular" as const },
-  { key: "agency", name: "Agency", price: 39, searches: 250, highlight: null },
+  { key: "pro", name: "Starter", price: 19, searches: 150, highlight: "popular" as const },
+  { key: "agency", name: "Agency", price: 29, searches: 400, highlight: "none" as const },
 ];
 
-function PaywallBanner({ tSearch }: { tSearch: ReturnType<typeof useTranslations> }) {
-  const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
+const PLAN_FEATURES: Record<string, string[]> = {
+  pro: ["150 búsquedas/mes", "Guardar leads en cartera", "Historial de búsquedas", "Soporte prioritario"],
+  agency: ["400 búsquedas/mes", "Todo lo del plan Starter", "Volumen alto para agencias", "Soporte prioritario"],
+};
 
-  useEffect(() => {
-    fetch("/api/events", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ event: "paywall_viewed", properties: { source: "dashboard" } }),
-    }).catch(() => {});
-  }, []);
+function PaywallModal({ tSearch, onClose }: { tSearch: ReturnType<typeof useTranslations>; onClose: () => void }) {
+  const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
 
   async function handleCheckout(planKey: string) {
     setLoadingPlan(planKey);
@@ -63,52 +61,56 @@ function PaywallBanner({ tSearch }: { tSearch: ReturnType<typeof useTranslations
   }
 
   return (
-    <div className="mb-12 rounded-2xl border border-amber-500/20 bg-amber-500/5 p-8 text-center backdrop-blur-xl">
-      <h3 className="text-xl font-black text-white mb-2">
-        {tSearch("paywallTitle")}
-      </h3>
-      <p className="text-sm text-zinc-400 mb-8 max-w-md mx-auto">
-        {tSearch("paywallBody")}
-      </p>
-      <div className="grid sm:grid-cols-3 gap-4 max-w-2xl mx-auto">
-        {PAYWALL_PLANS.map((p) => (
-          <div
-            key={p.key}
-            className={`relative rounded-xl border p-4 flex flex-col items-center gap-2 ${
+    <div className="grid sm:grid-cols-2 gap-3">
+      {PAYWALL_PLANS.map((p) => (
+        <div
+          key={p.key}
+          className={`relative rounded-xl border p-5 flex flex-col gap-3 ${
+            p.highlight === "popular"
+              ? "border-indigo-500/40 bg-indigo-950/20"
+              : "border-neutral-800 bg-white/[0.02]"
+          }`}
+        >
+          {p.highlight === "popular" && (
+            <span className="absolute -top-2.5 left-4 text-[10px] font-bold uppercase tracking-widest bg-indigo-600 text-white px-2.5 py-0.5 rounded-full">
+              {tSearch("paywallPopular")}
+            </span>
+          )}
+
+          <div className="flex items-baseline justify-between">
+            <span className="text-base font-black text-white">{p.name}</span>
+            <span className="text-xl font-black text-white">
+              ${p.price}<span className="text-xs text-zinc-500 font-normal">/mes</span>
+            </span>
+          </div>
+
+          <ul className="space-y-1.5 flex-1">
+            {(PLAN_FEATURES[p.key] ?? []).map((f) => (
+              <li key={f} className="flex items-center gap-2 text-xs text-zinc-300">
+                <svg className="w-3.5 h-3.5 text-emerald-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                </svg>
+                {f}
+              </li>
+            ))}
+          </ul>
+
+          <button
+            onClick={() => handleCheckout(p.key)}
+            disabled={!!loadingPlan}
+            className={`flex items-center justify-center gap-2 w-full py-2.5 rounded-xl text-sm font-bold transition-colors disabled:opacity-60 mt-1 ${
               p.highlight === "popular"
-                ? "border-indigo-500/40 bg-indigo-950/20"
-                : "border-white/[0.07] bg-white/[0.02]"
+                ? "bg-indigo-600 hover:bg-indigo-500 text-white"
+                : "bg-white/[0.07] hover:bg-white/[0.12] text-white border border-white/[0.08]"
             }`}
           >
-            {p.highlight === "popular" && (
-              <span className="absolute -top-2.5 text-[10px] font-bold uppercase tracking-widest bg-indigo-600 text-white px-2.5 py-0.5 rounded-full">
-                {tSearch("paywallPopular")}
-              </span>
-            )}
-            {p.highlight === "easiest" && (
-              <span className="absolute -top-2.5 text-[10px] font-bold uppercase tracking-widest bg-emerald-600 text-white px-2.5 py-0.5 rounded-full">
-                {tSearch("paywallEasiest")}
-              </span>
-            )}
-            <span className="text-lg font-black text-white">{p.name}</span>
-            <span className="text-2xl font-black text-white">${p.price}<span className="text-sm text-zinc-500 font-normal">{tSearch("paywallMonth")}</span></span>
-            <span className="text-xs text-zinc-400">{tSearch("paywallSearches", { count: p.searches })}</span>
-            <button
-              onClick={() => handleCheckout(p.key)}
-              disabled={!!loadingPlan}
-              className={`mt-2 w-full py-2 rounded-lg text-sm font-bold transition-colors disabled:opacity-60 ${
-                p.highlight === "popular"
-                  ? "bg-indigo-600 hover:bg-indigo-500 text-white"
-                  : p.highlight === "easiest"
-                  ? "bg-emerald-600 hover:bg-emerald-500 text-white"
-                  : "bg-white/10 hover:bg-white/15 text-white"
-              }`}
-            >
-              {loadingPlan === p.key ? "..." : tSearch("paywallCta", { plan: p.name })}
-            </button>
-          </div>
-        ))}
-      </div>
+            {loadingPlan === p.key
+              ? <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              : <>{tSearch("paywallCta", { plan: p.name })} <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg></>
+            }
+          </button>
+        </div>
+      ))}
     </div>
   );
 }
@@ -179,6 +181,48 @@ export default function Dashboard() {
 
   const resultsRef = useRef<HTMLDivElement>(null);
   const mainRef = useRef<HTMLDivElement>(null);
+
+  // Map picker
+  const [showMapPicker, setShowMapPicker] = useState(false);
+
+  // Paywall modal
+  const [showPaywallModal, setShowPaywallModal] = useState(false);
+  const [fakeLoading, setFakeLoading] = useState(false);
+
+  const triggerPaywall = () => {
+    setFakeLoading(true);
+    setTimeout(() => {
+      setFakeLoading(false);
+      setShowPaywallModal(true);
+      fetch("/api/events", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ event: "paywall_viewed", properties: { source: "dashboard_button" } }),
+      }).catch(() => {});
+    }, 1500);
+  };
+
+  // Auto-zone popup
+  const [zonePopup, setZonePopup] = useState<{ city: string; niche: string } | null>(null);
+  useEffect(() => {
+    const dismissed = sessionStorage.getItem("zone_popup_dismissed");
+    if (dismissed) return;
+    // Detect country via IP and suggest a local city
+    fetch("https://ipapi.co/json/")
+      .then((r) => r.json())
+      .then((data) => {
+        const country = data.country_name as string;
+        if (!country) return;
+        // Find cities matching this country
+        const countryCities = CITIES.filter((c) => c.endsWith(`, ${country}`));
+        if (countryCities.length === 0) return;
+        const randomCity = countryCities[Math.floor(Math.random() * countryCities.length)];
+        const randomNiche = VALIDATED_NICHES[Math.floor(Math.random() * VALIDATED_NICHES.length)];
+        setZonePopup({ city: randomCity, niche: randomNiche });
+      })
+      .catch(() => {});
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Watch for new search signal from sidebar button
   const prevNewSearchVersion = useRef(0);
@@ -577,6 +621,116 @@ export default function Dashboard() {
 
   return (
     <div className="h-full flex flex-col">
+      {/* Paywall modal */}
+      <AnimatePresence>
+        {showPaywallModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm"
+            onClick={(e) => { if (e.target === e.currentTarget) setShowPaywallModal(false); }}
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 16 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.96, y: 8 }}
+              transition={{ duration: 0.25, ease: "easeOut" }}
+              className="relative w-full max-w-lg rounded-2xl border border-neutral-800 bg-[#0d0d14] shadow-[0_0_80px_rgba(0,0,0,0.8)] overflow-hidden"
+            >
+              {/* Top accent line */}
+              <div className="h-px bg-gradient-to-r from-transparent via-indigo-500/60 to-transparent" />
+
+              <div className="p-6 md:p-8">
+                {/* Header */}
+                <div className="flex items-start justify-between mb-6">
+                  <div>
+                    <p className="text-xs font-mono text-indigo-400 uppercase tracking-widest mb-1">Plan de pago</p>
+                    <h2 className="text-2xl font-black text-white leading-tight">
+                      Agotaste tus búsquedas.<br />
+                      <span className="text-indigo-400">Elige un plan y sigue.</span>
+                    </h2>
+                    <p className="text-sm text-zinc-400 mt-2">
+                      Con un solo cliente web cubres meses de suscripción.
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => setShowPaywallModal(false)}
+                    className="p-1.5 rounded-lg hover:bg-neutral-800 text-zinc-500 hover:text-white transition-colors shrink-0 ml-4"
+                  >
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                  </button>
+                </div>
+
+                {/* Plans */}
+                <PaywallModal tSearch={tSearch} onClose={() => setShowPaywallModal(false)} />
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Map picker modal */}
+      {showMapPicker && (
+        <Suspense fallback={null}>
+          <MapPickerModal
+            onClose={() => setShowMapPicker(false)}
+            onSelect={(city) => {
+              setCity(city);
+              setCitySuggestions([]);
+              setShowSuggestions(false);
+            }}
+          />
+        </Suspense>
+      )}
+
+      {/* Auto-zone popup */}
+      <AnimatePresence>
+        {zonePopup && (
+          <motion.div
+            initial={{ opacity: 0, y: 60, scale: 0.96 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 40, scale: 0.96 }}
+            transition={{ duration: 0.35, ease: "easeOut", delay: 1.5 }}
+            className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 w-[calc(100%-2rem)] max-w-sm"
+          >
+            <div className="relative flex items-start gap-4 px-5 py-4 rounded-2xl border border-indigo-500/30 bg-neutral-900/95 backdrop-blur-xl shadow-[0_8px_40px_rgba(99,102,241,0.2)]">
+              <div className="flex items-center justify-center w-9 h-9 rounded-xl bg-indigo-500/15 border border-indigo-500/25 shrink-0 mt-0.5">
+                <MapPin className="w-4 h-4 text-indigo-400" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-bold text-white leading-snug">
+                  Hay negocios sin web cerca de ti
+                </p>
+                <p className="text-xs text-zinc-400 mt-0.5 truncate">
+                  {zonePopup.niche} en {zonePopup.city}
+                </p>
+                <button
+                  onClick={() => {
+                    setZonePopup(null);
+                    sessionStorage.setItem("zone_popup_dismissed", "1");
+                    handleSearch(undefined, zonePopup.niche, zonePopup.city);
+                  }}
+                  className="mt-2.5 text-xs font-bold text-indigo-400 hover:text-indigo-300 transition-colors"
+                >
+                  Ver ahora →
+                </button>
+              </div>
+              <button
+                onClick={() => {
+                  setZonePopup(null);
+                  sessionStorage.setItem("zone_popup_dismissed", "1");
+                }}
+                className="absolute top-3 right-3 p-1 rounded-lg hover:bg-neutral-800 text-zinc-600 hover:text-zinc-400 transition-colors"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <div
         ref={mainRef}
         className="flex-1 overflow-y-auto bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(120,119,198,0.08),transparent)]"
@@ -709,13 +863,22 @@ export default function Dashboard() {
                   <div>
                     <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 flex justify-between items-center">
                       <span>{tSearch("zoneLabel")}</span>
-                      <button
-                        type="button"
-                        onClick={getRandomCity}
-                        className="text-indigo-400 hover:text-indigo-300 text-[10px] flex items-center gap-1"
-                      >
-                        🎲 {tSearch("randomZone")}
-                      </button>
+                      <div className="flex items-center gap-3">
+                        <button
+                          type="button"
+                          onClick={() => setShowMapPicker(true)}
+                          className="text-indigo-400 hover:text-indigo-300 text-[10px] flex items-center gap-1"
+                        >
+                          <MapPinIcon className="w-3 h-3" /> Elegir en mapa
+                        </button>
+                        <button
+                          type="button"
+                          onClick={getRandomCity}
+                          className="text-indigo-400 hover:text-indigo-300 text-[10px] flex items-center gap-1"
+                        >
+                          🎲 {tSearch("randomZone")}
+                        </button>
+                      </div>
                     </label>
                     <div className="relative">
                       <input
@@ -753,34 +916,28 @@ export default function Dashboard() {
                 </div>
 
                 <div className="pt-2">
-                  {credits === 0 ? null : (
-                    <button
-                      onClick={() => handleSearch()}
-                      disabled={loading || (!niche && !customNiche) || !city}
-                      className="w-full group relative flex items-center justify-center gap-3 px-8 py-4 bg-white text-black hover:bg-slate-200 disabled:opacity-50 disabled:cursor-not-allowed text-base font-black uppercase tracking-wider rounded-xl transition-all"
-                    >
-                      {loading ? (
-                        <span className="flex items-center gap-2">
-                          <div className="w-5 h-5 border-2 border-black/20 border-t-black rounded-full animate-spin" />
-                          {tSearch("scanning")}
-                        </span>
-                      ) : (
-                        <>
-                          <Search className="w-5 h-5 group-hover:scale-110 transition-transform" />
-                          {tSearch("extractLeads")} {credits !== null ? tSearch("remaining", { count: credits }) : ""}
-                        </>
-                      )}
-                    </button>
-                  )}
+                  <button
+                    onClick={() => credits === 0 ? triggerPaywall() : handleSearch()}
+                    disabled={(loading || fakeLoading) || (credits !== 0 && ((!niche && !customNiche) || !city))}
+                    className="w-full group relative flex items-center justify-center gap-3 px-8 py-4 bg-white text-black hover:bg-slate-200 disabled:opacity-50 disabled:cursor-not-allowed text-base font-black uppercase tracking-wider rounded-xl transition-all"
+                  >
+                    {loading || fakeLoading ? (
+                      <span className="flex items-center gap-2">
+                        <div className="w-5 h-5 border-2 border-black/20 border-t-black rounded-full animate-spin" />
+                        {tSearch("scanning")}
+                      </span>
+                    ) : (
+                      <>
+                        <Search className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                        {tSearch("extractLeads")} {credits !== null && credits > 0 ? tSearch("remaining", { count: credits }) : ""}
+                      </>
+                    )}
+                  </button>
                 </div>
               </div>
             </div>
           </motion.div>}
 
-          {/* Paywall: shown when 0 credits */}
-          {credits === 0 && !historyContext && (
-            <PaywallBanner tSearch={tSearch} />
-          )}
 
           {error && (
             <div className="bg-red-500/10 text-red-400 p-4 rounded-xl text-center mb-12 border border-red-500/20 font-bold">

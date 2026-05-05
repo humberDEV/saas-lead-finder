@@ -125,26 +125,16 @@
         "Historial de búsquedas"
       ]
     },
-    "go": {
-      "name": "Go",
-      "desc": "Lo justo para empezar a contactar negocios cada semana.",
-      "cta": "Contratar Go",
+    "pro": {
+      "name": "Starter",
+      "desc": "Para freelancers que hacen prospección cada semana.",
+      "cta": "Contratar Starter",
       "features": [
-        "40 búsquedas/mes",
+        "150 búsquedas/mes",
         "Score de oportunidad en cada lead",
         "WhatsApp y llamada directa",
         "Guardar leads en cartera",
         "Historial de búsquedas",
-        "Soporte por email"
-      ]
-    },
-    "pro": {
-      "name": "Pro",
-      "desc": "Para freelancers que hacen prospección cada semana.",
-      "cta": "Contratar Pro",
-      "features": [
-        "100 búsquedas/mes",
-        "Todo lo de Go",
         "Soporte prioritario",
         "Acceso beta a nuevas funciones"
       ]
@@ -154,8 +144,8 @@
       "desc": "Para agencias o equipos con alto volumen de prospección.",
       "cta": "Contratar Agency",
       "features": [
-        "250 búsquedas/mes",
-        "Todo lo de Pro",
+        "400 búsquedas/mes",
+        "Todo lo de Starter",
         "Soporte prioritario",
         "Pensado para alto volumen"
       ]

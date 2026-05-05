@@ -150,7 +150,7 @@ export async function GET(request: Request) {
         scoreLabel: label,
         scoreExplanation: explanation,
         suggestedMessage: generateContactMessage(
-          name, hasWebsite, userRatingsTotal, rating
+          name, hasWebsite, userRatingsTotal, rating, "es", place.websiteUri || null
         ),
       };
     });

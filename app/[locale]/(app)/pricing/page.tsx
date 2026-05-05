@@ -36,16 +36,6 @@ export default function Pricing() {
       popular: false,
     },
     {
-      name: tPlans("go.name"),
-      price: "$9",
-      period: "/mes",
-      desc: tPlans("go.desc"),
-      features: (tPlans.raw("go.features") as string[]).map((text: string) => ({ text, ok: true })),
-      cta: tPlans("go.cta"),
-      planKey: "go",
-      popular: false,
-    },
-    {
       name: tPlans("pro.name"),
       price: "$19",
       period: "/mes",
@@ -57,7 +47,7 @@ export default function Pricing() {
     },
     {
       name: tPlans("agency.name"),
-      price: "$39",
+      price: "$29",
       period: "/mes",
       desc: tPlans("agency.desc"),
       features: (tPlans.raw("agency.features") as string[]).map((text: string) => ({ text, ok: true })),
@@ -109,7 +99,7 @@ export default function Pricing() {
           )}
         </div>
 
-        <div className="grid md:grid-cols-4 gap-4 items-start">
+        <div className="grid md:grid-cols-3 gap-4 items-start max-w-4xl mx-auto">
           {PLANS.map((plan) => {
             const isCurrentPlan = currentPlan === plan.planKey;
             const isLoading = loadingPlan === plan.planKey;

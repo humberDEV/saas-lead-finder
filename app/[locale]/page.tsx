@@ -68,15 +68,6 @@ export default async function LandingPage() {
       popular: false,
     },
     {
-      name: tPlans("go.name"),
-      price: "$9",
-      period: "/mes",
-      desc: tPlans("go.desc"),
-      features: (tPlans.raw("go.features") as string[]).map((text: string) => ({ text, ok: true })),
-      cta: tPlans("go.cta"),
-      popular: false,
-    },
-    {
       name: tPlans("pro.name"),
       price: "$19",
       period: "/mes",
@@ -87,7 +78,7 @@ export default async function LandingPage() {
     },
     {
       name: tPlans("agency.name"),
-      price: "$39",
+      price: "$29",
       period: "/mes",
       desc: tPlans("agency.desc"),
       features: (tPlans.raw("agency.features") as string[]).map((text: string) => ({ text, ok: true })),
@@ -511,7 +502,7 @@ export default async function LandingPage() {
                 </p>
               </div>
 
-              <div className="grid md:grid-cols-4 gap-4 items-start">
+              <div className="grid md:grid-cols-3 gap-4 items-start max-w-4xl mx-auto">
                 {PLANS.map((plan, i) => (
                   <div
                     key={i}

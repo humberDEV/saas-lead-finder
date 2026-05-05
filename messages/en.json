@@ -125,26 +125,16 @@
         "Search history"
       ]
     },
-    "go": {
-      "name": "Go",
-      "desc": "Just enough to start reaching out to businesses every week.",
-      "cta": "Get Go",
+    "pro": {
+      "name": "Starter",
+      "desc": "For freelancers who prospect every week.",
+      "cta": "Get Starter",
       "features": [
-        "40 searches/month",
+        "150 searches/month",
         "Opportunity score on every lead",
         "WhatsApp and direct call",
         "Save leads to portfolio",
         "Search history",
-        "Email support"
-      ]
-    },
-    "pro": {
-      "name": "Pro",
-      "desc": "For freelancers who prospect every week.",
-      "cta": "Get Pro",
-      "features": [
-        "100 searches/month",
-        "Everything in Go",
         "Priority support",
         "Beta access to new features"
       ]
@@ -154,8 +144,8 @@
       "desc": "For agencies or teams doing prospecting at scale.",
       "cta": "Get Agency",
       "features": [
-        "250 searches/month",
-        "Everything in Pro",
+        "400 searches/month",
+        "Everything in Starter",
         "Priority support",
         "Built for high volume"
       ]
