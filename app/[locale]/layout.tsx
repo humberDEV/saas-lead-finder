@@ -6,6 +6,7 @@ import { routing } from "@/i18n/routing";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import Script from "next/script";
+import CookieBanner from "@/components/CookieBanner";
 import "./globals.css";
 import "leaflet/dist/leaflet.css";
 
@@ -76,6 +77,12 @@ export default async function LocaleLayout({
           <Script id="google-ads-init" strategy="beforeInteractive">{`
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
+            gtag('consent', 'default', {
+              ad_storage: 'denied',
+              ad_user_data: 'denied',
+              ad_personalization: 'denied',
+              analytics_storage: 'denied'
+            });
             gtag('js', new Date());
             gtag('config', 'AW-18141614708');
           `}</Script>
@@ -85,6 +92,7 @@ export default async function LocaleLayout({
         >
           <NextIntlClientProvider messages={messages}>
             {children}
+            <CookieBanner />
           </NextIntlClientProvider>
         </body>
       </html>
