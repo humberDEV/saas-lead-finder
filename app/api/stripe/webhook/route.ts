@@ -29,7 +29,12 @@ async function upgradeUser(clerkId: string, planKey: string, subscriptionId: str
 
   if (user) {
     if (previousPlan === "free") {
-      await trackEvent(user.id, "subscription_started", { planKey });
+      await trackEvent(user.id, "subscription_started", {
+        planKey,
+        utm_source: (user as any).utmSource ?? null,
+        utm_campaign: (user as any).utmCampaign ?? null,
+        utm_term: (user as any).utmTerm ?? null,
+      });
     } else if (previousPlan !== planKey) {
       await trackEvent(user.id, "plan_changed", { from: previousPlan, to: planKey });
     }

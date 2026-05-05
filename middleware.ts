@@ -14,8 +14,11 @@ const isProtectedRoute = createRouteMatcher([
 export default clerkMiddleware((auth, req) => {
   if (isProtectedRoute(req)) auth().protect();
 
-  // Don't apply intl middleware to API routes
-  if (req.nextUrl.pathname.startsWith("/api")) {
+  // Don't apply intl middleware to API routes or admin
+  if (
+    req.nextUrl.pathname.startsWith("/api") ||
+    req.nextUrl.pathname.startsWith("/admin")
+  ) {
     return;
   }
 

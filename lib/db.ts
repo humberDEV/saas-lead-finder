@@ -22,6 +22,10 @@ function toUser(row: any) {
     firstLimitReachedAt: row.first_limit_reached_at ?? null,
     checkoutStartedAt: row.checkout_started_at ?? null,
     lastLoginAt: row.last_login_at ?? null,
+    utmSource: row.utm_source ?? null,
+    utmMedium: row.utm_medium ?? null,
+    utmCampaign: row.utm_campaign ?? null,
+    utmTerm: row.utm_term ?? null,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   };

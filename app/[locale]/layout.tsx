@@ -6,7 +6,9 @@ import { routing } from "@/i18n/routing";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import Script from "next/script";
+import { Suspense } from "react";
 import CookieBanner from "@/components/CookieBanner";
+import { UTMTracker } from "@/components/UTMTracker";
 import "./globals.css";
 import "leaflet/dist/leaflet.css";
 
@@ -91,6 +93,9 @@ export default async function LocaleLayout({
           className={`${inter.className} min-h-screen bg-[#0A0A0A] text-slate-100 selection:bg-indigo-500/30`}
         >
           <NextIntlClientProvider messages={messages}>
+            <Suspense fallback={null}>
+              <UTMTracker />
+            </Suspense>
             {children}
             <CookieBanner />
           </NextIntlClientProvider>
