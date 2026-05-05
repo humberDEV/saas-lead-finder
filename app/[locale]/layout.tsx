@@ -25,9 +25,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     description: t("description"),
     keywords: t("keywords"),
     icons: {
-      icon: "/icon.svg",
-      shortcut: "/icon.svg",
-      apple: "/icon.svg",
+      icon: "/icon.png",
+      shortcut: "/icon.png",
+      apple: "/icon.png",
     },
     openGraph: {
       title: t("ogTitle"),
