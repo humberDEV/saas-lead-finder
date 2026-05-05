@@ -290,4 +290,39 @@ const CITIES: string[] = Object.entries(BY_COUNTRY).flatMap(
   ([country, cities]) => cities.map((city) => `${city}, ${country}`)
 );
 
+export const CITIES_EN: string[] = [
+  // United States
+  "Brooklyn, New York", "Queens, New York", "Bronx, New York", "Staten Island, New York",
+  "Manhattan, New York", "Astoria, New York", "Flushing, New York", "Harlem, New York",
+  "Los Angeles, California", "San Diego, California", "San Jose, California",
+  "San Francisco, California", "Fresno, California", "Sacramento, California",
+  "Long Beach, California", "Oakland, California", "Bakersfield, California",
+  "Houston, Texas", "San Antonio, Texas", "Dallas, Texas", "Austin, Texas",
+  "Fort Worth, Texas", "El Paso, Texas", "Arlington, Texas", "Corpus Christi, Texas",
+  "Chicago, Illinois", "Jacksonville, Florida", "Miami, Florida", "Tampa, Florida",
+  "Orlando, Florida", "St. Petersburg, Florida", "Hialeah, Florida", "Fort Lauderdale, Florida",
+  "Phoenix, Arizona", "Tucson, Arizona", "Mesa, Arizona", "Chandler, Arizona",
+  "Philadelphia, Pennsylvania", "Pittsburgh, Pennsylvania", "Allentown, Pennsylvania",
+  "Columbus, Ohio", "Cleveland, Ohio", "Cincinnati, Ohio", "Toledo, Ohio",
+  "Indianapolis, Indiana", "Charlotte, North Carolina", "Raleigh, North Carolina",
+  "Nashville, Tennessee", "Memphis, Tennessee", "Louisville, Kentucky",
+  "Portland, Oregon", "Seattle, Washington", "Denver, Colorado", "Las Vegas, Nevada",
+  "Atlanta, Georgia", "Minneapolis, Minnesota", "New Orleans, Louisiana",
+  "Kansas City, Missouri", "Omaha, Nebraska", "Mesa, Arizona", "Virginia Beach, Virginia",
+  // United Kingdom
+  "Shoreditch, London", "Hackney, London", "Brixton, London", "Peckham, London",
+  "Camden, London", "Islington, London", "Dalston, London", "Bethnal Green, London",
+  "Croydon, London", "Lewisham, London", "Stratford, London", "Woolwich, London",
+  "Birmingham, UK", "Manchester, UK", "Leeds, UK", "Glasgow, UK",
+  "Sheffield, UK", "Bradford, UK", "Liverpool, UK", "Edinburgh, UK",
+  "Bristol, UK", "Coventry, UK", "Nottingham, UK", "Leicester, UK",
+  // Canada
+  "Toronto, Ontario", "Mississauga, Ontario", "Brampton, Ontario", "Hamilton, Ontario",
+  "Montreal, Quebec", "Calgary, Alberta", "Edmonton, Alberta", "Ottawa, Ontario",
+  "Vancouver, British Columbia", "Winnipeg, Manitoba",
+  // Australia
+  "Sydney, New South Wales", "Melbourne, Victoria", "Brisbane, Queensland",
+  "Perth, Western Australia", "Adelaide, South Australia", "Gold Coast, Queensland",
+];
+
 export default CITIES;

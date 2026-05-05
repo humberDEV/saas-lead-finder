@@ -18,6 +18,7 @@ export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const niche = searchParams.get("niche");
   const city = searchParams.get("city");
+  const locale = searchParams.get("locale") === "en" ? "en" : "es";
 
   if (!niche || !city) {
     return NextResponse.json(
@@ -82,7 +83,7 @@ export async function GET(request: Request) {
     const res1 = await fetch(googleUrl, {
       method: "POST",
       headers,
-      body: JSON.stringify({ textQuery: query, pageSize: 20, languageCode: "es" }),
+      body: JSON.stringify({ textQuery: query, pageSize: 20, languageCode: locale }),
     });
     const data1 = await res1.json();
     if (!res1.ok || data1.error) {
@@ -150,7 +151,7 @@ export async function GET(request: Request) {
         scoreLabel: label,
         scoreExplanation: explanation,
         suggestedMessage: generateContactMessage(
-          name, hasWebsite, userRatingsTotal, rating, "es", place.websiteUri || null
+          name, hasWebsite, userRatingsTotal, rating, locale, place.websiteUri || null
         ),
       };
     });

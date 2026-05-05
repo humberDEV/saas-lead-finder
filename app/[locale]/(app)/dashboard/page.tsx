@@ -8,10 +8,10 @@ import {
   Navigation2, Search, CheckCircle2, Clock, PartyPopper, Map, MapPin as MapPinIcon, X,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import type { Place } from "@/types";
 import { useSidebar } from "../SidebarContext";
-import CITIES from "@/lib/cities";
+import CITIES, { CITIES_EN } from "@/lib/cities";
 
 const MapPickerModal = lazy(() => import("@/components/MapPickerModal"));
 
@@ -28,8 +28,6 @@ function useTimeAgo() {
     return t("weeks", { count: Math.floor(days / 7) });
   };
 }
-
-const RANDOM_CITIES = CITIES;
 
 const PAYWALL_PLANS = [
   { key: "pro", name: "Starter", price: 19, searches: 150, highlight: "popular" as const },
@@ -122,8 +120,10 @@ export default function Dashboard() {
   const tUpgrade = useTranslations("dashboard.upgrade");
   const tHistory = useTranslations("dashboard.history");
   const timeAgo = useTimeAgo();
+  const locale = useLocale();
 
   const VALIDATED_NICHES = t.raw("niches") as string[];
+  const RANDOM_CITIES = locale === "en" ? CITIES_EN : CITIES;
 
   const {
     credits,
@@ -278,7 +278,7 @@ export default function Dashboard() {
 
     try {
       const res = await fetch(
-        `/api/search?niche=${encodeURIComponent(finalNiche)}&city=${encodeURIComponent(finalCity)}`
+        `/api/search?niche=${encodeURIComponent(finalNiche)}&city=${encodeURIComponent(finalCity)}&locale=${locale}`
       );
 
       let data: any;
