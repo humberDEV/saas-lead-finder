@@ -23,10 +23,22 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title: t("title"),
     description: t("description"),
     keywords: t("keywords"),
+    icons: {
+      icon: "/icon.svg",
+      shortcut: "/icon.svg",
+      apple: "/icon.svg",
+    },
     openGraph: {
       title: t("ogTitle"),
       description: t("ogDescription"),
       images: ["/og-image.png"],
+      type: "website",
+      siteName: "Huntly",
+    },
+    twitter: {
+      card: "summary",
+      title: t("ogTitle"),
+      description: t("ogDescription"),
     },
   };
 }
@@ -56,6 +68,17 @@ export default async function LocaleLayout({
             data-domain="tryhuntly.com"
             strategy="afterInteractive"
           />
+          <Script
+            async
+            src="https://www.googletagmanager.com/gtag/js?id=AW-18141614708"
+            strategy="beforeInteractive"
+          />
+          <Script id="google-ads-init" strategy="beforeInteractive">{`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'AW-18141614708');
+          `}</Script>
         </head>
         <body
           className={`${inter.className} min-h-screen bg-[#0A0A0A] text-slate-100 selection:bg-indigo-500/30`}
