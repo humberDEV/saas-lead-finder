@@ -879,39 +879,11 @@ export default function Dashboard() {
             </div>
           )}
 
-          {!loading && !error && results.length === 0 && !historyContext && (
+          {!loading && !error && results.length === 0 && hasSearched && !historyContext && (
             <div className="text-center text-slate-500 my-16 p-8 border border-neutral-800/50 rounded-2xl border-dashed">
               <Search className="w-12 h-12 mx-auto text-neutral-700 mb-4" />
-              {hasSearched ? (
-                <>
-                  <p className="text-lg font-medium text-slate-400">{tResults("noResultsTitle")}</p>
-                  <p className="text-sm mt-2 text-zinc-600">
-                    {tResults("noResultsTip")}
-                  </p>
-                </>
-              ) : (
-                <>
-                  <p className="text-lg font-medium text-slate-400">{tResults("emptyFirstTitle")}</p>
-                  <p className="text-sm mt-2 text-zinc-600 mb-6">
-                    {tResults("emptyFirstTip")}
-                  </p>
-                  <div className="flex flex-wrap justify-center gap-3">
-                    {[
-                      { niche: tResults("emptyExample1Niche"), city: tResults("emptyExample1City") },
-                      { niche: tResults("emptyExample2Niche"), city: tResults("emptyExample2City") },
-                      { niche: tResults("emptyExample3Niche"), city: tResults("emptyExample3City") },
-                    ].map((ex) => (
-                      <button
-                        key={ex.niche + ex.city}
-                        onClick={() => handleSearch(undefined, ex.niche, ex.city)}
-                        className="px-4 py-2.5 bg-neutral-800/60 hover:bg-indigo-600/20 border border-neutral-700/50 hover:border-indigo-500/30 rounded-xl text-sm text-zinc-300 hover:text-white transition-all font-medium"
-                      >
-                        {ex.niche} en {ex.city}
-                      </button>
-                    ))}
-                  </div>
-                </>
-              )}
+              <p className="text-lg font-medium text-slate-400">{tResults("noResultsTitle")}</p>
+              <p className="text-sm mt-2 text-zinc-600">{tResults("noResultsTip")}</p>
             </div>
           )}
 
