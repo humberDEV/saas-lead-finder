@@ -202,27 +202,69 @@ export default function Dashboard() {
     }, 1500);
   };
 
-  // Auto-zone popup
+  // Auto-zone popup — free preview, localStorage 3-day cooldown
+  // Only niches that realistically yield businesses without websites
+  const POPUP_NICHES = [
+    "Fontaneros", "Electricistas", "Carpinteros", "Pintores", "Cerrajeros",
+    "Limpieza del hogar", "Barberías", "Talleres mecánicos", "Mudanzas",
+    "Jardinería", "Reformas y construcción", "Instaladores de aire acondicionado",
+    "Cristaleros", "Tapiceros", "Soldadores",
+  ];
   const [zonePopup, setZonePopup] = useState<{ city: string; niche: string } | null>(null);
   useEffect(() => {
-    const dismissed = sessionStorage.getItem("zone_popup_dismissed");
-    if (dismissed) return;
-    // Detect country via IP and suggest a local city
+    const COOLDOWN_DAYS = 3;
+    const lastShown = localStorage.getItem("zone_popup_last");
+    if (lastShown) {
+      const daysSince = (Date.now() - Number(lastShown)) / 86_400_000;
+      if (daysSince < COOLDOWN_DAYS) return;
+    }
     fetch("https://ipapi.co/json/")
       .then((r) => r.json())
       .then((data) => {
         const country = data.country_name as string;
         if (!country) return;
-        // Find cities matching this country
         const countryCities = CITIES.filter((c) => c.endsWith(`, ${country}`));
         if (countryCities.length === 0) return;
         const randomCity = countryCities[Math.floor(Math.random() * countryCities.length)];
-        const randomNiche = VALIDATED_NICHES[Math.floor(Math.random() * VALIDATED_NICHES.length)];
+        const randomNiche = POPUP_NICHES[Math.floor(Math.random() * POPUP_NICHES.length)];
         setZonePopup({ city: randomCity, niche: randomNiche });
       })
       .catch(() => {});
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const dismissZonePopup = () => {
+    setZonePopup(null);
+    localStorage.setItem("zone_popup_last", String(Date.now()));
+  };
+
+  const runZonePreview = async (niche: string, city: string) => {
+    dismissZonePopup();
+    setLoading(true);
+    setError(null);
+    setResults([]);
+    setHiddenIndexes([]);
+    setHistoryContext(null);
+    setHasSearched(true);
+    try {
+      const res = await fetch(`/api/preview?niche=${encodeURIComponent(niche)}&city=${encodeURIComponent(city)}`);
+      const data = await res.json();
+      if (!res.ok) throw new Error(data?.error || `Error ${res.status}`);
+      const found: Place[] = data.results || [];
+      setResults(found);
+      setCurrentHistoryId(null);
+      if (found.length > 0) {
+        setToastCount(found.length);
+        setShowToast(true);
+        setTimeout(() => setShowToast(false), 3500);
+        setTimeout(() => resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 150);
+      }
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Watch for new search signal from sidebar button
   const prevNewSearchVersion = useRef(0);
@@ -685,47 +727,40 @@ export default function Dashboard() {
         </Suspense>
       )}
 
-      {/* Auto-zone popup */}
+      {/* Auto-zone popup — compact card, bottom-right */}
       <AnimatePresence>
         {zonePopup && (
           <motion.div
-            initial={{ opacity: 0, y: 60, scale: 0.96 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 40, scale: 0.96 }}
-            transition={{ duration: 0.35, ease: "easeOut", delay: 1.5 }}
-            className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 w-[calc(100%-2rem)] max-w-sm"
+            initial={{ opacity: 0, x: 16, y: 8 }}
+            animate={{ opacity: 1, x: 0, y: 0 }}
+            exit={{ opacity: 0, x: 12, y: 4 }}
+            transition={{ duration: 0.3, ease: "easeOut", delay: 2 }}
+            className="fixed bottom-5 right-5 z-40 w-64"
           >
-            <div className="relative flex items-start gap-4 px-5 py-4 rounded-2xl border border-indigo-500/30 bg-neutral-900/95 backdrop-blur-xl shadow-[0_8px_40px_rgba(99,102,241,0.2)]">
-              <div className="flex items-center justify-center w-9 h-9 rounded-xl bg-indigo-500/15 border border-indigo-500/25 shrink-0 mt-0.5">
-                <MapPin className="w-4 h-4 text-indigo-400" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-bold text-white leading-snug">
-                  Hay negocios sin web cerca de ti
-                </p>
-                <p className="text-xs text-zinc-400 mt-0.5 truncate">
-                  {zonePopup.niche} en {zonePopup.city}
+            <div className="relative rounded-xl border border-neutral-700/80 bg-neutral-900/98 backdrop-blur-xl shadow-[0_8px_32px_rgba(0,0,0,0.5)] overflow-hidden">
+              <div className="h-px bg-gradient-to-r from-indigo-500/60 via-indigo-400/30 to-transparent" />
+              <div className="p-4">
+                <div className="flex items-start justify-between gap-2 mb-2">
+                  <p className="text-xs font-bold text-white leading-snug">
+                    Negocios sin web cerca de ti
+                  </p>
+                  <button
+                    onClick={dismissZonePopup}
+                    className="p-0.5 rounded text-zinc-600 hover:text-zinc-400 transition-colors shrink-0 -mt-0.5"
+                  >
+                    <X className="w-3 h-3" />
+                  </button>
+                </div>
+                <p className="text-[11px] text-zinc-500 mb-3 leading-snug">
+                  {zonePopup.niche} · {zonePopup.city.split(",")[0]}
                 </p>
                 <button
-                  onClick={() => {
-                    setZonePopup(null);
-                    sessionStorage.setItem("zone_popup_dismissed", "1");
-                    handleSearch(undefined, zonePopup.niche, zonePopup.city);
-                  }}
-                  className="mt-2.5 text-xs font-bold text-indigo-400 hover:text-indigo-300 transition-colors"
+                  onClick={() => runZonePreview(zonePopup.niche, zonePopup.city)}
+                  className="w-full py-1.5 px-3 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold transition-colors"
                 >
-                  Ver ahora →
+                  Ver gratis →
                 </button>
               </div>
-              <button
-                onClick={() => {
-                  setZonePopup(null);
-                  sessionStorage.setItem("zone_popup_dismissed", "1");
-                }}
-                className="absolute top-3 right-3 p-1 rounded-lg hover:bg-neutral-800 text-zinc-600 hover:text-zinc-400 transition-colors"
-              >
-                <X className="w-3.5 h-3.5" />
-              </button>
             </div>
           </motion.div>
         )}

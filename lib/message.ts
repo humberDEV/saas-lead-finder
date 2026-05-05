@@ -1,6 +1,6 @@
 const pick = <T>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)];
 
-// ── Openers ──────────────────────────────────────────────────────────────────
+// Short, neutral openers — "usted" form, no regional markers
 const OPENERS = [
   "Hola, buenos dias.",
   "Hola, buenas tardes.",
@@ -8,46 +8,41 @@ const OPENERS = [
   "Buenas,",
 ];
 
-// ── Cómo encontré el negocio ─────────────────────────────────────────────────
+// How they found the business
 const HOW_FOUND = [
-  "he visto vuestro negocio en Google Maps y tenia una consulta.",
-  "os he encontrado buscando en Google Maps y queria haceros una pregunta.",
-  "vi vuestra ficha en Google Maps y me surgio una duda.",
-  "he visto vuestro local en Google Maps y queria comentaros algo.",
+  "he visto su negocio en Google Maps y queria comentarle algo.",
+  "encontre su negocio en Google Maps y tenia una consulta.",
+  "vi su ficha en Google Maps y queria hacerle una pregunta.",
 ];
 
-// ── Observacion sobre la ausencia de web ─────────────────────────────────────
+// No-website observation — varies by review count
 function noWebObs(reviewCount: number): string {
   if (reviewCount >= 50) {
     return pick([
-      `Teneis ${reviewCount} resenas en Google, lo que indica que el negocio va bien, pero no he encontrado pagina web propia.`,
-      `He visto que teneis bastantes resenas en Maps, pero no teneis web propia.`,
-      `Con ${reviewCount} resenas en Google ya tenis bastante presencia, aunque no teneis pagina web.`,
+      `Vi que tiene ${reviewCount} resenas en Google, que esta muy bien, pero no encontre pagina web propia.`,
+      `Tiene bastante actividad en Maps, aunque no tiene web propia.`,
     ]);
   }
   if (reviewCount >= 10) {
     return pick([
-      "He buscado vuestra web y no he encontrado ninguna.",
-      "No he encontrado pagina web del negocio.",
-      "Teneis ficha en Google pero no web propia.",
+      "Busque su web y no encontre ninguna.",
+      "No encontre pagina web del negocio.",
+      "Tiene presencia en Google Maps pero no web propia.",
     ]);
   }
   return pick([
-    "He buscado vuestra web y no aparece ninguna.",
-    "No he visto que tengais pagina web.",
-    "No he encontrado web propia del negocio.",
+    "Busque su web y no aparece ninguna.",
+    "No encontre pagina web de su negocio.",
   ]);
 }
 
-// ── Propuesta ────────────────────────────────────────────────────────────────
+// Closing proposal — direct, no pressure
 const PROPOSALS = [
-  "Me dedico a hacer paginas web para negocios locales y, si os interesa, puedo enviaros informacion sin compromiso.",
-  "Hago webs para negocios como el vuestro y, si quereis, os mando algo de informacion.",
-  "Me dedico al diseno web para negocios locales. Si os interesa podria enviaros una propuesta sin ningun compromiso.",
-  "Trabajo haciendo webs para negocios de la zona. Si os parece bien, puedo mandaros algo de informacion.",
+  "Me dedico al diseno web para negocios locales y, si le interesa, puedo enviarle informacion sin compromiso.",
+  "Hago paginas web para negocios como el suyo. Si le parece bien, puedo mandarle algo de informacion.",
+  "Me dedico a crear webs para negocios locales. Si le interesa, puedo enviarle una propuesta sin ningun compromiso.",
 ];
 
-// ── URL en texto plano para incluir en el mensaje ────────────────────────────
 function stripProtocol(url: string): string {
   return url.replace(/^https?:\/\/(www\.)?/, "").replace(/\/$/, "");
 }
@@ -62,20 +57,10 @@ export function generateContactMessage(
 ): string {
   const opener = pick(OPENERS);
 
-  // Negocio que ya tiene web: mensaje de rediseno
   if (hasWebsite) {
     const webRef = website ? ` (${stripProtocol(website)})` : "";
-    return [
-      opener,
-      `he visto vuestro negocio en Google Maps.`,
-      `Teneis web${webRef}, aunque me dedico tambien a redisenos y mejoras para negocios que quieran renovar su presencia online.`,
-      `Si os interesa, puedo enviaros algunas ideas sin ningun compromiso.`,
-    ].join(" ");
+    return `${opener} he visto su negocio en Google Maps. Tiene web${webRef}, aunque me especializo tambien en redisenos para negocios que quieran renovar su presencia online. Si le interesa, puedo enviarle algunas ideas sin compromiso.`;
   }
 
-  const howFound = pick(HOW_FOUND);
-  const obs = noWebObs(reviewCount);
-  const proposal = pick(PROPOSALS);
-
-  return [opener, howFound, obs, proposal].join(" ");
+  return [opener, pick(HOW_FOUND), noWebObs(reviewCount), pick(PROPOSALS)].join(" ");
 }
