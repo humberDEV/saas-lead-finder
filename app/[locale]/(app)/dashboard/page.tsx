@@ -153,6 +153,12 @@ export default function Dashboard() {
         if (data.plan && data.plan !== "free") {
           setUpgradedPlan(data.plan);
           clearInterval(interval);
+          if (typeof window !== "undefined" && (window as any).gtag) {
+            (window as any).gtag("event", "conversion", {
+              send_to: "AW-18141614708/yajWCMu8sqgcEPSkzMpD",
+              transaction_id: "",
+            });
+          }
         }
       } catch {}
       if (attempts >= 8) clearInterval(interval);
