@@ -68,21 +68,21 @@ export default async function LandingPage() {
       popular: false,
     },
     {
+      name: tPlans("go.name"),
+      price: "$9",
+      period: "/mes",
+      desc: tPlans("go.desc"),
+      features: (tPlans.raw("go.features") as string[]).map((text: string) => ({ text, ok: true })),
+      cta: tPlans("go.cta"),
+      popular: true,
+    },
+    {
       name: tPlans("pro.name"),
       price: "$19",
       period: "/mes",
       desc: tPlans("pro.desc"),
       features: (tPlans.raw("pro.features") as string[]).map((text: string) => ({ text, ok: true })),
       cta: tPlans("pro.cta"),
-      popular: true,
-    },
-    {
-      name: tPlans("agency.name"),
-      price: "$29",
-      period: "/mes",
-      desc: tPlans("agency.desc"),
-      features: (tPlans.raw("agency.features") as string[]).map((text: string) => ({ text, ok: true })),
-      cta: tPlans("agency.cta"),
       popular: false,
     },
   ];
@@ -99,7 +99,7 @@ export default async function LandingPage() {
             "@type": "SoftwareApplication",
             name: "Huntly",
             applicationCategory: "BusinessApplication",
-            offers: { "@type": "AggregateOffer", lowPrice: "0", highPrice: "39", priceCurrency: "USD" },
+            offers: { "@type": "AggregateOffer", lowPrice: "0", highPrice: "19", priceCurrency: "USD" },
           }),
         }}
       />
