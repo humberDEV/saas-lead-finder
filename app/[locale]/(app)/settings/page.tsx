@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
   CreditCard, LogOut, MessageCircle, ChevronRight,
-  Zap, CheckCircle, User, Shield,
+  Zap, CheckCircle, User,
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { useSidebar } from "../SidebarContext";
@@ -180,13 +180,7 @@ export default function SettingsPage() {
             icon={<MessageCircle className="w-4 h-4" />}
             label="Enviar feedback"
             sub="Cuéntanos qué mejorarías"
-            href="mailto:huntly@outlook.com?subject=Feedback%20Huntly"
-          />
-          <Row
-            icon={<Shield className="w-4 h-4" />}
-            label="Política de privacidad"
-            sub="Cómo gestionamos tus datos"
-            href="mailto:huntly@outlook.com?subject=Privacidad"
+            href="mailto:huntly@outlook.es?subject=Feedback%20Huntly"
           />
         </Section>
 

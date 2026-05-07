@@ -224,12 +224,8 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
 
       {/* ── Nav ── */}
       <div className={`shrink-0 ${isOpen ? "px-3 pb-2" : "px-2 pb-2"}`}>
-        {isOpen && (
-          <p className="text-[9px] font-black text-zinc-700 uppercase tracking-widest px-1 mb-1.5">Menú</p>
-        )}
         <div className="space-y-0.5">
           <NavItem href="/dashboard" icon={<LayoutDashboard className="w-4 h-4" />} label="Dashboard" active={isDashboard} isOpen={isOpen} accent="indigo" />
-          <NavItem onClick={handleNewSearch} icon={<Search className="w-4 h-4" />} label="Buscar leads" active={isSearch} isOpen={isOpen} accent="indigo" />
           <NavItem href="/crm" icon={<Briefcase className="w-4 h-4" />} label="Mi Cartera" active={isCrm} isOpen={isOpen} accent="violet" />
         </div>
       </div>
@@ -282,7 +278,7 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
 
       {/* ── Bottom: upgrade hint + settings ── */}
       <div className={`border-t border-white/[0.05] py-2 shrink-0 ${isOpen ? "px-3 space-y-1" : "px-2 flex flex-col items-center gap-1"}`}>
-        {plan === "free" && (
+        {plan === "free" && !outOfCredits && (
           <Link
             href="/pricing"
             className={`flex items-center gap-2.5 px-2 py-2 rounded-xl bg-amber-500/8 hover:bg-amber-500/15 border border-amber-500/15 hover:border-amber-500/30 transition-all text-amber-400 hover:text-amber-300 ${!isOpen && "justify-center w-9 h-9"}`}

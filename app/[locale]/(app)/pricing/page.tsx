@@ -38,6 +38,7 @@ export default function Pricing() {
     {
       name: tPlans("go.name"),
       price: "$9",
+      originalPrice: "$19",
       period: "/mes",
       desc: tPlans("go.desc"),
       features: (tPlans.raw("go.features") as string[]).map((text: string) => ({ text, ok: true })),
@@ -48,6 +49,7 @@ export default function Pricing() {
     {
       name: tPlans("pro.name"),
       price: "$19",
+      originalPrice: "$39",
       period: "/mes",
       desc: tPlans("pro.desc"),
       features: (tPlans.raw("pro.features") as string[]).map((text: string) => ({ text, ok: true })),
@@ -126,9 +128,19 @@ export default function Pricing() {
                   <h3 className="text-sm font-bold text-white mb-0.5">{plan.name}</h3>
                   <p className="text-xs text-zinc-400">{plan.desc}</p>
                 </div>
-                <div className="mb-5 flex items-baseline gap-1">
-                  <span className="text-4xl font-black text-white tracking-tight">{plan.price}</span>
-                  <span className="text-zinc-400 text-sm">{plan.period}</span>
+                <div className="mb-5">
+                  {"originalPrice" in plan && plan.originalPrice && (
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="text-sm text-zinc-600 line-through">{plan.originalPrice}</span>
+                      <span className="text-[10px] font-black text-emerald-400 uppercase tracking-wider bg-emerald-500/10 px-1.5 py-0.5 rounded">
+                        -{Math.round((1 - parseInt(plan.price.replace("$","")) / parseInt((plan.originalPrice as string).replace("$",""))) * 100)}%
+                      </span>
+                    </div>
+                  )}
+                  <div className="flex items-baseline gap-1">
+                    <span className="text-4xl font-black text-white tracking-tight">{plan.price}</span>
+                    <span className="text-zinc-400 text-sm">{plan.period}</span>
+                  </div>
                 </div>
                 <ul className="space-y-2 mb-6 flex-1">
                   {plan.features.map((feat, j) => (

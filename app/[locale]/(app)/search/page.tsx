@@ -29,86 +29,114 @@ function useTimeAgo() {
   };
 }
 
-const PAYWALL_PLANS = [
-  { key: "go", name: "Go", price: 9, searches: 100, highlight: "popular" as const },
-  { key: "pro", name: "Pro", price: 19, searches: 250, highlight: "none" as const },
-];
+interface PaywallStats {
+  noWebsiteFound: number;
+  contactableLeads: number;
+  whatsappCount: number;
+  searchesThisMonth: number;
+  totalSearches: number;
+}
 
-const PLAN_FEATURES: Record<string, string[]> = {
-  go: ["100 búsquedas/mes", "Guardar leads en cartera", "Historial completo", "Soporte prioritario"],
-  pro: ["250 búsquedas/mes", "Todo lo del plan Go", "Volumen para agencias", "Soporte prioritario"],
-};
+function PaywallModal({ onClose }: { onClose: () => void }) {
+  const [loadingCheckout, setLoadingCheckout] = useState(false);
+  const [stats, setStats] = useState<PaywallStats | null>(null);
 
-function PaywallModal({ tSearch, onClose }: { tSearch: ReturnType<typeof useTranslations>; onClose: () => void }) {
-  const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
+  useEffect(() => {
+    fetch("/api/stats")
+      .then((r) => r.json())
+      .then((d: PaywallStats) => setStats(d))
+      .catch(() => {});
+  }, []);
 
-  async function handleCheckout(planKey: string) {
-    setLoadingPlan(planKey);
+  async function handleCheckout() {
+    setLoadingCheckout(true);
     try {
       const res = await fetch("/api/stripe/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ planKey }),
+        body: JSON.stringify({ planKey: "go" }),
       });
       const data = await res.json();
       if (data.url) window.location.href = data.url;
-      else setLoadingPlan(null);
+      else setLoadingCheckout(false);
     } catch {
-      setLoadingPlan(null);
+      setLoadingCheckout(false);
     }
   }
 
+  const totalSearches = stats?.totalSearches ?? 0;
+
   return (
-    <div className="grid sm:grid-cols-2 gap-3">
-      {PAYWALL_PLANS.map((p) => (
-        <div
-          key={p.key}
-          className={`relative rounded-xl border p-5 flex flex-col gap-3 ${
-            p.highlight === "popular"
-              ? "border-indigo-500/40 bg-indigo-950/20"
-              : "border-neutral-800 bg-white/[0.02]"
-          }`}
-        >
-          {p.highlight === "popular" && (
-            <span className="absolute -top-2.5 left-4 text-[10px] font-bold uppercase tracking-widest bg-indigo-600 text-white px-2.5 py-0.5 rounded-full">
-              {tSearch("paywallPopular")}
-            </span>
-          )}
+    <div>
+      {/* Header */}
+      <div className="mb-5">
+        <p className="text-[10px] font-black text-amber-400/90 uppercase tracking-widest mb-2">
+          Has usado tus búsquedas gratis
+        </p>
+        <h2 className="text-xl font-black text-white leading-tight">
+          Mira lo que ya encontraste.
+        </h2>
+        <p className="text-sm text-zinc-400 mt-1">
+          Ahora desbloquéalo para trabajarlo bien.
+        </p>
+      </div>
 
-          <div className="flex items-baseline justify-between">
-            <span className="text-base font-black text-white">{p.name}</span>
-            <span className="text-xl font-black text-white">
-              ${p.price}<span className="text-xs text-zinc-500 font-normal">/mes</span>
-            </span>
-          </div>
-
-          <ul className="space-y-1.5 flex-1">
-            {(PLAN_FEATURES[p.key] ?? []).map((f) => (
-              <li key={f} className="flex items-center gap-2 text-xs text-zinc-300">
-                <svg className="w-3.5 h-3.5 text-emerald-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
-                </svg>
-                {f}
-              </li>
+      {/* Personalized stats */}
+      {stats && totalSearches > 0 && (
+        <div className="bg-neutral-800/60 border border-neutral-700/50 rounded-2xl p-4 mb-5">
+          <p className="text-[10px] font-black text-zinc-600 uppercase tracking-widest mb-3">
+            En tus {totalSearches} búsqueda{totalSearches !== 1 ? "s" : ""}, Huntly encontró
+          </p>
+          <div className="grid grid-cols-2 gap-2">
+            {[
+              { n: stats.noWebsiteFound,   label: "negocios sin web" },
+              { n: stats.contactableLeads, label: "leads contactables" },
+              { n: stats.whatsappCount,    label: "con WhatsApp" },
+              { n: stats.searchesThisMonth, label: "búsquedas este mes" },
+            ].map(({ n, label }) => (
+              <div key={label} className="text-center py-2.5 bg-neutral-900/60 rounded-xl border border-neutral-800">
+                <p className="text-xl font-black text-white leading-none">{n}</p>
+                <p className="text-[9px] text-zinc-500 mt-0.5 leading-tight">{label}</p>
+              </div>
             ))}
-          </ul>
-
-          <button
-            onClick={() => handleCheckout(p.key)}
-            disabled={!!loadingPlan}
-            className={`flex items-center justify-center gap-2 w-full py-2.5 rounded-xl text-sm font-bold transition-colors disabled:opacity-60 mt-1 ${
-              p.highlight === "popular"
-                ? "bg-indigo-600 hover:bg-indigo-500 text-white"
-                : "bg-white/[0.07] hover:bg-white/[0.12] text-white border border-white/[0.08]"
-            }`}
-          >
-            {loadingPlan === p.key
-              ? <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-              : <>{tSearch("paywallCta", { plan: p.name })} <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg></>
-            }
-          </button>
+          </div>
+          <p className="text-[11px] text-zinc-600 text-center mt-3 leading-relaxed">
+            Estás viendo solo una parte. Con Go tienes historial, cartera y 100 búsquedas al mes.
+          </p>
         </div>
-      ))}
+      )}
+
+      {/* Go CTA */}
+      <button
+        onClick={handleCheckout}
+        disabled={loadingCheckout}
+        className="w-full flex items-center justify-center gap-2 py-3.5 bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 text-white font-black text-sm rounded-xl transition-all shadow-[0_0_24px_rgba(99,102,241,0.35)] hover:shadow-[0_0_36px_rgba(99,102,241,0.5)] disabled:opacity-60"
+      >
+        {loadingCheckout ? (
+          <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+        ) : (
+          <>
+            Continuar con Go · $9/mes
+            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+          </>
+        )}
+      </button>
+      <p className="text-[10px] text-zinc-600 mt-2 text-center">
+        100 búsquedas/mes · historial completo · cartera de leads
+      </p>
+
+      {/* Secondary: all plans */}
+      <div className="mt-4 pt-4 border-t border-neutral-800/60 text-center">
+        <Link
+          href="/pricing"
+          onClick={onClose}
+          className="text-xs text-zinc-500 hover:text-zinc-300 transition-colors"
+        >
+          Ver todos los planes →
+        </Link>
+      </div>
     </div>
   );
 }
@@ -627,29 +655,19 @@ export default function Dashboard() {
               {/* Top accent line */}
               <div className="h-px bg-gradient-to-r from-transparent via-indigo-500/60 to-transparent" />
 
-              <div className="p-6 md:p-8">
-                {/* Header */}
-                <div className="flex items-start justify-between mb-6">
-                  <div>
-                    <p className="text-xs font-mono text-indigo-400 uppercase tracking-widest mb-1">Plan de pago</p>
-                    <h2 className="text-2xl font-black text-white leading-tight">
-                      Agotaste tus búsquedas.<br />
-                      <span className="text-indigo-400">Elige un plan y sigue.</span>
-                    </h2>
-                    <p className="text-sm text-zinc-400 mt-2">
-                      Con un solo cliente web cubres meses de suscripción.
-                    </p>
-                  </div>
+              <div className="p-6">
+                {/* Close */}
+                <div className="flex justify-end mb-1">
                   <button
                     onClick={() => setShowPaywallModal(false)}
-                    className="p-1.5 rounded-lg hover:bg-neutral-800 text-zinc-500 hover:text-white transition-colors shrink-0 ml-4"
+                    className="p-1.5 rounded-lg hover:bg-neutral-800 text-zinc-500 hover:text-white transition-colors"
                   >
-                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
                   </button>
                 </div>
-
-                {/* Plans */}
-                <PaywallModal tSearch={tSearch} onClose={() => setShowPaywallModal(false)} />
+                <PaywallModal onClose={() => setShowPaywallModal(false)} />
               </div>
             </motion.div>
           </motion.div>

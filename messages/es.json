@@ -128,7 +128,7 @@
     "go": {
       "name": "Go",
       "desc": "Para freelancers que hacen prospección cada semana.",
-      "cta": "Contratar Go",
+      "cta": "Empezar con Go",
       "features": [
         "100 búsquedas/mes",
         "Score de oportunidad en cada lead",
@@ -142,7 +142,7 @@
     "pro": {
       "name": "Pro",
       "desc": "Para quienes prospectan a diario y necesitan más volumen.",
-      "cta": "Contratar Pro",
+      "cta": "Empezar con Pro",
       "features": [
         "250 búsquedas/mes",
         "Todo lo del plan Go",
