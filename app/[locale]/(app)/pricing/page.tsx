@@ -195,8 +195,8 @@ export default function Pricing() {
 
         <p className="text-center text-xs text-zinc-600 mt-8">
           {t("contactUs")}{" "}
-          <a href="mailto:hola@huntly.app" className="text-zinc-400 hover:text-white transition-colors">
-            hola@huntly.app
+          <a href="mailto:huntly@outlook.es" className="text-zinc-400 hover:text-white transition-colors">
+            huntly@outlook.es
           </a>
         </p>
       </main>

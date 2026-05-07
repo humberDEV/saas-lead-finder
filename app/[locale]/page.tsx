@@ -676,7 +676,7 @@ export default async function LandingPage() {
               <div className="flex items-center gap-6 text-sm text-zinc-700">
                 <Link href="#como-funciona" className="hover:text-zinc-400 transition-colors">{t("footer.howItWorks")}</Link>
                 <Link href="#precios" className="hover:text-zinc-400 transition-colors">{t("footer.pricing")}</Link>
-                <Link href="mailto:hola@huntly.app" className="hover:text-zinc-400 transition-colors">{t("footer.contact")}</Link>
+                <Link href="mailto:huntly@outlook.es" className="hover:text-zinc-400 transition-colors">{t("footer.contact")}</Link>
               </div>
               <p className="text-sm text-zinc-700">© {new Date().getFullYear()} Huntly</p>
             </div>
