@@ -6,7 +6,7 @@ import { useRouter, usePathname } from "next/navigation";
 import { useUser, UserButton } from "@clerk/nextjs";
 import {
   Sparkles, ChevronLeft, ChevronRight, Plus,
-  Clock, Briefcase, Zap, Search, CreditCard, MessageCircle,
+  Clock, Briefcase, Zap, Search, CreditCard, MessageCircle, LayoutDashboard,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useSidebar } from "./SidebarContext";
@@ -58,17 +58,17 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
   const outOfCredits = credits !== null && credits <= 0;
 
   const handleNewSearch = () => {
-    if (pathname.endsWith("/dashboard")) {
+    if (pathname.endsWith("/search")) {
       triggerNewSearch();
     } else {
-      router.push("/dashboard");
+      router.push("/search");
     }
   };
 
   const handleSelectHistory = (id: string) => {
     setPendingHistoryId(id);
-    if (!pathname.endsWith("/dashboard")) {
-      router.push("/dashboard");
+    if (!pathname.endsWith("/search")) {
+      router.push("/search");
     }
   };
 
@@ -210,8 +210,16 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
       {/* ── Nav links ── */}
       <div className="border-t border-white/[0.05] py-2 px-2 shrink-0 space-y-0.5">
         <Link
+          href="/dashboard"
+          className={`flex items-center gap-2.5 px-2 py-2 rounded-lg hover:bg-white/5 transition-colors text-zinc-400 hover:text-white ${!isOpen && "justify-center"} ${pathname.endsWith("/dashboard") ? "bg-white/5 text-white" : ""}`}
+          title="Dashboard"
+        >
+          <LayoutDashboard className="w-4 h-4 shrink-0" />
+          {isOpen && <span className="text-sm">Dashboard</span>}
+        </Link>
+        <Link
           href="/crm"
-          className={`flex items-center gap-2.5 px-2 py-2 rounded-lg hover:bg-white/5 transition-colors text-zinc-400 hover:text-white ${!isOpen && "justify-center"}`}
+          className={`flex items-center gap-2.5 px-2 py-2 rounded-lg hover:bg-white/5 transition-colors text-zinc-400 hover:text-white ${!isOpen && "justify-center"} ${pathname.endsWith("/crm") ? "bg-white/5 text-white" : ""}`}
           title={t("portfolio")}
         >
           <Briefcase className="w-4 h-4 shrink-0" />

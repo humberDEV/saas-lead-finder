@@ -70,9 +70,13 @@ export async function PATCH(req: Request) {
     const body = await req.json();
     const { leadId, status, notes } = body;
 
+    const VALID_STATUSES = ["PENDIENTE", "CONTACTADO", "EN_CONTACTO", "INTERESADO", "CERRADO", "DESCARTADO"];
     const lead = await db.savedLead.update({
       where: { id: leadId },
-      data: { status, notes },
+      data: {
+        ...(status !== undefined && VALID_STATUSES.includes(status) ? { status } : {}),
+        ...(notes !== undefined ? { notes } : {}),
+      },
     });
 
     return NextResponse.json(lead);

@@ -12,7 +12,7 @@ export const PLANS: Record<string, PlanConfig> = {
     key: "free",
     displayName: "Free",
     priceEnvVar: "",
-    searches: 3,
+    searches: 5,
     priceMonthly: 0,
   },
   go: {

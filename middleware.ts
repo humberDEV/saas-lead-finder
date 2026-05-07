@@ -6,9 +6,11 @@ const intlMiddleware = createMiddleware(routing);
 
 const isProtectedRoute = createRouteMatcher([
   "/:locale/dashboard(.*)",
+  "/:locale/search(.*)",
   "/:locale/crm(.*)",
   "/api/leads(.*)",
   "/api/credits(.*)",
+  "/api/stats(.*)",
 ]);
 
 export default clerkMiddleware((auth, req) => {
