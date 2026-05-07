@@ -33,15 +33,13 @@ export default function MapPickerModal({ onClose, onSelect }: MapPickerModalProp
       const maplibregl = (await import("maplibre-gl")).default;
       if (aborted || !mapRef.current) return;
 
-      // Detect user location for globe center
-      let center: [number, number] = [10, 30];
-      let initZoom = 1.5;
+      // Detect user location for globe center only (never change zoom — stay in globe mode)
+      let center: [number, number] = [10, 20];
       try {
         const geo = await fetch("https://ipapi.co/json/");
         const d = await geo.json();
         if (!aborted && d.longitude && d.latitude) {
           center = [d.longitude, d.latitude];
-          initZoom = 3;
         }
       } catch { /* keep defaults */ }
 
@@ -51,26 +49,29 @@ export default function MapPickerModal({ onClose, onSelect }: MapPickerModalProp
         container: mapRef.current,
         style: "https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json",
         center,
-        zoom: initZoom,
+        zoom: 1.5,
         bearing: 20,
-        pitch: 0,
+        pitch: 22,          // tilt so you see the globe curve, not a flat top-down view
         antialias: true,
         attributionControl: false,
-        // Globe projection — 3D Earth
         projection: "globe",
       });
 
       mapInstance = map;
 
-      // Atmosphere + starfield (style.load fires when tiles are ready)
+      // The CartoCDN style ships with "projection: mercator" in its JSON which overrides
+      // the constructor option. Explicitly set globe AFTER the style finishes loading.
       map.on("style.load", () => {
+        try {
+          (map as any).setProjection("globe");
+        } catch { /* ignore if unsupported */ }
         try {
           map.setFog({
             color: "rgb(4, 4, 20)",
-            "high-color": "rgb(25, 50, 140)",
-            "horizon-blend": 0.025,
-            "space-color": "rgb(4, 4, 16)",
-            "star-intensity": 0.75,
+            "high-color": "rgb(20, 40, 130)",
+            "horizon-blend": 0.04,
+            "space-color": "rgb(4, 4, 14)",
+            "star-intensity": 0.85,
           });
         } catch { /* not supported in fallback */ }
       });
@@ -111,7 +112,7 @@ export default function MapPickerModal({ onClose, onSelect }: MapPickerModalProp
           .setLngLat([lng, lat])
           .addTo(map);
 
-        map.flyTo({ center: [lng, lat], zoom: Math.max(map.getZoom(), 7), duration: 600 });
+        map.flyTo({ center: [lng, lat], zoom: Math.max(map.getZoom(), 4), duration: 700 });
 
         setLoading(true);
         setDetected(null);
