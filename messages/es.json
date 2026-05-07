@@ -15,13 +15,13 @@
     },
     "hero": {
       "title1": "Encuentra negocios",
-      "title2": "locales a los que",
-      "title3": "venderles una web.",
-      "subtitle": "Busca por nicho y ciudad. Huntly encuentra negocios sin web, con teléfono disponible y señales claras para contactar.",
-      "ctaPrimary": "Encontrar mis primeros leads gratis",
+      "title2": "sin web que necesitan",
+      "title3": "lo que tú vendes.",
+      "subtitle": "Busca por nicho y ciudad. Huntly te da negocios sin página, con teléfono y un mensaje listo para enviar.",
+      "ctaPrimary": "Buscar clientes ahora",
       "ctaDashboard": "Ir al Dashboard",
       "ctaDemo": "Ver cómo funciona",
-      "freeNote": "5 búsquedas gratis · Sin tarjeta · Sin permanencia"
+      "freeNote": "5 búsquedas gratis · Sin tarjeta · Cancela cuando quieras"
     },
     "browserDemo": {
       "search": "Buscar",
@@ -34,9 +34,9 @@
       "noWeb": "SIN WEB"
     },
     "statBar": {
-      "stat1": "Búsquedas por ciudad y nicho",
-      "stat2": "Resultados en segundos",
-      "stat3": "Teléfonos disponibles"
+      "stat1": "+680 ciudades disponibles",
+      "stat2": "Resultados en menos de 5 segundos",
+      "stat3": "+35 nichos de negocio"
     },
     "problem": {
       "label": "El problema",
@@ -55,7 +55,7 @@
       "title": "Así encuentras clientes.",
       "subtitle": "Busca un nicho y una ciudad. Huntly detecta negocios sin web, prioriza oportunidades y te deja contactarlos en segundos.",
       "ctaQuestion": "¿Quieres probarlo con tu ciudad?",
-      "ctaButton": "Buscar mis primeros leads gratis"
+      "ctaButton": "Buscar clientes ahora"
     },
     "howItWorks": {
       "label": "Cómo funciona",
@@ -65,8 +65,8 @@
       "step1Note": "Barberías en Madrid, clínicas en Valencia o cualquier sector local.",
       "step2Title": "Huntly filtra oportunidades",
       "step2Note": "Detecta negocios sin web, con teléfono disponible y señales de actividad.",
-      "step3Title": "Contacta y guarda el seguimiento",
-      "step3Note": "Envía un WhatsApp, llama o guarda el lead en tu cartera para hacer seguimiento.",
+      "step3Title": "Contacta y haz seguimiento",
+      "step3Note": "Envía un WhatsApp, llama o guarda el negocio en tu cartera y ciérralo.",
       "step3Message": "Mensaje generado:",
       "step3Preview": "\"Me dedico al diseño web y vi que tienen 47 reseñas pero no tienen página...\"",
       "call": "Llamar"
@@ -75,18 +75,18 @@
       "label": "Para quién es",
       "title": "Hecho para gente que vende webs.",
       "audience1Title": "Freelancers web",
-      "audience1Desc": "Encuentra negocios locales sin perder horas revisando Google Maps.",
+      "audience1Desc": "Prospecta en 5 minutos lo que antes te llevaba horas en Google Maps.",
       "audience2Title": "Agencias pequeñas",
-      "audience2Desc": "Llena tu cartera con búsquedas por ciudad, sector y oportunidad.",
-      "audience3Title": "Creadores con IA",
-      "audience3Desc": "Si ya sabes crear webs rápido, Huntly te ayuda a encontrar a quién venderlas."
+      "audience2Desc": "Llena tu pipeline de oportunidades sin contratar a nadie para prospección.",
+      "audience3Title": "Creadores de webs con IA",
+      "audience3Desc": "Creas webs en horas. Huntly te encuentra los clientes que todavía no las tienen."
     },
     "pricingSection": {
       "label": "Precios",
       "title": "Sin permanencia.",
       "titleHighlight": " Cancela cuando quieras.",
-      "valueNote": "Un cliente web puede valer mucho más que un mes de Huntly.",
-      "valueHighlight": "Con cerrar uno, el plan se paga solo.",
+      "valueNote": "Un cliente web te puede generar $200 o más. Huntly Go cuesta $9.",
+      "valueHighlight": "Con cerrar uno, el plan se paga más de 20 veces.",
       "mostPopular": "Más popular"
     },
     "faq": {
@@ -95,10 +95,10 @@
     },
     "finalCta": {
       "title1": "Tu próximo cliente web",
-      "title2": "puede estar en Google Maps.",
-      "subtitle": "Huntly te ayuda a encontrarlo, contactarlo y hacer seguimiento.",
-      "freeNote": "5 búsquedas gratis · Sin tarjeta · Sin permanencia",
-      "ctaButton": "Encontrar mis primeros leads gratis",
+      "title2": "está en Google Maps ahora mismo.",
+      "subtitle": "Huntly lo encuentra. Tú lo contactas. Cerrado.",
+      "freeNote": "5 búsquedas gratis · Sin tarjeta · Cancela cuando quieras",
+      "ctaButton": "Buscar clientes ahora",
       "ctaDashboard": "Ir al Dashboard",
       "viewPlans": "Ver planes y precios →"
     },
@@ -111,43 +111,43 @@
   "plans": {
     "free": {
       "name": "Gratis",
-      "desc": "Para probar Huntly y encontrar tus primeros leads.",
+      "desc": "Comprueba que funciona. Sin tarjeta.",
       "cta": "Empezar gratis",
       "features": [
         "5 búsquedas gratis",
-        "Score de oportunidad en cada lead",
-        "WhatsApp y llamada directa",
-        "Ver en Google Maps",
+        "Score de oportunidad en cada negocio",
+        "WhatsApp y llamada con un clic",
+        "Ver ubicación en Google Maps",
         "Sin tarjeta"
       ],
       "disabledFeatures": [
-        "Guardar en Mi Cartera",
+        "Guardar negocios en Mi Cartera",
         "Historial de búsquedas"
       ]
     },
     "go": {
       "name": "Go",
-      "desc": "Para freelancers que hacen prospección cada semana.",
-      "cta": "Empezar con Go",
+      "desc": "Prospecta cada semana y cierra tu primer cliente.",
+      "cta": "Empezar con Go — $9/mes",
       "features": [
-        "100 búsquedas/mes",
-        "Score de oportunidad en cada lead",
-        "WhatsApp y llamada directa",
-        "Guardar leads en cartera",
-        "Historial de búsquedas",
+        "100 búsquedas al mes",
+        "Score de oportunidad en cada negocio",
+        "WhatsApp y llamada con un clic",
+        "Guardar negocios en Mi Cartera",
+        "Historial completo de búsquedas",
         "Soporte prioritario",
-        "Acceso beta a nuevas funciones"
+        "Acceso a nuevas funciones primero"
       ]
     },
     "pro": {
       "name": "Pro",
-      "desc": "Para quienes prospectan a diario y necesitan más volumen.",
-      "cta": "Empezar con Pro",
+      "desc": "Volumen alto para cerrar clientes cada semana.",
+      "cta": "Empezar con Pro — $19/mes",
       "features": [
-        "250 búsquedas/mes",
+        "250 búsquedas al mes",
         "Todo lo del plan Go",
         "Soporte prioritario",
-        "Acceso beta a nuevas funciones"
+        "Acceso a nuevas funciones primero"
       ]
     }
   },

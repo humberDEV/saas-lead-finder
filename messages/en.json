@@ -14,11 +14,11 @@
       "dashboard": "Dashboard"
     },
     "hero": {
-      "title1": "Find local businesses",
-      "title2": "that need",
-      "title3": "a website.",
-      "subtitle": "Search by niche and city. Huntly finds businesses without a website, with available phone numbers and clear signals to reach out.",
-      "ctaPrimary": "Find my first leads for free",
+      "title1": "Find businesses",
+      "title2": "with no website that need",
+      "title3": "what you sell.",
+      "subtitle": "Search by niche and city. Huntly gives you businesses with no website, a phone number, and a message ready to send.",
+      "ctaPrimary": "Find clients now",
       "ctaDashboard": "Go to Dashboard",
       "ctaDemo": "See how it works",
       "freeNote": "5 free searches · No credit card · Cancel anytime"
@@ -34,9 +34,9 @@
       "noWeb": "NO WEBSITE"
     },
     "statBar": {
-      "stat1": "Search by city and niche",
-      "stat2": "Results in seconds",
-      "stat3": "Phone numbers available"
+      "stat1": "+680 cities available",
+      "stat2": "Results in under 5 seconds",
+      "stat3": "+35 business niches"
     },
     "problem": {
       "label": "The problem",
@@ -55,7 +55,7 @@
       "title": "This is how you find clients.",
       "subtitle": "Search a niche and a city. Huntly detects businesses without websites, prioritizes opportunities, and lets you contact them in seconds.",
       "ctaQuestion": "Want to try it with your city?",
-      "ctaButton": "Find my first leads for free"
+      "ctaButton": "Find clients now"
     },
     "howItWorks": {
       "label": "How it works",
@@ -65,8 +65,8 @@
       "step1Note": "Barbershops in Miami, clinics in Austin, or any local sector.",
       "step2Title": "Huntly filters opportunities",
       "step2Note": "Detects businesses without a website, with available phone numbers and activity signals.",
-      "step3Title": "Reach out and track follow-ups",
-      "step3Note": "Send a WhatsApp, call, or save the lead to your portfolio for follow-up.",
+      "step3Title": "Reach out and close",
+      "step3Note": "Send a WhatsApp, call, or save the business to your portfolio and close the deal.",
       "step3Message": "Generated message:",
       "step3Preview": "\"I do web design and noticed you have 47 reviews but no website...\"",
       "call": "Call"
@@ -75,18 +75,18 @@
       "label": "Who it's for",
       "title": "Built for people who sell websites.",
       "audience1Title": "Web freelancers",
-      "audience1Desc": "Find local businesses without spending hours scrolling Google Maps.",
+      "audience1Desc": "Prospect in 5 minutes what used to take hours scrolling Google Maps.",
       "audience2Title": "Small agencies",
-      "audience2Desc": "Fill your pipeline with searches by city, sector, and opportunity.",
-      "audience3Title": "AI builders",
-      "audience3Desc": "If you already build sites fast, Huntly helps you find who to sell them to."
+      "audience2Desc": "Fill your pipeline with opportunities without hiring anyone for prospecting.",
+      "audience3Title": "AI web builders",
+      "audience3Desc": "You build sites in hours. Huntly finds the clients who still don't have one."
     },
     "pricingSection": {
       "label": "Pricing",
       "title": "No commitment.",
       "titleHighlight": " Cancel anytime.",
-      "valueNote": "One web client can be worth way more than a month of Huntly.",
-      "valueHighlight": "Close one deal and the plan pays for itself.",
+      "valueNote": "One web client can bring you $200 or more. Huntly Go costs $9.",
+      "valueHighlight": "Close just one and the plan pays for itself 20 times over.",
       "mostPopular": "Most popular"
     },
     "faq": {
@@ -95,10 +95,10 @@
     },
     "finalCta": {
       "title1": "Your next web client",
-      "title2": "might be on Google Maps.",
-      "subtitle": "Huntly helps you find them, reach out, and follow up.",
+      "title2": "is on Google Maps right now.",
+      "subtitle": "Huntly finds them. You reach out. Done.",
       "freeNote": "5 free searches · No credit card · Cancel anytime",
-      "ctaButton": "Find my first leads for free",
+      "ctaButton": "Find clients now",
       "ctaDashboard": "Go to Dashboard",
       "viewPlans": "View plans and pricing →"
     },
@@ -111,43 +111,43 @@
   "plans": {
     "free": {
       "name": "Free",
-      "desc": "Try Huntly and find your first leads.",
+      "desc": "See it work. No card needed.",
       "cta": "Start for free",
       "features": [
         "5 free searches",
-        "Opportunity score on every lead",
-        "WhatsApp and direct call",
+        "Opportunity score on every business",
+        "WhatsApp and call in one click",
         "View on Google Maps",
         "No credit card needed"
       ],
       "disabledFeatures": [
-        "Save to My Portfolio",
+        "Save businesses to My Portfolio",
         "Search history"
       ]
     },
     "go": {
       "name": "Go",
-      "desc": "For freelancers who prospect every week.",
-      "cta": "Get Go",
+      "desc": "Prospect every week and close your first client.",
+      "cta": "Start with Go — $9/mo",
       "features": [
-        "100 searches/month",
-        "Opportunity score on every lead",
-        "WhatsApp and direct call",
-        "Save leads to portfolio",
-        "Search history",
+        "100 searches per month",
+        "Opportunity score on every business",
+        "WhatsApp and call in one click",
+        "Save businesses to My Portfolio",
+        "Full search history",
         "Priority support",
-        "Beta access to new features"
+        "Early access to new features"
       ]
     },
     "pro": {
       "name": "Pro",
-      "desc": "For those who prospect daily and need more volume.",
-      "cta": "Get Pro",
+      "desc": "High volume to close clients every week.",
+      "cta": "Start with Pro — $19/mo",
       "features": [
-        "250 searches/month",
+        "250 searches per month",
         "Everything in Go",
         "Priority support",
-        "Beta access to new features"
+        "Early access to new features"
       ]
     }
   },
