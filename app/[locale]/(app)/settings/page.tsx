@@ -108,7 +108,7 @@ export default function SettingsPage() {
 
   return (
     <div className="h-full overflow-y-auto bg-[#0A0A0A]">
-      <main className="max-w-lg mx-auto p-6 md:p-10 pb-24">
+      <main className="max-w-lg mx-auto px-5 pt-10 pb-28 md:px-10 md:pt-14">
 
         {/* Header */}
         <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.25 }} className="mb-8">
