@@ -1,10 +1,10 @@
 {
   "metadata": {
     "title": "Huntly — Encuentra negocios locales sin web",
-    "description": "Busca por nicho y ciudad y encuentra negocios sin página web en segundos. Obtén su teléfono, puntúa leads y envía un mensaje por WhatsApp. 3 búsquedas gratis.",
+    "description": "Busca por nicho y ciudad y encuentra negocios sin página web en segundos. Obtén su teléfono, puntúa leads y envía un mensaje por WhatsApp. 5 búsquedas gratis.",
     "keywords": "prospección negocios, leads locales, negocios sin web, agencia web, google maps leads, España",
     "ogTitle": "Huntly — Encuentra negocios locales sin web",
-    "ogDescription": "Encuentra negocios sin web por nicho y ciudad. Puntúa leads, consigue su teléfono y contacta por WhatsApp. 3 búsquedas gratis, sin tarjeta."
+    "ogDescription": "Encuentra negocios sin web por nicho y ciudad. Puntúa leads, consigue su teléfono y contacta por WhatsApp. 5 búsquedas gratis, sin tarjeta."
   },
   "landing": {
     "nav": {
@@ -21,7 +21,7 @@
       "ctaPrimary": "Encontrar mis primeros leads gratis",
       "ctaDashboard": "Ir al Dashboard",
       "ctaDemo": "Ver cómo funciona",
-      "freeNote": "3 búsquedas gratis · Sin tarjeta · Sin permanencia"
+      "freeNote": "5 búsquedas gratis · Sin tarjeta · Sin permanencia"
     },
     "browserDemo": {
       "search": "Buscar",
@@ -97,7 +97,7 @@
       "title1": "Tu próximo cliente web",
       "title2": "puede estar en Google Maps.",
       "subtitle": "Huntly te ayuda a encontrarlo, contactarlo y hacer seguimiento.",
-      "freeNote": "3 búsquedas gratis · Sin tarjeta · Sin permanencia",
+      "freeNote": "5 búsquedas gratis · Sin tarjeta · Sin permanencia",
       "ctaButton": "Encontrar mis primeros leads gratis",
       "ctaDashboard": "Ir al Dashboard",
       "viewPlans": "Ver planes y precios →"
