@@ -8,6 +8,7 @@ const isProtectedRoute = createRouteMatcher([
   "/:locale/dashboard(.*)",
   "/:locale/search(.*)",
   "/:locale/crm(.*)",
+  "/:locale/settings(.*)",
   "/api/leads(.*)",
   "/api/credits(.*)",
   "/api/stats(.*)",

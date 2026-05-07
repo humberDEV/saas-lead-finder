@@ -3,11 +3,11 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
-import { useUser, UserButton } from "@clerk/nextjs";
+import { useUser } from "@clerk/nextjs";
 import {
   Sparkles, ChevronLeft, ChevronRight,
-  Clock, Briefcase, Search, CreditCard,
-  MessageCircle, LayoutDashboard, Zap,
+  Clock, Briefcase, Search, Settings,
+  LayoutDashboard, Zap,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useSidebar } from "./SidebarContext";
@@ -153,7 +153,18 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
         {isOpen ? (
           <div className="space-y-2.5">
             <div className="flex items-center gap-2.5">
-              <UserButton appearance={{ elements: { avatarBox: "w-7 h-7 ring-1 ring-white/10" } }} />
+              {/* Custom avatar — not clickable */}
+              {user?.imageUrl ? (
+                <img
+                  src={user.imageUrl}
+                  alt={displayName}
+                  className="w-7 h-7 rounded-full ring-1 ring-white/10 object-cover shrink-0 select-none pointer-events-none"
+                />
+              ) : (
+                <div className="w-7 h-7 rounded-full bg-indigo-700 flex items-center justify-center ring-1 ring-white/10 shrink-0 select-none">
+                  <span className="text-[11px] font-black text-white">{displayName[0]?.toUpperCase()}</span>
+                </div>
+              )}
               <div className="min-w-0 flex-1">
                 <p className="text-xs font-bold text-white truncate leading-tight">{displayName}</p>
                 <span className={`text-[9px] font-black uppercase px-1.5 py-0.5 rounded leading-none ${
@@ -183,7 +194,17 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
             )}
           </div>
         ) : (
-          <UserButton appearance={{ elements: { avatarBox: "w-7 h-7 ring-1 ring-white/10" } }} />
+          user?.imageUrl ? (
+            <img
+              src={user.imageUrl}
+              alt={displayName}
+              className="w-7 h-7 rounded-full ring-1 ring-white/10 object-cover select-none pointer-events-none"
+            />
+          ) : (
+            <div className="w-7 h-7 rounded-full bg-indigo-700 flex items-center justify-center ring-1 ring-white/10 select-none">
+              <span className="text-[11px] font-black text-white">{displayName[0]?.toUpperCase()}</span>
+            </div>
+          )
         )}
       </div>
 
@@ -259,22 +280,9 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
         )}
       </div>
 
-      {/* ── Bottom actions ── */}
-      <div className={`border-t border-white/[0.05] py-2 shrink-0 ${isOpen ? "px-3 space-y-0.5" : "px-2 space-y-1 flex flex-col items-center"}`}>
-        {plan !== "free" ? (
-          <button
-            onClick={async () => {
-              const res = await fetch("/api/stripe/portal", { method: "POST" });
-              const data = await res.json();
-              if (data.url) window.location.href = data.url;
-            }}
-            className={`flex items-center gap-2.5 px-2 py-2 rounded-lg hover:bg-white/[0.04] transition-colors text-zinc-500 hover:text-zinc-300 ${!isOpen && "justify-center w-9 h-9"}`}
-            title={t("managePlan")}
-          >
-            <CreditCard className="w-3.5 h-3.5 shrink-0" />
-            {isOpen && <span className="text-xs">{t("managePlan")}</span>}
-          </button>
-        ) : (
+      {/* ── Bottom: upgrade hint + settings ── */}
+      <div className={`border-t border-white/[0.05] py-2 shrink-0 ${isOpen ? "px-3 space-y-1" : "px-2 flex flex-col items-center gap-1"}`}>
+        {plan === "free" && (
           <Link
             href="/pricing"
             className={`flex items-center gap-2.5 px-2 py-2 rounded-xl bg-amber-500/8 hover:bg-amber-500/15 border border-amber-500/15 hover:border-amber-500/30 transition-all text-amber-400 hover:text-amber-300 ${!isOpen && "justify-center w-9 h-9"}`}
@@ -284,14 +292,14 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
             {isOpen && <span className="text-xs font-bold">{t("upgrade")}</span>}
           </Link>
         )}
-        <a
-          href="mailto:huntly@outlook.com?subject=Feedback%20Huntly"
-          className={`flex items-center gap-2.5 px-2 py-2 rounded-lg hover:bg-white/[0.04] transition-colors text-zinc-600 hover:text-zinc-400 ${!isOpen && "justify-center w-9 h-9"}`}
-          title={t("feedback")}
+        <Link
+          href="/settings"
+          className={`flex items-center gap-2.5 px-2 py-2 rounded-lg hover:bg-white/[0.04] transition-colors text-zinc-500 hover:text-zinc-200 ${!isOpen && "justify-center w-9 h-9"} ${pathname.includes("/settings") ? "bg-white/[0.04] text-zinc-200" : ""}`}
+          title="Configuración"
         >
-          <MessageCircle className="w-3.5 h-3.5 shrink-0" />
-          {isOpen && <span className="text-xs">{t("feedback")}</span>}
-        </a>
+          <Settings className="w-3.5 h-3.5 shrink-0" />
+          {isOpen && <span className="text-xs">Configuración</span>}
+        </Link>
       </div>
 
       {/* ── Sin créditos banner ── */}
