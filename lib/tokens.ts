@@ -16,7 +16,7 @@ export async function getOrCreateUser(
     user = await db.user.create({
       data: {
         clerkId: clerkUserId,
-        tokens: 3,
+        tokens: PLAN_LIMITS["free"],
         email: clerkProfile?.email ?? undefined,
         name: clerkProfile?.name ?? undefined,
       },
