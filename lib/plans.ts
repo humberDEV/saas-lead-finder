@@ -15,19 +15,19 @@ export const PLANS: Record<string, PlanConfig> = {
     searches: 3,
     priceMonthly: 0,
   },
+  go: {
+    key: "go",
+    displayName: "Go",
+    priceEnvVar: "STRIPE_GO_PRICE_ID",
+    searches: 100,
+    priceMonthly: 9,
+  },
   pro: {
     key: "pro",
-    displayName: "Starter",
-    priceEnvVar: "STRIPE_STARTER_PRICE_ID", // legacy env var name from production
-    searches: 150,
+    displayName: "Pro",
+    priceEnvVar: "STRIPE_STARTER_PRICE_ID", // legacy env var name — do not rename
+    searches: 250,
     priceMonthly: 19,
-  },
-  agency: {
-    key: "agency",
-    displayName: "Agency",
-    priceEnvVar: "STRIPE_PRO_PRICE_ID", // legacy env var name from production
-    searches: 400,
-    priceMonthly: 29,
   },
 };
 

@@ -36,6 +36,16 @@ export default function Pricing() {
       popular: false,
     },
     {
+      name: tPlans("go.name"),
+      price: "$9",
+      period: "/mes",
+      desc: tPlans("go.desc"),
+      features: (tPlans.raw("go.features") as string[]).map((text: string) => ({ text, ok: true })),
+      cta: tPlans("go.cta"),
+      planKey: "go",
+      popular: true,
+    },
+    {
       name: tPlans("pro.name"),
       price: "$19",
       period: "/mes",
@@ -43,16 +53,6 @@ export default function Pricing() {
       features: (tPlans.raw("pro.features") as string[]).map((text: string) => ({ text, ok: true })),
       cta: tPlans("pro.cta"),
       planKey: "pro",
-      popular: true,
-    },
-    {
-      name: tPlans("agency.name"),
-      price: "$29",
-      period: "/mes",
-      desc: tPlans("agency.desc"),
-      features: (tPlans.raw("agency.features") as string[]).map((text: string) => ({ text, ok: true })),
-      cta: tPlans("agency.cta"),
-      planKey: "agency",
       popular: false,
     },
   ];
