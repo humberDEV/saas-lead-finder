@@ -76,6 +76,7 @@ export default async function LandingPage() {
       features: (tPlans.raw("go.features") as string[]).map((text: string) => ({ text, ok: true })),
       cta: tPlans("go.cta"),
       popular: true,
+      checkoutKey: "go",
     },
     {
       name: tPlans("pro.name"),
@@ -86,6 +87,7 @@ export default async function LandingPage() {
       features: (tPlans.raw("pro.features") as string[]).map((text: string) => ({ text, ok: true })),
       cta: tPlans("pro.cta"),
       popular: false,
+      checkoutKey: "pro",
     },
   ];
 
@@ -549,18 +551,29 @@ export default async function LandingPage() {
                       ))}
                     </ul>
                     <SignedOut>
-                      <SignInButton mode="modal">
-                        <button className={`w-full py-2.5 rounded-xl text-sm font-semibold transition-colors ${plan.popular
-                          ? "bg-indigo-600 hover:bg-indigo-500 text-white"
-                          : "bg-white/[0.06] hover:bg-white/[0.10] text-white border border-white/[0.08]"
-                          }`}>
-                          {plan.cta}
-                        </button>
-                      </SignInButton>
+                      {"checkoutKey" in plan && plan.checkoutKey ? (
+                        <SignInButton mode="modal" forceRedirectUrl={`/checkout/${plan.checkoutKey}`}>
+                          <button className={`w-full py-2.5 rounded-xl text-sm font-semibold transition-colors ${plan.popular
+                            ? "bg-indigo-600 hover:bg-indigo-500 text-white"
+                            : "bg-white/[0.06] hover:bg-white/[0.10] text-white border border-white/[0.08]"
+                            }`}>
+                            {plan.cta}
+                          </button>
+                        </SignInButton>
+                      ) : (
+                        <SignInButton mode="modal">
+                          <button className={`w-full py-2.5 rounded-xl text-sm font-semibold transition-colors ${plan.popular
+                            ? "bg-indigo-600 hover:bg-indigo-500 text-white"
+                            : "bg-white/[0.06] hover:bg-white/[0.10] text-white border border-white/[0.08]"
+                            }`}>
+                            {plan.cta}
+                          </button>
+                        </SignInButton>
+                      )}
                     </SignedOut>
                     <SignedIn>
                       <Link
-                        href="/pricing"
+                        href={"checkoutKey" in plan && plan.checkoutKey ? `/checkout/${plan.checkoutKey}` : "/pricing"}
                         className={`block text-center w-full py-2.5 rounded-xl text-sm font-semibold transition-colors ${plan.popular
                           ? "bg-indigo-600 hover:bg-indigo-500 text-white"
                           : "bg-white/[0.06] hover:bg-white/[0.10] text-white border border-white/[0.08]"

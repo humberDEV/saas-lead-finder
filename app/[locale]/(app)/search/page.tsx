@@ -165,6 +165,8 @@ export default function Dashboard() {
 
   const searchParams = useSearchParams();
   const justUpgraded = searchParams.get("upgraded") === "1";
+  const prefilledNiche = searchParams.get("niche");
+  const prefilledCity = searchParams.get("city");
   const [showUpgradeBanner, setShowUpgradeBanner] = useState(justUpgraded);
   const [upgradedPlan, setUpgradedPlan] = useState<string | null>(null);
 
@@ -198,6 +200,23 @@ export default function Dashboard() {
   const [niche, setNiche] = useState(VALIDATED_NICHES[0]);
   const [customNiche, setCustomNiche] = useState("");
   const [city, setCity] = useState("");
+
+  // Pre-fill from query params (e.g. from dashboard recommendations)
+  useEffect(() => {
+    if (prefilledNiche) {
+      const match = VALIDATED_NICHES.find(
+        (n) => n.toLowerCase() === prefilledNiche.toLowerCase()
+      );
+      if (match) {
+        setNiche(match);
+        setCustomNiche("");
+      } else {
+        setCustomNiche(prefilledNiche);
+      }
+    }
+    if (prefilledCity) setCity(prefilledCity);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   const [citySuggestions, setCitySuggestions] = useState<string[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);

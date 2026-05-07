@@ -277,7 +277,7 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
       </div>
 
       {/* ── Bottom: upgrade hint + settings ── */}
-      <div className={`border-t border-white/[0.05] py-2 shrink-0 ${isOpen ? "px-3 space-y-1" : "px-2 flex flex-col items-center gap-1"}`}>
+      <div className={`border-t border-white/[0.08] bg-[#0a0a12] py-2 shrink-0 ${isOpen ? "px-3 space-y-1" : "px-2 flex flex-col items-center gap-1"}`}>
         {plan === "free" && !outOfCredits && (
           <Link
             href="/pricing"

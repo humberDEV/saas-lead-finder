@@ -306,12 +306,18 @@ function getRelated(niche: string): string[] {
 }
 
 // ── Recommendations ("you searched here → try there") ────────────────────────
-function buildRecs(d: IntelligenceData): string[] {
+interface Rec {
+  text: string;
+  niche?: string;
+  city?: string;
+}
+
+function buildRecs(d: IntelligenceData): Rec[] {
   if (d.totalSearches === 0) {
-    return ["Haz tu primera búsqueda para descubrir oportunidades en tu zona."];
+    return [{ text: "Haz tu primera búsqueda para descubrir oportunidades en tu zona." }];
   }
 
-  const recs: string[] = [];
+  const recs: Rec[] = [];
 
   // Most used niche → suggest a related niche they haven't tried
   const searchedNiches = new Set(d.topNiches.map((n) => n.niche.toLowerCase()));
@@ -323,9 +329,13 @@ function buildRecs(d: IntelligenceData): string[] {
     if (suggestions.length > 0) {
       const topCity = d.recentSearches[0]?.city;
       const where = topCity ? ` en ${topCity}` : "";
-      recs.push(
-        `Buscaste "${topNiche.niche}"${where}. Prueba también ${suggestions.slice(0, 2).join(" o ")} — suelen tener leads similares.`
-      );
+      const suggested = suggestions[0];
+      const extra = suggestions[1] ? ` o ${suggestions[1]}` : "";
+      recs.push({
+        text: `Buscaste "${topNiche.niche}"${where}. Prueba también ${suggested}${extra} — suelen tener leads similares.`,
+        niche: suggested,
+        city: topCity,
+      });
     }
   }
 
@@ -335,20 +345,20 @@ function buildRecs(d: IntelligenceData): string[] {
   const sameCity = d.recentSearches.length >= 2 &&
     d.recentSearches.every((s) => s.city.toLowerCase() === topCity.toLowerCase());
   if (isGenericCity && sameCity && recs.length < 2) {
-    recs.push(
-      `Has buscado varias veces en "${topCity}". Especificar el barrio o zona exacta suele mostrar negocios más locales y distintos.`
-    );
+    recs.push({
+      text: `Has buscado varias veces en "${topCity}". Especificar el barrio o zona exacta suele mostrar negocios más locales y distintos.`,
+    });
   }
 
   // Multiple niches but same city → suggest another city
   if (d.topNiches.length >= 3 && sameCity && recs.length < 2) {
-    recs.push(
-      `Has probado ${d.topNiches.length} nichos en "${topCity}". Probar esos mismos nichos en otra ciudad puede darte muchas más oportunidades.`
-    );
+    recs.push({
+      text: `Has probado ${d.topNiches.length} nichos en "${topCity}". Probar esos mismos nichos en otra ciudad puede darte muchas más oportunidades.`,
+    });
   }
 
   if (recs.length === 0) {
-    recs.push("Prueba un nicho o zona diferente para ampliar tus oportunidades.");
+    recs.push({ text: "Prueba un nicho o zona diferente para ampliar tus oportunidades." });
   }
 
   return recs.slice(0, 2);
@@ -628,7 +638,17 @@ export default function DashboardHome() {
                     className="flex items-start gap-3 bg-indigo-500/7 border border-indigo-500/14 rounded-2xl px-5 py-3.5"
                   >
                     <Sparkles className="w-3.5 h-3.5 text-indigo-400 shrink-0 mt-0.5" />
-                    <p className="text-sm text-zinc-300 leading-relaxed">{rec}</p>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm text-zinc-300 leading-relaxed">{rec.text}</p>
+                      {rec.niche && (
+                        <Link
+                          href={`/search?niche=${encodeURIComponent(rec.niche)}${rec.city ? `&city=${encodeURIComponent(rec.city)}` : ""}`}
+                          className="mt-2 inline-flex items-center gap-1.5 text-xs font-bold text-indigo-400 hover:text-indigo-300 transition-colors"
+                        >
+                          Buscar {rec.niche} <ArrowRight className="w-3 h-3" />
+                        </Link>
+                      )}
+                    </div>
                   </div>
                 ))}
               </motion.div>
