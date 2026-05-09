@@ -1,10 +1,10 @@
 {
   "metadata": {
     "title": "Huntly — Encuentra negocios locales sin web",
-    "description": "Busca por nicho y ciudad y encuentra negocios sin página web en segundos. Obtén su teléfono, puntúa leads y envía un mensaje por WhatsApp. 5 búsquedas gratis.",
+    "description": "Busca por nicho y ciudad y encuentra negocios sin página web en segundos. Obtén su teléfono, puntúa leads y envía un mensaje por WhatsApp. 3 búsquedas gratis.",
     "keywords": "prospección negocios, leads locales, negocios sin web, agencia web, google maps leads, España",
     "ogTitle": "Huntly — Encuentra negocios locales sin web",
-    "ogDescription": "Encuentra negocios sin web por nicho y ciudad. Puntúa leads, consigue su teléfono y contacta por WhatsApp. 5 búsquedas gratis, sin tarjeta."
+    "ogDescription": "Encuentra negocios sin web por nicho y ciudad. Puntúa leads, consigue su teléfono y contacta por WhatsApp. 3 búsquedas gratis, sin tarjeta."
   },
   "landing": {
     "nav": {
@@ -21,7 +21,7 @@
       "ctaPrimary": "Buscar clientes ahora",
       "ctaDashboard": "Ir al Dashboard",
       "ctaDemo": "Ver cómo funciona",
-      "freeNote": "5 búsquedas gratis · Sin tarjeta · Cancela cuando quieras"
+      "freeNote": "3 búsquedas gratis · Sin tarjeta · Cancela cuando quieras"
     },
     "browserDemo": {
       "search": "Buscar",
@@ -97,7 +97,7 @@
       "title1": "Tu próximo cliente web",
       "title2": "está en Google Maps ahora mismo.",
       "subtitle": "Huntly lo encuentra. Tú lo contactas. Cerrado.",
-      "freeNote": "5 búsquedas gratis · Sin tarjeta · Cancela cuando quieras",
+      "freeNote": "3 búsquedas gratis · Sin tarjeta · Cancela cuando quieras",
       "ctaButton": "Buscar clientes ahora",
       "ctaDashboard": "Ir al Dashboard",
       "viewPlans": "Ver planes y precios →"
@@ -114,7 +114,7 @@
       "desc": "Comprueba que funciona. Sin tarjeta.",
       "cta": "Empezar gratis",
       "features": [
-        "5 búsquedas gratis",
+        "3 búsquedas gratis",
         "Score de oportunidad en cada negocio",
         "WhatsApp y llamada con un clic",
         "Ver ubicación en Google Maps",

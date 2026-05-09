@@ -1,10 +1,10 @@
 {
   "metadata": {
     "title": "Huntly — Find Local Businesses With No Website",
-    "description": "Search any niche and city to instantly find local businesses with no website. Get their phone, score leads, and send a WhatsApp pitch in minutes. 5 free searches.",
+    "description": "Search any niche and city to instantly find local businesses with no website. Get their phone, score leads, and send a WhatsApp pitch in minutes. 3 free searches.",
     "keywords": "sell websites, find web clients, businesses without website, local leads, freelance web, prospecting",
     "ogTitle": "Huntly — Find Local Businesses With No Website",
-    "ogDescription": "Find businesses with no website by niche and city. Score leads, grab their phone, pitch on WhatsApp. 5 free searches, no card."
+    "ogDescription": "Find businesses with no website by niche and city. Score leads, grab their phone, pitch on WhatsApp. 3 free searches, no card."
   },
   "landing": {
     "nav": {
@@ -21,7 +21,7 @@
       "ctaPrimary": "Find clients now",
       "ctaDashboard": "Go to Dashboard",
       "ctaDemo": "See how it works",
-      "freeNote": "5 free searches · No credit card · Cancel anytime"
+      "freeNote": "3 free searches · No credit card · Cancel anytime"
     },
     "browserDemo": {
       "search": "Search",
@@ -97,7 +97,7 @@
       "title1": "Your next web client",
       "title2": "is on Google Maps right now.",
       "subtitle": "Huntly finds them. You reach out. Done.",
-      "freeNote": "5 free searches · No credit card · Cancel anytime",
+      "freeNote": "3 free searches · No credit card · Cancel anytime",
       "ctaButton": "Find clients now",
       "ctaDashboard": "Go to Dashboard",
       "viewPlans": "View plans and pricing →"
@@ -114,7 +114,7 @@
       "desc": "See it work. No card needed.",
       "cta": "Start for free",
       "features": [
-        "5 free searches",
+        "3 free searches",
         "Opportunity score on every business",
         "WhatsApp and call in one click",
         "View on Google Maps",
