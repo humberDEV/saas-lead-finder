@@ -454,7 +454,7 @@ export default async function LandingPage() {
                     role: "diseñadora freelance · Barcelona",
                     avatar: "S",
                     stars: 5,
-                    text: "lo usé sin muchas expectativas la verdad. en el primer día encontré una clínica dental con 200 reseñas y sin web. le mandé whatsapp con el mensaje que genera huntly y a los 3 días estaba cobrando 900€",
+                    text: "el primer mes nada, mandé mensajes y no contestó nadie. el segundo mes ya le pillé el truco, cambié el enfoque y cerré una clínica dental en Gràcia. con eso ya recuperé los dos meses y me sobró",
                   },
                   {
                     name: "Pablo",
