@@ -15,19 +15,21 @@ export async function GET() {
     const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
     const cutoff14 = new Date(Date.now() - 14 * 24 * 60 * 60 * 1000);
 
-    const { data: historyRows } = await supabase
+    const { data: historyRows, error: historyError } = await supabase
       .from("search_history")
       .select("niche, city, result_count, results, created_at")
       .eq("user_id", user.id)
       .order("created_at", { ascending: false })
-      .limit(200);
+      .limit(100);
+
+    if (historyError) throw historyError;
 
     const rows = historyRows ?? [];
     const searchesThisMonth = rows.filter(
       (r) => new Date(r.created_at) >= startOfMonth
     ).length;
     const totalSearches = rows.length;
-    const planLimit = PLAN_LIMITS[user.plan] ?? 5;
+    const planLimit = PLAN_LIMITS[user.plan] ?? 3;
 
     let noWebsiteFound = 0;
     let contactableLeads = 0;
@@ -112,7 +114,8 @@ export async function GET() {
       topNiches,
       recentSearches,
     });
-  } catch {
+  } catch (err) {
+    console.error("[api/stats] error:", err);
     return new NextResponse("Internal Error", { status: 500 });
   }
 }
