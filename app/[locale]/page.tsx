@@ -115,7 +115,7 @@ export default async function LandingPage() {
             <div className="flex items-center gap-3">
               <SignedOut>
                 <SignInButton mode="modal">
-                  <button className="text-sm text-violet-200/50 hover:text-violet-100 transition-colors hidden sm:block">
+                  <button className="text-sm text-violet-300 hover:text-violet-100 transition-colors hidden sm:block">
                     {t("nav.signIn")}
                   </button>
                 </SignInButton>
@@ -192,7 +192,7 @@ export default async function LandingPage() {
               </Reveal>
 
               <Reveal delay={160}>
-                <p className="text-base md:text-lg text-violet-200/70 mb-12 max-w-sm leading-relaxed">
+                <p className="text-base md:text-lg text-violet-200 mb-12 max-w-sm leading-relaxed">
                   {t("hero.subtitle")}
                 </p>
               </Reveal>
@@ -217,8 +217,8 @@ export default async function LandingPage() {
                       {t("hero.ctaDashboard")} <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
                     </Link>
                   </SignedIn>
-                  <span className="text-xs text-violet-300/50">{t("hero.freeNote")}</span>
-                  <div className="flex items-center gap-3 mt-3 text-[11px] text-violet-300/50">
+                  <span className="text-xs text-violet-400">{t("hero.freeNote")}</span>
+                  <div className="flex items-center gap-3 mt-3 text-[11px] text-violet-400">
                     <span>① Elige nicho y ciudad</span>
                     <span className="text-violet-700">·</span>
                     <span>② Huntly escanea</span>
@@ -246,11 +246,11 @@ export default async function LandingPage() {
                     <span className="w-1 h-1 rounded-full bg-emerald-400" />
                     Sin web
                   </span>
-                  <span className="text-xs font-medium text-violet-200/65">{item.name}</span>
+                  <span className="text-xs font-medium text-violet-200">{item.name}</span>
                   <span className="text-violet-800">·</span>
-                  <span className="text-xs text-violet-300/40">{item.city}</span>
+                  <span className="text-xs text-violet-400">{item.city}</span>
                   <span className="text-violet-800">·</span>
-                  <span className="text-xs text-yellow-500/65 font-medium">★ {item.rating}</span>
+                  <span className="text-xs text-yellow-400 font-medium">★ {item.rating}</span>
                 </span>
               ))}
             </div>
@@ -260,7 +260,7 @@ export default async function LandingPage() {
           <section className="px-6 pt-8 pb-20 md:pb-24" style={{ background: BG.alt }}>
             <div className="max-w-5xl mx-auto">
               <Reveal>
-                <p className="text-[10px] font-mono text-violet-300/40 uppercase tracking-widest mb-8 text-center">
+                <p className="text-[10px] font-mono text-violet-400 uppercase tracking-widest mb-8 text-center">
                   Sin Huntly · Con Huntly
                 </p>
               </Reveal>
@@ -299,7 +299,7 @@ export default async function LandingPage() {
             />
             <div className="relative max-w-4xl mx-auto">
               <Reveal>
-                <p className="text-[10px] font-mono text-violet-300/50 uppercase tracking-widest mb-12">
+                <p className="text-[10px] font-mono text-violet-400 uppercase tracking-widest mb-12">
                   {t("problem.label")}
                 </p>
               </Reveal>
@@ -309,14 +309,14 @@ export default async function LandingPage() {
                   style={{ fontSize: "clamp(24px, 4vw, 48px)" }}
                 >
                   ¿Cuántas horas llevas<br />
-                  <span className="text-violet-200/40">buscando clientes en Google Maps?</span>
+                  <span className="text-violet-300">buscando clientes en Google Maps?</span>
                 </h2>
               </Reveal>
               <div className="space-y-5 md:space-y-6">
-                <Reveal delay={0}><p className="font-black tracking-tighter leading-tight text-violet-200/30" style={{ fontSize: "clamp(18px, 2.5vw, 30px)" }}>Otra vez abrir Maps.</p></Reveal>
-                <Reveal delay={60}><p className="font-black tracking-tighter leading-tight text-violet-200/40" style={{ fontSize: "clamp(21px, 3vw, 38px)" }}>Otra vez revisar si tienen web.</p></Reveal>
-                <Reveal delay={120}><p className="font-black tracking-tighter leading-tight text-violet-100/55" style={{ fontSize: "clamp(24px, 3.5vw, 44px)" }}>Otra vez copiar el teléfono.</p></Reveal>
-                <Reveal delay={180}><p className="font-black tracking-tighter leading-tight text-violet-100/75" style={{ fontSize: "clamp(27px, 4.2vw, 54px)" }}>Otra vez que no contesten.</p></Reveal>
+                <Reveal delay={0}><p className="font-black tracking-tighter leading-tight text-violet-400/80" style={{ fontSize: "clamp(18px, 2.5vw, 30px)" }}>Otra vez abrir Maps.</p></Reveal>
+                <Reveal delay={60}><p className="font-black tracking-tighter leading-tight text-violet-300" style={{ fontSize: "clamp(21px, 3vw, 38px)" }}>Otra vez revisar si tienen web.</p></Reveal>
+                <Reveal delay={120}><p className="font-black tracking-tighter leading-tight text-violet-100" style={{ fontSize: "clamp(24px, 3.5vw, 44px)" }}>Otra vez copiar el teléfono.</p></Reveal>
+                <Reveal delay={180}><p className="font-black tracking-tighter leading-tight text-white" style={{ fontSize: "clamp(27px, 4.2vw, 54px)" }}>Otra vez que no contesten.</p></Reveal>
                 <Reveal delay={240}>
                   <p
                     className="font-black tracking-tighter leading-tight"
@@ -334,15 +334,15 @@ export default async function LandingPage() {
             <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-12 md:gap-20 items-center">
               <Reveal>
                 <div>
-                  <p className="text-[10px] font-mono text-violet-400/60 uppercase tracking-widest mb-5">Para qué sirve</p>
+                  <p className="text-[10px] font-mono text-violet-400 uppercase tracking-widest mb-5">Para qué sirve</p>
                   <h2
                     className="font-black tracking-tighter leading-[1.05] text-white mb-5"
                     style={{ fontSize: "clamp(24px, 3.2vw, 44px)" }}
                   >
                     Deja de perder horas<br />
-                    <span className="text-violet-200/45">buscando clientes<br />a mano en Google Maps.</span>
+                    <span className="text-violet-300">buscando clientes<br />a mano en Google Maps.</span>
                   </h2>
-                  <p className="text-sm text-violet-200/60 leading-relaxed max-w-xs">
+                  <p className="text-sm text-violet-200 leading-relaxed max-w-xs">
                     Huntly escanea Google Maps por ti. Filtra los negocios sin web, extrae su teléfono y los puntúa para que solo contactes los que tienen oportunidad real.
                   </p>
                 </div>
@@ -353,7 +353,7 @@ export default async function LandingPage() {
                   style={{ aspectRatio: "16/10", background: "rgba(139,92,246,0.03)" }}
                 >
                   <div className="h-full flex flex-col items-center justify-center gap-3 p-6">
-                    <span className="text-[9px] font-mono text-violet-400/30 uppercase tracking-widest text-center leading-relaxed">
+                    <span className="text-[9px] font-mono text-violet-400/75 uppercase tracking-widest text-center leading-relaxed">
                       Vídeo: búsqueda manual en Google Maps<br />aquí — 1280 × 800 recomendado
                     </span>
                   </div>
@@ -373,20 +373,20 @@ export default async function LandingPage() {
             <div className="relative max-w-6xl mx-auto grid md:grid-cols-2 gap-12 md:gap-20 items-center">
               <Reveal>
                 <div>
-                  <p className="text-[10px] font-mono text-violet-400/60 uppercase tracking-widest mb-5">Cobertura global</p>
+                  <p className="text-[10px] font-mono text-violet-400 uppercase tracking-widest mb-5">Cobertura global</p>
                   <h2
                     className="font-black tracking-tighter leading-[1.05] text-white mb-5"
                     style={{ fontSize: "clamp(24px, 3.2vw, 44px)" }}
                   >
                     No te limites<br />
-                    <span className="text-violet-200/45">a tu ciudad.</span>
+                    <span className="text-violet-300">a tu ciudad.</span>
                   </h2>
-                  <p className="text-sm text-violet-200/60 leading-relaxed max-w-xs">
+                  <p className="text-sm text-violet-200 leading-relaxed max-w-xs">
                     Huntly funciona en cualquier país hispanohablante del mundo. Busca clientes en Madrid, Ciudad de México, Buenos Aires o Bogotá con el mismo proceso.
                   </p>
                   <div className="mt-6 flex flex-wrap gap-2">
                     {["España", "México", "Argentina", "Colombia", "Perú", "Chile", "+más"].map((c) => (
-                      <span key={c} className="text-[10px] font-mono text-violet-300/55 bg-violet-500/[0.07] border border-violet-500/15 rounded-full px-2.5 py-1 uppercase tracking-wide">
+                      <span key={c} className="text-[10px] font-mono text-violet-300/90 bg-violet-500/[0.07] border border-violet-500/15 rounded-full px-2.5 py-1 uppercase tracking-wide">
                         {c}
                       </span>
                     ))}
@@ -405,7 +405,7 @@ export default async function LandingPage() {
           <section id="demo" className="px-6 py-20 md:py-24" style={{ background: BG.mid }}>
             <div className="max-w-4xl mx-auto">
               <Reveal>
-                <p className="text-[10px] font-mono text-violet-400/60 uppercase tracking-widest mb-4">{t("demo.label")}</p>
+                <p className="text-[10px] font-mono text-violet-400 uppercase tracking-widest mb-4">{t("demo.label")}</p>
                 <h2 className="font-black tracking-tighter text-white mb-8" style={{ fontSize: "clamp(22px, 3vw, 40px)" }}>
                   {t("demo.title")}
                 </h2>
@@ -442,7 +442,7 @@ export default async function LandingPage() {
           <section className="px-6 py-16 md:py-20" style={{ background: BG.alt }}>
             <div className="max-w-6xl mx-auto">
               <Reveal>
-                <p className="text-[10px] font-mono text-violet-300/45 uppercase tracking-widest mb-8 text-center">
+                <p className="text-[10px] font-mono text-violet-400 uppercase tracking-widest mb-8 text-center">
                   Lo que dicen los usuarios
                 </p>
               </Reveal>
@@ -464,7 +464,7 @@ export default async function LandingPage() {
                         <div className="h-2 bg-violet-700/20 rounded-full w-5/6" />
                         <div className="h-2 bg-violet-700/20 rounded-full w-4/6" />
                       </div>
-                      <span className="text-[9px] font-mono text-violet-400/30 uppercase tracking-widest">Testimonio real aquí</span>
+                      <span className="text-[9px] font-mono text-violet-400/75 uppercase tracking-widest">Testimonio real aquí</span>
                     </div>
                   </Reveal>
                 ))}
@@ -476,7 +476,7 @@ export default async function LandingPage() {
           <section id="precios" className="px-6 py-14 md:py-20" style={{ background: BG.deep }}>
             <div className="max-w-6xl mx-auto">
               <Reveal>
-                <p className="text-[10px] font-mono text-violet-400/60 uppercase tracking-widest mb-3">
+                <p className="text-[10px] font-mono text-violet-400 uppercase tracking-widest mb-3">
                   {t("pricingSection.label")}
                 </p>
                 <h2
@@ -507,8 +507,8 @@ export default async function LandingPage() {
                       <p className="text-white font-semibold text-sm leading-snug mb-1">
                         recuperas la inversión con tu primera venta web.
                       </p>
-                      <p className="text-violet-200/60 text-xs leading-relaxed">
-                        Los usuarios de Huntly pagan <span className="text-violet-200/80">$9 al mes</span>. Una sola web vale 200€ o más. Cierra uno y el plan está pagado 20 veces.
+                      <p className="text-violet-200 text-xs leading-relaxed">
+                        Los usuarios de Huntly pagan <span className="text-violet-100">$9 al mes</span>. Una sola web vale 200€ o más. Cierra uno y el plan está pagado 20 veces.
                       </p>
                     </div>
                   </div>
@@ -548,7 +548,7 @@ export default async function LandingPage() {
                       )}
 
                       <div className="flex items-center justify-between mb-5">
-                        <span className="text-[10px] font-mono text-violet-300/55 uppercase tracking-widest">{plan.name}</span>
+                        <span className="text-[10px] font-mono text-violet-300/90 uppercase tracking-widest">{plan.name}</span>
                         {plan.popular && (
                           <span className="text-[10px] font-semibold text-violet-300 bg-violet-500/15 border border-violet-500/25 px-2.5 py-1 rounded-full uppercase tracking-wider">
                             {t("pricingSection.mostPopular")}
@@ -567,9 +567,9 @@ export default async function LandingPage() {
                           >
                             {plan.price}
                           </span>
-                          <span className="text-violet-300/45 text-sm">{plan.period}</span>
+                          <span className="text-violet-400 text-sm">{plan.period}</span>
                         </div>
-                        <p className="text-xs text-violet-200/55 mt-1.5 leading-relaxed">{plan.desc}</p>
+                        <p className="text-xs text-violet-200 mt-1.5 leading-relaxed">{plan.desc}</p>
                       </div>
 
                       <ul className="space-y-2.5 mb-7 flex-1">
@@ -580,7 +580,7 @@ export default async function LandingPage() {
                             ) : (
                               <span className="w-3.5 h-3.5 shrink-0 mt-1.5 flex items-center"><span className="w-2.5 h-px bg-violet-700/40 block" /></span>
                             )}
-                            <span className={`text-xs leading-snug ${feat.ok ? (plan.popular ? "text-violet-100/85" : "text-violet-200/60") : "text-violet-300/25"}`}>
+                            <span className={`text-xs leading-snug ${feat.ok ? (plan.popular ? "text-white" : "text-violet-200") : "text-violet-600"}`}>
                               {feat.text}
                             </span>
                           </li>
@@ -593,7 +593,7 @@ export default async function LandingPage() {
                             <button className={`w-full py-3 rounded-2xl text-sm font-bold transition-all ${
                               plan.popular
                                 ? "bg-violet-600 hover:bg-violet-500 text-white shadow-[0_0_20px_rgba(139,92,246,0.35)]"
-                                : "bg-violet-500/[0.09] hover:bg-violet-500/[0.18] text-violet-200/70 border border-violet-500/20"
+                                : "bg-violet-500/[0.09] hover:bg-violet-500/[0.18] text-violet-200 border border-violet-500/20"
                             }`}>
                               {plan.cta}
                             </button>
@@ -603,7 +603,7 @@ export default async function LandingPage() {
                             <button className={`w-full py-3 rounded-2xl text-sm font-bold transition-all ${
                               plan.popular
                                 ? "bg-violet-600 hover:bg-violet-500 text-white shadow-[0_0_20px_rgba(139,92,246,0.35)]"
-                                : "bg-violet-500/[0.09] hover:bg-violet-500/[0.18] text-violet-200/70 border border-violet-500/20"
+                                : "bg-violet-500/[0.09] hover:bg-violet-500/[0.18] text-violet-200 border border-violet-500/20"
                             }`}>
                               {plan.cta}
                             </button>
@@ -616,7 +616,7 @@ export default async function LandingPage() {
                           className={`block text-center w-full py-3 rounded-2xl text-sm font-bold transition-all ${
                             plan.popular
                               ? "bg-violet-600 hover:bg-violet-500 text-white shadow-[0_0_20px_rgba(139,92,246,0.35)]"
-                              : "bg-violet-500/[0.09] hover:bg-violet-500/[0.18] text-violet-200/70 border border-violet-500/20"
+                              : "bg-violet-500/[0.09] hover:bg-violet-500/[0.18] text-violet-200 border border-violet-500/20"
                           }`}
                         >
                           {plan.cta}
@@ -639,7 +639,7 @@ export default async function LandingPage() {
             />
             <div className="relative max-w-4xl mx-auto">
               <Reveal>
-                <p className="text-[10px] font-mono text-violet-300/45 uppercase tracking-widest mb-8">Empieza ahora</p>
+                <p className="text-[10px] font-mono text-violet-400 uppercase tracking-widest mb-8">Empieza ahora</p>
                 <h2
                   className="font-black tracking-tighter leading-[0.95] text-white mb-5"
                   style={{ fontSize: "clamp(28px, 5vw, 66px)" }}
@@ -648,7 +648,7 @@ export default async function LandingPage() {
                   <br />
                   <span className="text-violet-400">{t("finalCta.title2")}</span>
                 </h2>
-                <p className="text-violet-200/55 text-base mb-10">{t("finalCta.subtitle")}</p>
+                <p className="text-violet-200 text-base mb-10">{t("finalCta.subtitle")}</p>
               </Reveal>
               <Reveal delay={100}>
                 <div className="flex flex-col items-center gap-4">
@@ -671,8 +671,8 @@ export default async function LandingPage() {
                       <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
                     </Link>
                   </SignedIn>
-                  <span className="text-xs text-violet-300/40">{t("finalCta.freeNote")}</span>
-                  <Link href="#precios" className="text-xs text-violet-300/40 hover:text-violet-200/65 transition-colors">
+                  <span className="text-xs text-violet-400">{t("finalCta.freeNote")}</span>
+                  <Link href="#precios" className="text-xs text-violet-400 hover:text-violet-200 transition-colors">
                     {t("finalCta.viewPlans")}
                   </Link>
                 </div>
@@ -685,12 +685,12 @@ export default async function LandingPage() {
             <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
               <div className="flex items-center gap-2">
                 <Sparkles className="w-4 h-4 text-violet-600" />
-                <span className="text-sm font-semibold text-violet-300/35">Huntly</span>
+                <span className="text-sm font-semibold text-violet-400/75">Huntly</span>
               </div>
-              <div className="flex items-center gap-6 text-sm text-violet-300/35">
-                <Link href="#demo" className="hover:text-violet-200/65 transition-colors">{t("footer.howItWorks")}</Link>
-                <Link href="#precios" className="hover:text-violet-200/65 transition-colors">{t("footer.pricing")}</Link>
-                <Link href="mailto:huntly@outlook.es" className="hover:text-violet-200/65 transition-colors">{t("footer.contact")}</Link>
+              <div className="flex items-center gap-6 text-sm text-violet-400/75">
+                <Link href="#demo" className="hover:text-violet-200 transition-colors">{t("footer.howItWorks")}</Link>
+                <Link href="#precios" className="hover:text-violet-200 transition-colors">{t("footer.pricing")}</Link>
+                <Link href="mailto:huntly@outlook.es" className="hover:text-violet-200 transition-colors">{t("footer.contact")}</Link>
               </div>
               <p className="text-sm text-violet-300/20">© {new Date().getFullYear()} Huntly</p>
             </div>

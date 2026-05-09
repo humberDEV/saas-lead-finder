@@ -56,11 +56,11 @@ export default function HeroLiveFeed() {
 
       {/* City + phone */}
       <div className="flex flex-col gap-1 mb-3">
-        <div className="flex items-center gap-1.5 text-violet-300/40">
+        <div className="flex items-center gap-1.5 text-violet-400">
           <MapPin className="w-2.5 h-2.5 shrink-0" />
           <span className="text-[10px]">{lead.city}</span>
         </div>
-        <div className="flex items-center gap-1.5 text-violet-300/40">
+        <div className="flex items-center gap-1.5 text-violet-400">
           <Phone className="w-2.5 h-2.5 shrink-0" />
           <span className="text-[10px] font-mono">{lead.phone}</span>
         </div>
@@ -69,7 +69,7 @@ export default function HeroLiveFeed() {
       {/* Reviews + score bar */}
       <div className="border-t border-violet-500/10 pt-3">
         <div className="flex justify-between items-center mb-1.5">
-          <span className="text-[9px] text-violet-300/40">★ {lead.reviews} reseñas</span>
+          <span className="text-[9px] text-violet-400">★ {lead.reviews} reseñas</span>
           <span className="text-[9px] font-black" style={{ color: scoreColor }}>{lead.score}/100</span>
         </div>
         <div className="h-1 rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.05)" }}>
@@ -87,7 +87,7 @@ export default function HeroLiveFeed() {
       {/* Live indicator */}
       <div className="flex items-center gap-1.5 mt-3">
         <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-        <span className="text-[8px] font-mono text-violet-400/40 uppercase tracking-widest">Detectado ahora</span>
+        <span className="text-[8px] font-mono text-violet-400/80 uppercase tracking-widest">Detectado ahora</span>
       </div>
     </div>
   );
