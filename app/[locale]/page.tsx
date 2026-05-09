@@ -108,12 +108,6 @@ export default async function LandingPage() {
               </span>
             </div>
             <div className="flex items-center gap-5">
-              <Link href="#demo" className="text-sm text-zinc-600 hover:text-zinc-300 transition-colors hidden md:block">
-                {t("nav.howItWorks")}
-              </Link>
-              <Link href="#precios" className="text-sm text-zinc-600 hover:text-zinc-300 transition-colors hidden md:block">
-                {t("nav.pricing")}
-              </Link>
               <SignedOut>
                 <div className="flex items-center gap-3">
                   <SignInButton mode="modal">
