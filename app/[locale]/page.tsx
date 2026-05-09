@@ -447,12 +447,12 @@ export default async function LandingPage() {
                   </div>
 
                   <div className="flex gap-3">
-                    <button className="flex-1 bg-emerald-500 hover:bg-emerald-400 text-black text-sm font-bold py-3.5 rounded-xl transition-colors">
+                    <Link href="#precios" className="flex-1 text-center bg-emerald-500 hover:bg-emerald-400 text-black text-sm font-bold py-3.5 rounded-xl transition-colors">
                       Enviar WhatsApp
-                    </button>
-                    <button className="flex-1 bg-white/[0.05] hover:bg-white/[0.09] border border-white/[0.08] text-white text-sm py-3.5 rounded-xl transition-colors">
+                    </Link>
+                    <Link href="#precios" className="flex-1 text-center bg-white/[0.05] hover:bg-white/[0.09] border border-white/[0.08] text-white text-sm py-3.5 rounded-xl transition-colors">
                       Llamar
-                    </button>
+                    </Link>
                   </div>
                 </div>
               </Reveal>
