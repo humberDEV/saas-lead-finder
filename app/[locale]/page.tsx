@@ -443,25 +443,25 @@ export default async function LandingPage() {
               <div className="grid md:grid-cols-3 gap-4">
                 {[
                   {
-                    name: "Carlos M.",
-                    role: "Freelance web · Madrid",
-                    avatar: "CM",
+                    name: "Marcos",
+                    role: "freelance web · Sevilla",
+                    avatar: "M",
                     stars: 5,
-                    text: "En mi primera semana con Huntly encontré 3 barberías sin web en mi zona. Cerré una al segundo día. El plan se pagó solo con esa venta.",
+                    text: "llevo 2 años haciendo webs y siempre fue lo mismo, mirando maps a mano buscando sin web. busqué talleres mecánicos en triana, en 5 min tenía 8 con teléfono. cerré uno esa misma semana.",
                   },
                   {
-                    name: "Laura R.",
-                    role: "Agencia pequeña · Barcelona",
-                    avatar: "LR",
+                    name: "Sara",
+                    role: "diseñadora freelance · Barcelona",
+                    avatar: "S",
                     stars: 5,
-                    text: "Antes tardaba horas revisando Google Maps a mano. Ahora en 10 minutos tengo una lista de oportunidades reales con teléfono y puntuación. Un cambio brutal.",
+                    text: "lo usé sin muchas expectativas la verdad. en el primer día encontré una clínica dental con 200 reseñas y sin web. le mandé whatsapp con el mensaje que genera huntly y a los 3 días estaba cobrando 900€",
                   },
                   {
-                    name: "Iván T.",
-                    role: "Web builder con IA · Valencia",
-                    avatar: "IT",
-                    stars: 5,
-                    text: "Creo webs con IA en pocas horas pero encontrar clientes era el cuello de botella. Con Huntly tengo siempre un listado listo para contactar. Totalmente recomendado.",
+                    name: "Pablo",
+                    role: "hace webs con framer · Madrid",
+                    avatar: "P",
+                    stars: 4,
+                    text: "hago webs en 3-4 horas con framer. el problema siempre fue a quién vendérselas. huntly te da los datos en segundos, lo que pase después ya depende de ti. pero al menos el primer paso está resuelto",
                   },
                 ].map((t, i) => (
                   <Reveal key={i} delay={i * 80}>
