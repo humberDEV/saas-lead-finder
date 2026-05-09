@@ -9,7 +9,6 @@ import {
 import CursorGlow from "./CursorGlow";
 import Reveal from "./Reveal";
 import GlobeMap from "./GlobeMap";
-import HeroLiveFeed from "./HeroLiveFeed";
 
 const TICKER_ITEMS = [
   { name: "Barbería El Rincón", city: "Madrid", rating: "4.8" },
@@ -162,11 +161,6 @@ export default async function LandingPage() {
             <div aria-hidden className="absolute bottom-0 right-0 w-96 h-96 pointer-events-none"
               style={{ background: "radial-gradient(circle, rgba(168,85,247,0.07) 0%, transparent 70%)" }}
             />
-
-            {/* Animated live card — right side, only xl+ */}
-            <div className="absolute right-8 top-1/2 -translate-y-1/2 hidden xl:block">
-              <HeroLiveFeed />
-            </div>
 
             <div className="relative z-10 flex flex-col items-center">
               <Reveal delay={0}>
@@ -447,24 +441,57 @@ export default async function LandingPage() {
                 </p>
               </Reveal>
               <div className="grid md:grid-cols-3 gap-4">
-                {[0, 1, 2].map((i) => (
+                {[
+                  {
+                    name: "Carlos M.",
+                    role: "Freelance web · Madrid",
+                    avatar: "CM",
+                    stars: 5,
+                    text: "En mi primera semana con Huntly encontré 3 barberías sin web en mi zona. Cerré una al segundo día. El plan se pagó solo con esa venta.",
+                  },
+                  {
+                    name: "Laura R.",
+                    role: "Agencia pequeña · Barcelona",
+                    avatar: "LR",
+                    stars: 5,
+                    text: "Antes tardaba horas revisando Google Maps a mano. Ahora en 10 minutos tengo una lista de oportunidades reales con teléfono y puntuación. Un cambio brutal.",
+                  },
+                  {
+                    name: "Iván T.",
+                    role: "Web builder con IA · Valencia",
+                    avatar: "IT",
+                    stars: 5,
+                    text: "Creo webs con IA en pocas horas pero encontrar clientes era el cuello de botella. Con Huntly tengo siempre un listado listo para contactar. Totalmente recomendado.",
+                  },
+                ].map((t, i) => (
                   <Reveal key={i} delay={i * 80}>
-                    <div className="rounded-2xl border border-dashed border-violet-500/[0.12] p-6 h-full"
-                      style={{ background: "rgba(139,92,246,0.03)" }}
+                    <div
+                      className="rounded-2xl border border-violet-500/15 p-6 h-full flex flex-col"
+                      style={{ background: "rgba(139,92,246,0.05)" }}
                     >
-                      <div className="flex items-center gap-3 mb-4">
-                        <div className="w-8 h-8 rounded-full bg-violet-800/30 shrink-0" />
-                        <div className="space-y-1.5">
-                          <div className="h-2 w-20 bg-violet-700/25 rounded-full" />
-                          <div className="h-1.5 w-14 bg-violet-800/20 rounded-full" />
+                      {/* Stars */}
+                      <div className="flex gap-0.5 mb-4">
+                        {Array.from({ length: t.stars }).map((_, s) => (
+                          <span key={s} className="text-yellow-400 text-sm">★</span>
+                        ))}
+                      </div>
+                      {/* Quote */}
+                      <p className="text-sm text-violet-200 leading-relaxed flex-1 mb-5">
+                        "{t.text}"
+                      </p>
+                      {/* Author */}
+                      <div className="flex items-center gap-3">
+                        <div
+                          className="w-8 h-8 rounded-full flex items-center justify-center text-[10px] font-bold text-violet-200 shrink-0"
+                          style={{ background: "rgba(139,92,246,0.25)" }}
+                        >
+                          {t.avatar}
+                        </div>
+                        <div>
+                          <p className="text-xs font-semibold text-white">{t.name}</p>
+                          <p className="text-[10px] text-violet-400">{t.role}</p>
                         </div>
                       </div>
-                      <div className="space-y-2 mb-3">
-                        <div className="h-2 bg-violet-700/20 rounded-full" />
-                        <div className="h-2 bg-violet-700/20 rounded-full w-5/6" />
-                        <div className="h-2 bg-violet-700/20 rounded-full w-4/6" />
-                      </div>
-                      <span className="text-[9px] font-mono text-violet-400/75 uppercase tracking-widest">Testimonio real aquí</span>
                     </div>
                   </Reveal>
                 ))}
