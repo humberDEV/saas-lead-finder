@@ -37,7 +37,7 @@ interface PaywallStats {
   totalSearches: number;
 }
 
-import { useFlashOffer, FLASH_COUPON } from "@/hooks/useFlashOffer";
+import { useFlashOffer, startFlashOffer, FLASH_COUPON } from "@/hooks/useFlashOffer";
 
 function PaywallModal({ onClose }: { onClose: () => void }) {
   const [loadingCheckout, setLoadingCheckout] = useState(false);
@@ -118,7 +118,7 @@ function PaywallModal({ onClose }: { onClose: () => void }) {
             <p className="text-xs text-amber-400/75 italic">Oferta de bienvenida</p>
             <span className="text-xl font-black text-amber-400 tabular-nums leading-none">$4.50</span>
             <span className="text-zinc-600 text-xs line-through">$9</span>
-            <span className="text-[11px] tabular-nums ml-auto" style={{ color: "rgba(245,158,11,0.4)" }}>
+            <span className="text-2xl font-black tabular-nums ml-auto leading-none" style={{ color: "rgba(245,158,11,0.85)" }}>
               {flash.mm}:{flash.ss}
             </span>
           </div>
@@ -272,6 +272,7 @@ export default function Dashboard() {
   const [fakeLoading, setFakeLoading] = useState(false);
 
   const triggerPaywall = () => {
+    startFlashOffer(); // arranca el timer de 10 min la primera vez que llega a 0 créditos
     setFakeLoading(true);
     setTimeout(() => {
       setFakeLoading(false);

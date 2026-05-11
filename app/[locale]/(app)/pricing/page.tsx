@@ -216,9 +216,11 @@ export default function Pricing() {
                         <span className="text-amber-400/60 text-sm">/mes</span>
                         <span className="text-zinc-600 text-sm line-through">$9</span>
                       </div>
-                      <p className="text-[11px] tabular-nums" style={{ color: "rgba(245,158,11,0.45)" }}>
-                        expira en {flash.mm}:{flash.ss} · luego $9/mes
+                      <p className="text-xs italic mt-0.5" style={{ color: "rgba(245,158,11,0.45)" }}>expira en</p>
+                      <p className="text-3xl font-black tabular-nums leading-none" style={{ color: "rgba(245,158,11,0.9)" }}>
+                        {flash.mm}:{flash.ss}
                       </p>
+                      <p className="text-[11px] tabular-nums" style={{ color: "rgba(245,158,11,0.35)" }}>luego $9/mes</p>
                     </>
                   ) : (
                     <>
