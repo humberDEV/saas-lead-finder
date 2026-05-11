@@ -62,6 +62,20 @@ export async function POST(req: Request) {
   }
 }
 
+export async function DELETE(req: Request) {
+  const { userId } = await auth();
+  if (!userId) return new NextResponse("Unauthorized", { status: 401 });
+
+  try {
+    const { leadId } = await req.json();
+    const user = await getOrCreateUser(userId);
+    await db.savedLead.delete({ where: { id: leadId, userId: user.id } });
+    return NextResponse.json({ ok: true });
+  } catch {
+    return new NextResponse("Internal Error", { status: 500 });
+  }
+}
+
 export async function PATCH(req: Request) {
   const { userId } = await auth();
   if (!userId) return new NextResponse("Unauthorized", { status: 401 });

@@ -250,6 +250,15 @@ export const db = {
       if (error) throw error;
       return toLead(row)!;
     },
+
+    async delete({ where }: { where: { id: string; userId: string } }) {
+      const { error } = await supabase
+        .from("saved_leads")
+        .delete()
+        .eq("id", where.id)
+        .eq("user_id", where.userId);
+      if (error) throw error;
+    },
   },
 
   searchHistory: {

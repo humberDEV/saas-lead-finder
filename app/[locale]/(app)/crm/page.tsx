@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import {
   MapPin, Navigation2, CheckCircle, Clock, Copy, CopyCheck,
   Map, Globe, Star, Lock, ChevronRight, ChevronLeft,
-  Phone, ThumbsUp, XCircle, StickyNote, Check,
+  Phone, ThumbsUp, XCircle, StickyNote, Check, Trash2,
 } from "lucide-react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
@@ -138,14 +138,16 @@ function QuickNote({ leadId, initial, onSave }: { leadId: string; initial: strin
 
 // ── Lead card UI ──────────────────────────────────────────────────────────────
 function LeadCard({
-  lead, copiedId, onCopy, onMove, onSaveNote,
+  lead, copiedId, onCopy, onMove, onSaveNote, onDelete,
 }: {
   lead: Lead;
   copiedId: string | null;
   onCopy: (l: Lead) => void;
   onMove: (id: string, dir: "forward" | "back") => void;
   onSaveNote: (id: string, note: string) => void;
+  onDelete: (id: string) => void;
 }) {
+  const [confirmDelete, setConfirmDelete] = useState(false);
   const normalStatus = normalizeStatus(lead.status);
   const cleanPhone = lead.phone?.replace(/[^0-9+]/g, "") ?? "";
   const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(lead.name + " " + lead.address)}`;
@@ -228,6 +230,26 @@ function LeadCard({
         >
           <Map className="w-3.5 h-3.5" />
         </a>
+        <button
+          onPointerDown={e => e.stopPropagation()}
+          onClick={e => {
+            e.stopPropagation();
+            if (confirmDelete) {
+              onDelete(lead.id);
+            } else {
+              setConfirmDelete(true);
+              setTimeout(() => setConfirmDelete(false), 2500);
+            }
+          }}
+          className={`p-1.5 rounded-lg transition-all ${
+            confirmDelete
+              ? "bg-red-500/20 text-red-400 border border-red-500/30"
+              : "bg-neutral-800/60 hover:bg-red-500/15 text-zinc-500 hover:text-red-400"
+          }`}
+          title={confirmDelete ? "Confirmar eliminación" : "Eliminar lead"}
+        >
+          <Trash2 className="w-3.5 h-3.5" />
+        </button>
         <div className="flex-1" />
         <button
           onPointerDown={e => e.stopPropagation()} onClick={e => { e.stopPropagation(); onMove(lead.id, "back"); }}
@@ -336,6 +358,11 @@ export default function CRM() {
     }));
   };
 
+  const deleteLead = (id: string) => {
+    setLeads(prev => prev.filter(l => l.id !== id));
+    fetch("/api/leads", { method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ leadId: id }) });
+  };
+
   const copyMessage = (lead: Lead) => {
     navigator.clipboard.writeText(lead.suggestedMessage ?? lead.notes ?? lead.name);
     setCopiedId(lead.id);
@@ -399,7 +426,7 @@ export default function CRM() {
               <div className="space-y-3">
                 <AnimatePresence mode="popLayout">
                   {leads.filter(l => normalizeStatus(l.status) === mobileTab).map(lead => (
-                    <LeadCard key={lead.id} lead={lead} copiedId={copiedId} onCopy={copyMessage} onMove={moveStatus} onSaveNote={patchNote} />
+                    <LeadCard key={lead.id} lead={lead} copiedId={copiedId} onCopy={copyMessage} onMove={moveStatus} onSaveNote={patchNote} onDelete={deleteLead} />
                   ))}
                 </AnimatePresence>
                 {leads.filter(l => normalizeStatus(l.status) === mobileTab).length === 0 && (
@@ -424,7 +451,7 @@ export default function CRM() {
                       <AnimatePresence mode="popLayout">
                         {colLeads.map(lead => (
                           <DraggableCard key={lead.id} lead={lead} isBeingDragged={activeId === lead.id}>
-                            <LeadCard lead={lead} copiedId={copiedId} onCopy={copyMessage} onMove={moveStatus} onSaveNote={patchNote} />
+                            <LeadCard lead={lead} copiedId={copiedId} onCopy={copyMessage} onMove={moveStatus} onSaveNote={patchNote} onDelete={deleteLead} />
                           </DraggableCard>
                         ))}
                       </AnimatePresence>
@@ -456,7 +483,7 @@ export default function CRM() {
                       className="grid md:grid-cols-4 gap-4 overflow-hidden"
                     >
                       {discardedLeads.map(lead => (
-                        <LeadCard key={lead.id} lead={lead} copiedId={copiedId} onCopy={copyMessage} onMove={moveStatus} onSaveNote={patchNote} />
+                        <LeadCard key={lead.id} lead={lead} copiedId={copiedId} onCopy={copyMessage} onMove={moveStatus} onSaveNote={patchNote} onDelete={deleteLead} />
                       ))}
                     </motion.div>
                   )}
@@ -468,7 +495,7 @@ export default function CRM() {
             <DragOverlay dropAnimation={{ duration: 150, easing: "ease-out" }}>
               {activeLead && (
                 <div className="rotate-1 scale-[1.02] opacity-90 shadow-2xl">
-                  <LeadCard lead={activeLead} copiedId={copiedId} onCopy={copyMessage} onMove={moveStatus} onSaveNote={patchNote} />
+                  <LeadCard lead={activeLead} copiedId={copiedId} onCopy={copyMessage} onMove={moveStatus} onSaveNote={patchNote} onDelete={deleteLead} />
                 </div>
               )}
             </DragOverlay>
