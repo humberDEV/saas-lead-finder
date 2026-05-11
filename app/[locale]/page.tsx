@@ -4,47 +4,33 @@ import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import {
-  ArrowRight, CheckCircle, LogIn, MapPin,
-  Sparkles, ArrowUpRight, Search, ChevronDown, Copy,
+  ArrowRight, CheckCircle, Sparkles, Zap,
 } from "lucide-react";
+import CursorGlow from "./CursorGlow";
+import Reveal from "./Reveal";
+import AnimatedSteps from "./AnimatedSteps";
 
 const TICKER_ITEMS = [
-  { name: "Barbería El Rincón", city: "Madrid", phone: "+34 612 345 678", rating: "4.8" },
-  { name: "Clínica Dental Arco", city: "Valencia", phone: "+34 963 112 445", rating: "4.6" },
-  { name: "Taller Mecánico Castro", city: "Barcelona", phone: "+34 932 887 001", rating: "4.3" },
-  { name: "Peluquería Avant", city: "Sevilla", phone: "+34 954 221 789", rating: "4.9" },
-  { name: "Reformas González", city: "Bilbao", phone: "+34 944 556 320", rating: "4.5" },
-  { name: "Fisio Centro Norte", city: "Zaragoza", phone: "+34 976 331 654", rating: "4.7" },
-  { name: "Estética Luna", city: "Málaga", phone: "+34 952 667 123", rating: "4.8" },
-  { name: "CrossFit Zona Sur", city: "Murcia", phone: "+34 968 445 877", rating: "4.4" },
+  { name: "Barbería El Rincón", city: "Madrid", rating: "4.8" },
+  { name: "Clínica Dental Arco", city: "Valencia", rating: "4.6" },
+  { name: "Taller Mecánico Castro", city: "Barcelona", rating: "4.3" },
+  { name: "Peluquería Avant", city: "Sevilla", rating: "4.9" },
+  { name: "Reformas González", city: "Bilbao", rating: "4.5" },
+  { name: "Fisio Centro Norte", city: "Zaragoza", rating: "4.7" },
+  { name: "Estética Luna", city: "Málaga", rating: "4.8" },
+  { name: "CrossFit Zona Sur", city: "Murcia", rating: "4.4" },
+  { name: "Gestoría Pérez", city: "Alicante", rating: "4.5" },
+  { name: "Óptica Central", city: "Granada", rating: "4.7" },
 ];
 
 const GRAIN_SVG = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`;
 
-function BrowserFrame({ children }: { children: React.ReactNode }) {
-  return (
-    <div
-      className="rounded-xl overflow-hidden border border-white/[0.08]"
-      style={{ boxShadow: "0 32px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.04)" }}
-    >
-      <div className="bg-[#16162a] px-4 py-3 flex items-center gap-3 border-b border-white/[0.06]">
-        <div className="flex gap-1.5 shrink-0">
-          <div className="w-2.5 h-2.5 rounded-full bg-[#ff5f57]" />
-          <div className="w-2.5 h-2.5 rounded-full bg-[#febc2e]" />
-          <div className="w-2.5 h-2.5 rounded-full bg-[#28c840]" />
-        </div>
-        <div className="flex-1 bg-[#0d0d20] border border-white/[0.07] rounded-md px-3 py-1 text-[11px] text-zinc-600 text-center">
-          huntly.app/dashboard
-        </div>
-        <div className="flex items-center gap-1.5 shrink-0">
-          <Sparkles className="w-3.5 h-3.5 text-indigo-500" />
-          <span className="text-[11px] font-bold text-white">Huntly</span>
-        </div>
-      </div>
-      {children}
-    </div>
-  );
-}
+const BG = {
+  base:  "#0e0b1e",
+  deep:  "#0b0917",
+  mid:   "#120f26",
+  alt:   "#100d22",
+};
 
 export default async function LandingPage() {
   const { userId } = await auth();
@@ -70,7 +56,6 @@ export default async function LandingPage() {
     {
       name: tPlans("go.name"),
       price: "$9",
-      originalPrice: "$19",
       period: "/mes",
       desc: tPlans("go.desc"),
       features: (tPlans.raw("go.features") as string[]).map((text: string) => ({ text, ok: true })),
@@ -81,7 +66,6 @@ export default async function LandingPage() {
     {
       name: tPlans("pro.name"),
       price: "$19",
-      originalPrice: "$39",
       period: "/mes",
       desc: tPlans("pro.desc"),
       features: (tPlans.raw("pro.features") as string[]).map((text: string) => ({ text, ok: true })),
@@ -93,55 +77,111 @@ export default async function LandingPage() {
 
   const FAQS = tFaqs.raw("faqs") as Array<{ q: string; a: string }>;
 
+  const HOW_IT_WORKS = [
+    {
+      n: "01",
+      title: t("howItWorks.step1Title"),
+      desc: "Selecciona el tipo de negocio — barberías, clínicas dentales, talleres mecánicos, restaurantes, fisioterapeutas y más de 35 nichos — y la ciudad o barrio donde quieres prospectar.",
+    },
+    {
+      n: "02",
+      title: t("howItWorks.step2Title"),
+      desc: "Huntly analiza Google Maps, filtra los negocios locales sin página web, extrae su teléfono disponible y les asigna un score de oportunidad según reseñas, valoración y actividad.",
+    },
+    {
+      n: "03",
+      title: t("howItWorks.step3Title"),
+      desc: "Llama directamente, envía un WhatsApp con el mensaje de apertura generado automáticamente o guarda el lead en tu cartera de clientes. Todo en una sola pantalla.",
+    },
+  ];
+
   return (
-    <div className="min-h-screen bg-[#0d0d14] text-white antialiased">
+    <div className="min-h-screen text-white antialiased" style={{ background: BG.base }}>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "SoftwareApplication",
-            name: "Huntly",
-            applicationCategory: "BusinessApplication",
-            offers: { "@type": "AggregateOffer", lowPrice: "0", highPrice: "19", priceCurrency: "USD" },
-          }),
+          __html: JSON.stringify([
+            {
+              "@context": "https://schema.org",
+              "@type": "SoftwareApplication",
+              name: "Huntly",
+              applicationCategory: "BusinessApplication",
+              operatingSystem: "Web",
+              description: "Herramienta de prospección local que escanea Google Maps para encontrar negocios sin página web. Ideal para freelancers web y agencias.",
+              offers: { "@type": "AggregateOffer", lowPrice: "0", highPrice: "19", priceCurrency: "USD" },
+            },
+            {
+              "@context": "https://schema.org",
+              "@type": "HowTo",
+              name: "Cómo encontrar negocios sin web con Huntly",
+              description: "Guía paso a paso para encontrar clientes potenciales de diseño web usando Huntly",
+              step: [
+                { "@type": "HowToStep", position: 1, name: "Elige nicho y ciudad", text: "Selecciona el tipo de negocio y la ciudad o barrio donde quieres buscar clientes web." },
+                { "@type": "HowToStep", position: 2, name: "Huntly detecta negocios sin página web", text: "Huntly analiza Google Maps, filtra los negocios sin web y extrae su teléfono con un score de oportunidad." },
+                { "@type": "HowToStep", position: 3, name: "Contacta y cierra el cliente", text: "Llama o envía un WhatsApp con el mensaje generado automáticamente para cerrar la venta." },
+              ],
+            },
+            {
+              "@context": "https://schema.org",
+              "@type": "FAQPage",
+              mainEntity: FAQS.map((faq) => ({
+                "@type": "Question",
+                name: faq.q,
+                acceptedAnswer: { "@type": "Answer", text: faq.a },
+              })),
+            },
+            {
+              "@context": "https://schema.org",
+              "@type": "Organization",
+              name: "Huntly",
+              url: "https://tryhuntly.com",
+              description: "Herramienta de prospección local para encontrar negocios sin web y conseguir clientes de diseño web",
+            },
+          ]),
         }}
       />
 
-      {/* Grain overlay */}
-      <div
-        aria-hidden
-        className="fixed inset-0 pointer-events-none z-0 opacity-[0.032]"
+      <div aria-hidden className="fixed inset-0 pointer-events-none z-0 opacity-[0.025]"
         style={{ backgroundImage: GRAIN_SVG, backgroundRepeat: "repeat", backgroundSize: "180px" }}
       />
+      <CursorGlow />
 
       <div className="relative z-10">
 
         {/* ── NAV ── */}
-        <nav className="fixed top-0 inset-x-0 z-50 h-14 bg-[#0d0d14]/90 backdrop-blur-md border-b border-white/[0.05]">
+        <nav
+          className="fixed top-0 inset-x-0 z-50 h-14 backdrop-blur-md border-b border-violet-500/[0.08]"
+          style={{ background: "rgba(14,11,30,0.92)" }}
+        >
           <div className="max-w-6xl mx-auto px-6 h-full flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-indigo-500" />
+            <Link href="#" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
+              <Sparkles className="w-4 h-4 text-violet-400" />
               <span className="font-bold tracking-tight">
-                Hunt<span className="text-indigo-500">ly</span>
+                Hunt<span className="text-violet-400">ly</span>
               </span>
-            </div>
-            <div className="flex items-center gap-6">
-              <Link href="#como-funciona" className="text-sm text-zinc-300 hover:text-white transition-colors hidden md:block">
-                {t("nav.howItWorks")}
-              </Link>
-              <Link href="#precios" className="text-sm text-zinc-300 hover:text-white transition-colors hidden md:block">
-                {t("nav.pricing")}
-              </Link>
+            </Link>
+            <div className="flex items-center gap-2">
               <SignedOut>
                 <SignInButton mode="modal">
-                  <button className="flex items-center gap-1.5 text-sm text-zinc-400 hover:text-white transition-colors">
-                    <LogIn className="w-3.5 h-3.5" /> {t("nav.signIn")}
+                  <button className="hidden sm:flex items-center gap-1.5 text-sm font-semibold px-4 py-1.5 rounded-lg border border-violet-500/30 text-violet-200 hover:bg-violet-500/10 hover:border-violet-400/50 transition-all">
+                    {t("nav.signIn")}
                   </button>
                 </SignInButton>
+                <Link
+                  href="#precios"
+                  className="relative flex items-center gap-1.5 text-sm font-bold px-5 py-2 rounded-lg text-white overflow-hidden transition-all hover:scale-[1.03] active:scale-[0.98]"
+                  style={{
+                    background: "linear-gradient(135deg, #7c3aed, #a855f7, #7c3aed)",
+                    backgroundSize: "200% 100%",
+                    boxShadow: "0 0 0 1px rgba(167,139,250,0.3), 0 0 24px rgba(139,92,246,0.5), 0 0 48px rgba(139,92,246,0.2)",
+                  }}
+                >
+                  <span className="relative z-10">Comprar ahora</span>
+                  <ArrowRight className="relative z-10 w-3.5 h-3.5" />
+                </Link>
               </SignedOut>
               <SignedIn>
-                <Link href="/dashboard" className="flex items-center gap-1.5 text-sm font-medium px-4 py-1.5 bg-indigo-600 hover:bg-indigo-500 rounded-lg transition-colors">
+                <Link href="/dashboard" className="flex items-center gap-1.5 text-sm font-semibold px-4 py-1.5 bg-violet-600 hover:bg-violet-500 rounded-lg transition-colors text-white">
                   {t("nav.dashboard")} <ArrowRight className="w-3.5 h-3.5" />
                 </Link>
               </SignedIn>
@@ -151,534 +191,685 @@ export default async function LandingPage() {
 
         <main className="pt-14">
 
-          {/* ── HERO ── */}
-          <section className="relative overflow-hidden">
-            <div
-              aria-hidden
-              className="absolute inset-0 pointer-events-none"
-              style={{ background: "radial-gradient(ellipse 900px 700px at 60% 40%, rgba(99,102,241,0.14) 0%, transparent 70%)" }}
+          {/* ── HERO + COMPARISON — una sola sección ── */}
+          <section
+            className="relative px-6 overflow-hidden"
+            style={{ background: BG.base }}
+          >
+            {/* Fondos decorativos */}
+            <div aria-hidden className="absolute inset-0 pointer-events-none"
+              style={{
+                backgroundImage: "radial-gradient(circle, rgba(167,139,250,0.18) 1px, transparent 1px)",
+                backgroundSize: "32px 32px",
+                maskImage: "radial-gradient(ellipse 75% 50% at 50% 20%, black 0%, transparent 100%)",
+                WebkitMaskImage: "radial-gradient(ellipse 75% 50% at 50% 20%, black 0%, transparent 100%)",
+                opacity: 0.12,
+              }}
+            />
+            <div aria-hidden className="absolute top-0 inset-x-0 h-[60%] pointer-events-none"
+              style={{ background: "radial-gradient(ellipse 80% 80% at 50% 0%, rgba(139,92,246,0.11) 0%, transparent 100%)" }}
             />
 
-            <div className="relative max-w-6xl mx-auto px-6 py-20 md:py-28 grid md:grid-cols-[1fr_1.15fr] gap-12 items-center">
+            {/* ── Hero text ── */}
+            <div className="relative z-10 flex flex-col items-center text-center pt-10 pb-12 md:pt-14 md:pb-16">
+              <Reveal delay={0}>
+                <div className="inline-flex items-center gap-2 bg-violet-500/[0.10] border border-violet-500/25 rounded-full px-4 py-1.5 mb-10">
+                  <Zap className="w-3 h-3 text-violet-400" />
+                  <span className="text-xs text-violet-200 tracking-wide">Prospección local automatizada</span>
+                </div>
+              </Reveal>
 
-              {/* LEFT */}
-              <div>
-                <h1 className="text-5xl md:text-[60px] font-black leading-[1.0] tracking-tighter mb-5">
+              <Reveal delay={80}>
+                <h1
+                  className="font-black tracking-tighter leading-[0.92] text-white mb-6 max-w-3xl"
+                  style={{ fontSize: "clamp(36px, 6vw, 84px)" }}
+                >
                   {t("hero.title1")}
                   <br />
                   {t("hero.title2")}
                   <br />
-                  <span className="bg-gradient-to-r from-indigo-400 via-violet-400 to-purple-400 bg-clip-text text-transparent">{t("hero.title3")}</span>
+                  <span className="bg-gradient-to-br from-violet-400 via-fuchsia-400 to-purple-300 bg-clip-text text-transparent">
+                    {t("hero.title3")}
+                  </span>
                 </h1>
-                <p className="text-[18px] text-[#94a3b8] leading-relaxed mb-8 max-w-sm">
+              </Reveal>
+
+              <Reveal delay={160}>
+                <p className="text-base md:text-lg text-violet-200 mb-10 max-w-sm leading-relaxed">
                   {t("hero.subtitle")}
                 </p>
-                <div className="flex flex-wrap items-center gap-3 mb-6">
+              </Reveal>
+
+              <Reveal delay={240}>
+                <div className="flex flex-col items-center gap-3">
                   <SignedOut>
                     <SignInButton mode="modal">
-                      <button className="flex items-center gap-2 px-5 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-xl transition-colors text-sm shadow-[0_0_32px_rgba(99,102,241,0.3)]">
+                      <button
+                        className="group flex items-center gap-2.5 px-8 py-4 bg-white text-[#0e0b1e] font-bold text-[15px] rounded-2xl hover:bg-violet-50 transition-all"
+                        style={{ boxShadow: "0 0 60px rgba(139,92,246,0.15)" }}
+                      >
                         {t("hero.ctaPrimary")}
-                        <ArrowRight className="w-4 h-4" />
+                        <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
                       </button>
                     </SignInButton>
                   </SignedOut>
                   <SignedIn>
-                    <Link href="/dashboard" className="flex items-center gap-2 px-5 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-xl transition-colors text-sm shadow-[0_0_32px_rgba(99,102,241,0.3)]">
-                      {t("hero.ctaDashboard")} <ArrowRight className="w-4 h-4" />
+                    <Link href="/dashboard"
+                      className="group flex items-center gap-2.5 px-8 py-4 bg-white text-[#0e0b1e] font-bold text-[15px] rounded-2xl hover:bg-violet-50 transition-all"
+                    >
+                      {t("hero.ctaDashboard")} <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
                     </Link>
                   </SignedIn>
-                  <Link
-                    href="#demo"
-                    className="flex items-center gap-1.5 px-5 py-3 text-sm text-zinc-400 hover:text-white transition-colors rounded-xl border border-white/[0.08] hover:border-white/20"
-                  >
-                    {t("hero.ctaDemo")}
-                  </Link>
+                  <span className="text-xs text-violet-400">{t("hero.freeNote")}</span>
                 </div>
-                <p className="text-xs text-zinc-400">{t("hero.freeNote")}</p>
-              </div>
+              </Reveal>
+            </div>
 
-              {/* RIGHT — browser frame with mini dashboard */}
-              <div className="hidden md:block">
-                <BrowserFrame>
-                  <div className="bg-[#0d0d14] p-4">
-                    {/* Search bar */}
-                    <div className="flex gap-2 mb-4 p-3 bg-[#111120] rounded-xl border border-white/[0.06]">
-                      <div className="flex-1 bg-black/60 border border-white/[0.07] rounded-lg px-3 py-2 text-xs text-zinc-400 flex items-center gap-1.5">
-                        <span>Barberías</span>
-                        <ChevronDown className="w-3 h-3 text-zinc-600 ml-auto" />
-                      </div>
-                      <div className="flex-1 bg-black/60 border border-white/[0.07] rounded-lg px-3 py-2 text-xs text-zinc-400 flex items-center gap-1.5">
-                        <MapPin className="w-3 h-3 text-zinc-600" />
-                        <span>Madrid, Centro</span>
-                      </div>
-                      <button className="px-4 py-2 bg-white text-black text-xs font-black rounded-lg whitespace-nowrap flex items-center gap-1">
-                        <Search className="w-3 h-3" /> {t("browserDemo.search")}
-                      </button>
-                    </div>
+            {/* ── Comparison ── */}
+            <div className="relative z-10 max-w-4xl mx-auto pb-16">
+              <div className="grid grid-cols-[1fr_auto_1fr] gap-6 items-start">
 
-                    {/* Results header */}
-                    <div className="flex items-center gap-2 mb-3 px-1">
-                      <span className="text-sm">🚨</span>
-                      <span className="text-xs font-bold text-white">{t("browserDemo.opportunitiesFound")}</span>
-                      <div className="ml-auto flex items-center gap-1 text-[10px] text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-full">
-                        <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                        Live
-                      </div>
-                    </div>
+                {/* Sin Huntly */}
+                <div className="flex flex-col gap-4">
+                  <p
+                    className="font-black tracking-tighter leading-none text-center"
+                    style={{ fontSize: "clamp(22px, 3vw, 36px)", color: "rgba(248,113,113,0.55)" }}
+                  >
+                    Sin Huntly
+                  </p>
 
-                    {/* 2 cards */}
-                    <div className="grid grid-cols-2 gap-2">
-                      {[
-                        { name: "Barbería El Rincón", addr: "Calle Mayor 14", rating: "4.8", reviews: "47", phone: "+34 612 345 678" },
-                        { name: "Peluquería Nova", addr: "Gran Vía 88", rating: "4.6", reviews: "31", phone: "+34 610 987 234" },
-                      ].map((b, i) => (
-                        <div key={i} className="bg-[#111120] border border-indigo-500/15 rounded-xl p-3">
-                          <div className="flex items-start justify-between mb-1.5">
-                            <span className="text-[11px] font-bold text-white leading-tight">{b.name}</span>
-                            <span className="text-[9px] font-bold text-indigo-400 bg-indigo-500/12 border border-indigo-500/20 px-1.5 py-0.5 rounded-full shrink-0 ml-1">
-                              T{i + 1}
-                            </span>
-                          </div>
-                          <div className="text-[9px] text-zinc-600 mb-1.5 flex items-center gap-0.5">
-                            <MapPin className="w-2.5 h-2.5" /> {b.addr}
-                          </div>
-                          <div className="flex items-center gap-1.5 mb-2 flex-wrap">
-                            <span className="text-[10px] text-yellow-400">★ {b.rating}</span>
-                            <span className="text-[9px] text-zinc-600">({b.reviews})</span>
-                            <span className="text-[9px] font-bold text-emerald-400 bg-emerald-400/8 border border-emerald-500/20 px-1.5 py-0.5 rounded">
-                              {t("browserDemo.noWeb")}
-                            </span>
-                          </div>
-                          <div className="bg-emerald-500/6 border border-emerald-500/15 rounded-lg p-1.5 mb-2">
-                            <div className="flex items-center gap-1.5">
-                              <span className="w-2 h-2 rounded-full bg-emerald-400 shrink-0" />
-                              <span className="text-[9px] font-bold text-emerald-400">{t("browserDemo.highProbability")}</span>
-                            </div>
-                          </div>
-                          <div className="flex gap-1">
-                            <button className="flex-1 bg-emerald-500 text-black text-[9px] font-bold py-1.5 rounded">WA</button>
-                            <button className="flex-1 bg-white/6 border border-white/10 text-white text-[9px] py-1.5 rounded">{t("browserDemo.call")}</button>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
+                  {/* Imagen Google Maps */}
+                  <div className="w-full rounded-2xl overflow-hidden" style={{ border: "1px solid rgba(248,113,113,0.12)" }}>
+                    <img src="/maps.png" alt="Búsqueda manual en Google Maps" className="w-full block" style={{ opacity: 0.8 }} />
                   </div>
-                </BrowserFrame>
+
+                  <p className="text-center font-semibold" style={{ fontSize: "clamp(13px, 1.5vw, 16px)", color: "rgba(248,113,113,0.5)" }}>
+                    3–4 horas por semana<br />
+                    <span style={{ color: "rgba(248,113,113,0.35)", fontSize: "0.85em" }}>buscando a mano</span>
+                  </p>
+                </div>
+
+                {/* Flecha */}
+                <div className="flex flex-col items-center justify-center gap-2 pt-10 self-stretch">
+                  <div className="flex-1 w-px" style={{ background: "linear-gradient(to bottom, transparent, rgba(139,92,246,0.3))" }} />
+                  <div
+                    className="shrink-0 w-11 h-11 rounded-full flex items-center justify-center"
+                    style={{
+                      background: "linear-gradient(135deg, rgba(139,92,246,0.20), rgba(167,139,250,0.08))",
+                      border: "1px solid rgba(139,92,246,0.50)",
+                      boxShadow: "0 0 24px rgba(139,92,246,0.30), 0 0 48px rgba(139,92,246,0.12)",
+                    }}
+                  >
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(167,139,250,1)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M5 12h14M13 6l6 6-6 6" />
+                    </svg>
+                  </div>
+                  <div className="flex-1 w-px" style={{ background: "linear-gradient(to bottom, rgba(139,92,246,0.3), transparent)" }} />
+                </div>
+
+                {/* Con Huntly */}
+                <div className="flex flex-col gap-4">
+                  <p
+                    className="font-black tracking-tighter leading-none text-center text-white"
+                    style={{ fontSize: "clamp(22px, 3vw, 36px)", textShadow: "0 0 40px rgba(139,92,246,0.5)" }}
+                  >
+                    Con Huntly
+                  </p>
+
+                  {/* Imagen Huntly */}
+                  <div className="w-full rounded-2xl overflow-hidden" style={{ border: "1px solid rgba(139,92,246,0.22)", boxShadow: "0 0 40px rgba(139,92,246,0.10)" }}>
+                    <img src="/huntly.png" alt="Dashboard Huntly con leads filtrados" className="w-full block" />
+                  </div>
+
+                  <p className="text-center font-semibold text-violet-300" style={{ fontSize: "clamp(13px, 1.5vw, 16px)" }}>
+                    10 segundos por búsqueda<br />
+                    <span className="text-violet-400/60" style={{ fontSize: "0.85em" }}>leads listos para contactar</span>
+                  </p>
+                </div>
+
               </div>
             </div>
           </section>
 
           {/* ── TICKER ── */}
-          <div className="bg-[#0a0a12] py-3 overflow-hidden">
+          <div
+            className="border-b border-violet-500/[0.07] py-5 overflow-hidden relative"
+            style={{
+              background: BG.base,
+              maskImage: "linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%)",
+              WebkitMaskImage: "linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%)",
+            }}
+          >
             <div className="flex animate-marquee whitespace-nowrap">
               {[...TICKER_ITEMS, ...TICKER_ITEMS].map((item, i) => (
-                <span key={i} className="inline-flex items-center gap-2 mx-6 text-xs text-zinc-300 shrink-0">
-                  <span className="text-emerald-500 font-bold">●</span>
-                  <span className="text-white font-medium">{item.name}</span>
-                  <span className="text-zinc-700">·</span>
-                  <span>{item.city}</span>
-                  <span className="text-zinc-700">·</span>
-                  <span className="text-emerald-400 font-semibold">{t("ticker.noWeb")}</span>
-                  <span className="text-zinc-700">·</span>
-                  <span className="font-mono text-zinc-400">{item.phone}</span>
-                  <span className="text-zinc-700">·</span>
-                  <span className="text-yellow-500">★ {item.rating}</span>
+                <span key={i} className="inline-flex items-center gap-3 mx-10 shrink-0">
+                  <span className="inline-flex items-center gap-1 text-[9px] font-bold text-emerald-400 uppercase tracking-wider bg-emerald-500/10 border border-emerald-500/20 px-1.5 py-0.5 rounded-full">
+                    <span className="w-1 h-1 rounded-full bg-emerald-400" />
+                    Sin web
+                  </span>
+                  <span className="text-xs font-medium text-violet-200">{item.name}</span>
+                  <span className="text-violet-700">·</span>
+                  <span className="text-xs text-violet-400">{item.city}</span>
+                  <span className="text-violet-700">·</span>
+                  <span className="text-xs text-yellow-400 font-medium">★ {item.rating}</span>
                 </span>
               ))}
             </div>
           </div>
 
-          {/* ── STAT BAR ── */}
-          <div className="bg-[#0f1117] border-y border-white/[0.04]">
-            <div className="max-w-4xl mx-auto px-6 py-4 flex flex-wrap items-center justify-center gap-x-8 gap-y-2 text-sm text-zinc-200">
-              <span>{t("statBar.stat1")}</span>
-              <span className="text-zinc-700 hidden sm:inline">·</span>
-              <span>{t("statBar.stat2")}</span>
-              <span className="text-zinc-700 hidden sm:inline">·</span>
-              <span>{t("statBar.stat3")}</span>
-            </div>
-          </div>
-
-          {/* ── PROBLEMA ── */}
-          <section className="bg-[#0d0d14]">
-            <div className="max-w-6xl mx-auto px-6 py-24">
-              <div className="grid md:grid-cols-[1.3fr_1fr] gap-16 items-start">
-                <div>
-                  <p className="text-xs font-mono text-indigo-500 uppercase tracking-wide mb-5">{t("problem.label")}</p>
-                  <h2 className="text-4xl md:text-5xl font-black tracking-tighter leading-tight text-white mb-5">
-                    {t("problem.title1")}
-                    <br />
-                    <span
-                      className="text-red-400"
-                      style={{ textShadow: "0 0 40px rgba(248,113,113,0.5)" }}
-                    >
-                      {t("problem.title2")}
-                    </span>
-                  </h2>
-                  <p className="text-zinc-300 text-base leading-relaxed max-w-sm">
-                    {t("problem.subtitle")}
+          {/* ── PAIN ── */}
+          <section
+            className="relative px-6 py-20 md:py-28 overflow-hidden"
+            style={{ background: `linear-gradient(to bottom, ${BG.alt}, ${BG.mid}, ${BG.alt})` }}
+          >
+            <div aria-hidden className="absolute inset-0 pointer-events-none"
+              style={{ background: "radial-gradient(ellipse 60% 40% at 30% 70%, rgba(248,113,113,0.06) 0%, transparent 70%)" }}
+            />
+            <div className="relative max-w-4xl mx-auto">
+              <Reveal>
+                <p className="text-[10px] font-mono text-violet-400 uppercase tracking-widest mb-12">
+                  {t("problem.label")}
+                </p>
+              </Reveal>
+              <Reveal delay={60}>
+                <h2
+                  className="font-black tracking-tighter leading-[1.0] text-white mb-14 max-w-3xl"
+                  style={{ fontSize: "clamp(24px, 4vw, 48px)" }}
+                >
+                  ¿Cuántas horas llevas<br />
+                  <span className="text-violet-300">buscando clientes en Google Maps?</span>
+                </h2>
+              </Reveal>
+              <div className="space-y-5 md:space-y-6">
+                <Reveal delay={0}><p className="font-black tracking-tighter leading-tight text-violet-400/80" style={{ fontSize: "clamp(18px, 2.5vw, 30px)" }}>Otra vez abrir Maps.</p></Reveal>
+                <Reveal delay={60}><p className="font-black tracking-tighter leading-tight text-violet-300" style={{ fontSize: "clamp(21px, 3vw, 38px)" }}>Otra vez revisar si tienen web.</p></Reveal>
+                <Reveal delay={120}><p className="font-black tracking-tighter leading-tight text-violet-100" style={{ fontSize: "clamp(24px, 3.5vw, 44px)" }}>Otra vez copiar el teléfono.</p></Reveal>
+                <Reveal delay={180}><p className="font-black tracking-tighter leading-tight text-white" style={{ fontSize: "clamp(27px, 4.2vw, 54px)" }}>Otra vez que no contesten.</p></Reveal>
+                <Reveal delay={240}>
+                  <p
+                    className="font-black tracking-tighter leading-tight"
+                    style={{ fontSize: "clamp(38px, 6vw, 76px)", color: "#f87171", textShadow: "0 0 80px rgba(248,113,113,0.25)" }}
+                  >
+                    Horas<br />sin facturar.
                   </p>
-                </div>
-                <div className="divide-y divide-white/[0.05]">
-                  {[
-                    { stat: t("problem.stat1"), detail: t("problem.detail1") },
-                    { stat: t("problem.stat2"), detail: t("problem.detail2") },
-                    { stat: t("problem.stat3"), detail: t("problem.detail3") },
-                  ].map((item) => (
-                    <div key={item.stat} className="py-5 flex items-center gap-5">
-                      <div className="w-1 h-10 rounded-full bg-red-500 shrink-0" style={{ boxShadow: "0 0 8px rgba(239,68,68,0.6)" }} />
-                      <div>
-                        <span className="block text-red-400 font-bold text-sm">{item.stat}</span>
-                        <span className="block text-zinc-300 text-sm mt-0.5">{item.detail}</span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+                </Reveal>
               </div>
             </div>
           </section>
 
-          {/* ── DEMO / VIDEO ── */}
-          <section id="demo" className="bg-[#0f1117]">
-            <div className="max-w-6xl mx-auto px-6 py-24">
-              <div className="mb-10">
-                <p className="text-xs font-mono text-indigo-500 uppercase tracking-wide mb-3">{t("demo.label")}</p>
-                <h2 className="text-3xl md:text-4xl font-black tracking-tighter text-white">
+          {/* ── DEMO ── */}
+          <section id="demo" className="px-6 py-20 md:py-24" style={{ background: BG.mid }}>
+            <div className="max-w-4xl mx-auto">
+              <Reveal>
+                <p className="text-[10px] font-mono text-violet-400 uppercase tracking-widest mb-4">{t("demo.label")}</p>
+                <h2 className="font-black tracking-tighter text-white mb-8" style={{ fontSize: "clamp(22px, 3vw, 40px)" }}>
                   {t("demo.title")}
                 </h2>
-                <p className="text-zinc-300 text-sm mt-2 max-w-lg">
-                  {t("demo.subtitle")}
-                </p>
-              </div>
-
-              {/* Video */}
-              <div className="max-w-4xl mx-auto">
-                <div
-                  className="rounded-2xl overflow-hidden border border-white/15 bg-black"
-                  style={{ boxShadow: "0 0 0 1px rgba(255,255,255,0.06), 0 0 40px rgba(255,255,255,0.04), 0 24px 48px rgba(0,0,0,0.5)" }}
+              </Reveal>
+              <Reveal delay={80}>
+                <div className="rounded-2xl overflow-hidden border border-violet-500/15 bg-black"
+                  style={{ boxShadow: "0 0 0 1px rgba(139,92,246,0.08), 0 24px 48px rgba(0,0,0,0.5)" }}
                 >
-                  <video
-                    className="w-full bg-black brightness-110"
-                    autoPlay
-                    loop
-                    muted
-                    playsInline
+                  <video className="w-full bg-black brightness-110" autoPlay loop muted playsInline
                     src="https://res.cloudinary.com/dufnkxsfm/video/upload/v1777248069/minidemo_kzfinl.mp4"
                   />
                 </div>
-              </div>
-
-              {/* CTA */}
-              <div className="mt-10 text-center">
-                <p className="text-zinc-400 text-sm mb-4">{t("demo.ctaQuestion")}</p>
-                <SignedOut>
-                  <SignInButton mode="modal">
-                    <button className="inline-flex items-center gap-2 px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-xl transition-colors text-sm shadow-[0_0_32px_rgba(99,102,241,0.25)]">
-                      {t("demo.ctaButton")}
-                      <ArrowRight className="w-4 h-4" />
-                    </button>
-                  </SignInButton>
-                </SignedOut>
-                <SignedIn>
-                  <Link
-                    href="/dashboard"
-                    className="inline-flex items-center gap-2 px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-xl transition-colors text-sm shadow-[0_0_32px_rgba(99,102,241,0.25)]"
-                  >
-                    {t("demo.ctaButton")}
-                    <ArrowRight className="w-4 h-4" />
-                  </Link>
-                </SignedIn>
-              </div>
+              </Reveal>
+              <Reveal delay={140}>
+                <div className="mt-8 flex justify-center">
+                  <SignedOut>
+                    <SignInButton mode="modal">
+                      <button className="inline-flex items-center gap-2 px-7 py-3.5 bg-violet-600 hover:bg-violet-500 text-white font-semibold rounded-xl transition-colors text-sm shadow-[0_0_32px_rgba(139,92,246,0.3)]">
+                        {t("demo.ctaButton")} <ArrowRight className="w-4 h-4" />
+                      </button>
+                    </SignInButton>
+                  </SignedOut>
+                  <SignedIn>
+                    <Link href="/dashboard" className="inline-flex items-center gap-2 px-7 py-3.5 bg-violet-600 hover:bg-violet-500 text-white font-semibold rounded-xl transition-colors text-sm shadow-[0_0_32px_rgba(139,92,246,0.3)]">
+                      {t("demo.ctaButton")} <ArrowRight className="w-4 h-4" />
+                    </Link>
+                  </SignedIn>
+                </div>
+              </Reveal>
             </div>
           </section>
 
           {/* ── CÓMO FUNCIONA ── */}
-          <section id="como-funciona" className="bg-[#0d0d14]">
-            <div className="max-w-5xl mx-auto px-6 py-24">
-              <p className="text-xs font-mono text-indigo-500 uppercase tracking-wide mb-4">{t("howItWorks.label")}</p>
-              <h2 className="text-3xl md:text-4xl font-black tracking-tighter text-white mb-14">
-                {t("howItWorks.title")}<span className="text-indigo-400">{t("howItWorks.titleHighlight")}</span>
-              </h2>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-white/[0.06] border border-white/[0.06] rounded-2xl overflow-hidden">
-                {[
-                  {
-                    n: "01",
-                    title: t("howItWorks.step1Title"),
-                    note: t("howItWorks.step1Note"),
-                    preview: (
-                      <div className="mt-4 bg-black/40 rounded-xl p-3 border border-white/[0.05]">
-                        <div className="bg-black/60 border border-white/[0.07] rounded-lg px-3 py-2 text-[10px] text-zinc-400 flex items-center justify-between mb-2">
-                          Barberías <ChevronDown className="w-3 h-3 text-zinc-600" />
-                        </div>
-                        <div className="bg-black/60 border border-white/[0.07] rounded-lg px-3 py-2 text-[10px] text-zinc-400 flex items-center gap-1.5">
-                          <MapPin className="w-2.5 h-2.5 text-zinc-600" /> Madrid, Centro
-                        </div>
-                      </div>
-                    ),
-                  },
-                  {
-                    n: "02",
-                    title: t("howItWorks.step2Title"),
-                    note: t("howItWorks.step2Note"),
-                    preview: (
-                      <div className="mt-4 bg-black/40 rounded-xl p-3 border border-white/[0.05] space-y-1.5">
-                        {["🟢 Barbería El Rincón · SIN WEB", "🟢 Peluquería Nova · SIN WEB", "🟡 Barbería Cortex · Revisando"].map((line, i) => (
-                          <div key={i} className="text-[10px] text-zinc-400 flex items-center gap-2">
-                            <div className="w-1 h-1 rounded-full bg-indigo-500" />
-                            {line}
-                          </div>
-                        ))}
-                      </div>
-                    ),
-                  },
-                  {
-                    n: "03",
-                    title: t("howItWorks.step3Title"),
-                    note: t("howItWorks.step3Note"),
-                    preview: (
-                      <div className="mt-4 bg-black/40 rounded-xl p-3 border border-white/[0.05]">
-                        <div className="text-[10px] text-zinc-600 mb-2">{t("howItWorks.step3Message")}</div>
-                        <div className="text-[10px] text-zinc-300 leading-relaxed mb-2 line-clamp-2">
-                          {t("howItWorks.step3Preview")}
-                        </div>
-                        <div className="flex gap-1.5">
-                          <div className="flex-1 bg-emerald-500/20 border border-emerald-500/30 rounded text-[9px] text-emerald-400 font-bold py-1 text-center">WA</div>
-                          <div className="flex-1 bg-white/5 border border-white/10 rounded text-[9px] text-white py-1 text-center">{t("howItWorks.call")}</div>
-                          <div className="w-7 bg-white/5 border border-white/10 rounded text-[9px] text-zinc-400 py-1 flex items-center justify-center">
-                            <Copy className="w-2.5 h-2.5" />
-                          </div>
-                        </div>
-                      </div>
-                    ),
-                  },
-                ].map((step) => (
-                  <div key={step.n} className="bg-[#0f1117] p-8">
-                    <span className="block text-xs font-mono text-indigo-500 mb-3">{step.n}</span>
-                    <p className="text-white font-semibold leading-snug mb-1">{step.title}</p>
-                    <p className="text-xs text-zinc-400 leading-relaxed">{step.note}</p>
-                    {step.preview}
-                  </div>
-                ))}
-              </div>
+          <section id="como-funciona" className="px-6 py-20 md:py-28" style={{ background: BG.alt }}>
+            <div className="max-w-5xl mx-auto">
+              <Reveal>
+                <p className="text-[10px] font-mono text-violet-400 uppercase tracking-widest mb-4">{t("howItWorks.label")}</p>
+                <h2
+                  className="font-black tracking-tighter text-white mb-12"
+                  style={{ fontSize: "clamp(22px, 3vw, 40px)" }}
+                >
+                  {t("howItWorks.title")}
+                  <span className="text-violet-400">{t("howItWorks.titleHighlight")}</span>
+                </h2>
+              </Reveal>
+              <AnimatedSteps steps={HOW_IT_WORKS} />
+              <Reveal delay={200}>
+                <div className="mt-10 flex justify-center">
+                  <SignedOut>
+                    <SignInButton mode="modal">
+                      <button className="inline-flex items-center gap-2 px-6 py-3 bg-violet-600 hover:bg-violet-500 text-white font-semibold rounded-xl transition-colors text-sm shadow-[0_0_24px_rgba(139,92,246,0.3)]">
+                        Probarlo gratis <ArrowRight className="w-4 h-4" />
+                      </button>
+                    </SignInButton>
+                  </SignedOut>
+                  <SignedIn>
+                    <Link href="/dashboard" className="inline-flex items-center gap-2 px-6 py-3 bg-violet-600 hover:bg-violet-500 text-white font-semibold rounded-xl transition-colors text-sm shadow-[0_0_24px_rgba(139,92,246,0.3)]">
+                      Ir al dashboard <ArrowRight className="w-4 h-4" />
+                    </Link>
+                  </SignedIn>
+                </div>
+              </Reveal>
             </div>
           </section>
 
           {/* ── PARA QUIÉN ES ── */}
-          <section className="bg-[#0f1117]">
-            <div className="max-w-5xl mx-auto px-6 py-24">
-              <p className="text-xs font-mono text-indigo-500 uppercase tracking-wide mb-4">{t("audience.label")}</p>
-              <h2 className="text-3xl md:text-4xl font-black tracking-tighter text-white mb-14">
-                {t("audience.title")}
-              </h2>
+          <section className="px-6 py-20 md:py-28 overflow-hidden" style={{ background: BG.mid }}>
+            <div className="max-w-5xl mx-auto">
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {/* Header */}
+              <Reveal>
+                <p className="text-[10px] font-mono text-violet-400 uppercase tracking-widest mb-5">
+                  {t("audience.label")}
+                </p>
+                <h2
+                  className="font-black tracking-tighter text-white mb-16 max-w-xl"
+                  style={{ fontSize: "clamp(22px, 3vw, 40px)" }}
+                >
+                  {t("audience.title")}
+                </h2>
+              </Reveal>
+
+              {/* Editorial rows */}
+              <div className="space-y-0">
                 {[
-                  { title: t("audience.audience1Title"), desc: t("audience.audience1Desc") },
-                  { title: t("audience.audience2Title"), desc: t("audience.audience2Desc") },
-                  { title: t("audience.audience3Title"), desc: t("audience.audience3Desc") },
-                ].map((item) => (
-                  <div
-                    key={item.title}
-                    className="rounded-2xl border border-white/[0.07] bg-white/[0.015] p-6"
-                  >
-                    <h3 className="text-sm font-bold text-white mb-1.5">{item.title}</h3>
-                    <p className="text-xs text-zinc-400 leading-relaxed">{item.desc}</p>
-                  </div>
+                  {
+                    num: "01",
+                    emoji: "🧑‍💻",
+                    title: "Freelancers de diseño web",
+                    desc: "Prospecta en 5 minutos lo que antes te llevaba horas revisando Google Maps a mano. Encuentra negocios locales sin web listos para contratar.",
+                    stat: "20+ leads listos en menos de 30 segundos",
+                    color: "#a78bfa",
+                  },
+                  {
+                    num: "02",
+                    emoji: "🏢",
+                    title: "Agencias web pequeñas",
+                    desc: "Llena tu pipeline de oportunidades de venta sin contratar a nadie para prospección. Búsquedas ilimitadas por ciudad y nicho.",
+                    stat: "Pipeline lleno sin contratar a nadie",
+                    color: "#e879f9",
+                  },
+                  {
+                    num: "03",
+                    emoji: "⚡",
+                    title: "Creadores web con IA",
+                    desc: "Haces webs en pocas horas con Framer, Webflow o herramientas de IA. Huntly te encuentra los clientes que todavía no las tienen.",
+                    stat: "Clientes que necesitan exactamente lo que ofreces",
+                    color: "#38bdf8",
+                  },
+                ].map((item, i) => (
+                  <Reveal key={i} delay={i * 70}>
+                    <div
+                      className="group relative py-10 md:py-12"
+                      style={{
+                        borderTop: "1px solid rgba(139,92,246,0.10)",
+                      }}
+                    >
+                      {/* Hover accent line */}
+                      <div
+                        className="absolute top-0 left-0 h-px w-0 group-hover:w-full transition-all duration-500 pointer-events-none"
+                        style={{ background: `linear-gradient(to right, ${item.color}, transparent)` }}
+                      />
+
+                      <div className="flex flex-col md:flex-row md:items-start gap-6 md:gap-12">
+
+                        {/* Number + emoji */}
+                        <div className="flex md:flex-col items-center md:items-start gap-4 md:gap-3 md:w-20 shrink-0">
+                          <span
+                            className="font-black leading-none transition-all duration-300"
+                            style={{
+                              fontSize: "clamp(40px, 5vw, 64px)",
+                              color: "rgba(139,92,246,0.18)",
+                              fontVariantNumeric: "tabular-nums",
+                            }}
+                          >
+                            {item.num}
+                          </span>
+                          <span className="text-2xl md:text-3xl">{item.emoji}</span>
+                        </div>
+
+                        {/* Content */}
+                        <div className="flex-1 min-w-0">
+                          <h3
+                            className="font-black tracking-tight text-white mb-3 transition-colors duration-300 group-hover:text-violet-100"
+                            style={{ fontSize: "clamp(18px, 2.2vw, 28px)" }}
+                          >
+                            {item.title}
+                          </h3>
+                          <p className="text-sm text-violet-200/80 leading-relaxed mb-5 max-w-lg">
+                            {item.desc}
+                          </p>
+
+                          {/* Stat callout */}
+                          <div className="inline-flex items-center gap-2.5">
+                            <div
+                              className="w-1 h-4 rounded-full shrink-0"
+                              style={{ background: item.color, opacity: 0.7 }}
+                            />
+                            <span
+                              className="text-xs font-semibold"
+                              style={{ color: item.color, opacity: 0.85 }}
+                            >
+                              {item.stat}
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* CTA */}
+                        <div className="shrink-0 md:self-center">
+                          <SignedOut>
+                            <SignInButton mode="modal">
+                              <button className="flex items-center gap-1.5 text-xs font-semibold text-violet-400 hover:text-violet-200 transition-colors">
+                                Empezar gratis <ArrowRight className="w-3 h-3" />
+                              </button>
+                            </SignInButton>
+                          </SignedOut>
+                          <SignedIn>
+                            <Link
+                              href="/dashboard"
+                              className="flex items-center gap-1.5 text-xs font-semibold text-violet-400 hover:text-violet-200 transition-colors"
+                            >
+                              Ir al dashboard <ArrowRight className="w-3 h-3" />
+                            </Link>
+                          </SignedIn>
+                        </div>
+
+                      </div>
+                    </div>
+                  </Reveal>
                 ))}
+
+                {/* Bottom border */}
+                <div style={{ borderTop: "1px solid rgba(139,92,246,0.10)" }} />
               </div>
+
             </div>
           </section>
 
-          {/* ── PRICING ── */}
-          <section id="precios" className="bg-[#0f1117]">
-            <div className="max-w-5xl mx-auto px-6 py-24">
-              <p className="text-xs font-mono text-indigo-500 uppercase tracking-wide mb-4">{t("pricingSection.label")}</p>
-              <h2 className="text-3xl md:text-4xl font-black tracking-tighter text-white mb-5">
-                {t("pricingSection.title")}<span className="text-indigo-400">{t("pricingSection.titleHighlight")}</span>
-              </h2>
-
-              <div className="flex items-start gap-3 bg-white/[0.03] border border-white/[0.07] rounded-xl px-5 py-4 mb-10 max-w-lg">
-                <ArrowUpRight className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
-                <p className="text-sm text-zinc-400 leading-relaxed">
-                  <span className="text-white font-medium">{t("pricingSection.valueNote")}</span>{" "}
-                  <span className="text-emerald-400">{t("pricingSection.valueHighlight")}</span>
+          {/* ── PRICING ── compact to fit in viewport ── */}
+          <section id="precios" className="px-6 py-14 md:py-20" style={{ background: BG.deep }}>
+            <div className="max-w-6xl mx-auto">
+              <Reveal>
+                <p className="text-[10px] font-mono text-violet-400 uppercase tracking-widest mb-3">
+                  {t("pricingSection.label")}
                 </p>
-              </div>
+                <h2
+                  className="font-black tracking-tighter text-white mb-3"
+                  style={{ fontSize: "clamp(22px, 3.5vw, 42px)" }}
+                >
+                  {t("pricingSection.title")}
+                  <span className="text-violet-400">{t("pricingSection.titleHighlight")}</span>
+                </h2>
+              </Reveal>
 
-              <div className="grid md:grid-cols-3 gap-4 items-start max-w-4xl mx-auto">
-                {PLANS.map((plan, i) => (
-                  <div
-                    key={i}
-                    className={`relative rounded-2xl border flex flex-col p-6 ${plan.popular
-                      ? "border-indigo-500/35 bg-indigo-950/15 shadow-[0_0_48px_rgba(99,102,241,0.07)]"
-                      : "border-white/[0.07] bg-white/[0.015]"
-                      }`}
-                  >
-                    {plan.popular && (
-                      <div className="absolute -top-3 left-5 bg-indigo-600 text-white text-[10px] font-semibold uppercase tracking-widest px-2.5 py-1 rounded-full">
-                        {t("pricingSection.mostPopular")}
-                      </div>
-                    )}
-                    <div className="mb-4">
-                      <h3 className="text-sm font-bold text-white mb-0.5">{plan.name}</h3>
-                      <p className="text-xs text-zinc-400">{plan.desc}</p>
-                    </div>
-                    <div className="mb-5">
-                      {"originalPrice" in plan && plan.originalPrice && (
-                        <div className="flex items-center gap-2 mb-1">
-                          <span className="text-sm text-zinc-600 line-through">{plan.originalPrice as string}</span>
-                          <span className="text-[10px] font-black text-emerald-400 uppercase tracking-wider bg-emerald-500/10 px-1.5 py-0.5 rounded">
-                            -{Math.round((1 - parseInt(plan.price.replace("$","")) / parseInt((plan.originalPrice as string).replace("$",""))) * 100)}%
-                          </span>
-                        </div>
-                      )}
-                      <div className="flex items-baseline gap-1">
-                        <span className="text-4xl font-black text-white tracking-tight">{plan.price}</span>
-                        <span className="text-zinc-400 text-sm">{plan.period}</span>
-                      </div>
-                    </div>
-                    <ul className="space-y-2 mb-6 flex-1">
-                      {plan.features.map((feat, j) => (
-                        <li key={j} className="flex items-center gap-2.5 text-sm">
-                          {feat.ok ? (
-                            <CheckCircle className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                          ) : (
-                            <div className="w-3.5 h-3.5 rounded-full border border-white/10 shrink-0" />
-                          )}
-                          <span className={feat.ok ? "text-zinc-300" : "text-zinc-700"}>{feat.text}</span>
-                        </li>
-                      ))}
-                    </ul>
-                    <SignedOut>
-                      {"checkoutKey" in plan && plan.checkoutKey ? (
-                        <SignInButton mode="modal" forceRedirectUrl={`/checkout/${plan.checkoutKey}`}>
-                          <button className={`w-full py-2.5 rounded-xl text-sm font-semibold transition-colors ${plan.popular
-                            ? "bg-indigo-600 hover:bg-indigo-500 text-white"
-                            : "bg-white/[0.06] hover:bg-white/[0.10] text-white border border-white/[0.08]"
-                            }`}>
-                            {plan.cta}
-                          </button>
-                        </SignInButton>
-                      ) : (
-                        <SignInButton mode="modal">
-                          <button className={`w-full py-2.5 rounded-xl text-sm font-semibold transition-colors ${plan.popular
-                            ? "bg-indigo-600 hover:bg-indigo-500 text-white"
-                            : "bg-white/[0.06] hover:bg-white/[0.10] text-white border border-white/[0.08]"
-                            }`}>
-                            {plan.cta}
-                          </button>
-                        </SignInButton>
-                      )}
-                    </SignedOut>
-                    <SignedIn>
-                      <Link
-                        href={"checkoutKey" in plan && plan.checkoutKey ? `/checkout/${plan.checkoutKey}` : "/pricing"}
-                        className={`block text-center w-full py-2.5 rounded-xl text-sm font-semibold transition-colors ${plan.popular
-                          ? "bg-indigo-600 hover:bg-indigo-500 text-white"
-                          : "bg-white/[0.06] hover:bg-white/[0.10] text-white border border-white/[0.08]"
-                          }`}
+              {/* 20× value callout */}
+              <Reveal delay={60}>
+                <div
+                  className="rounded-2xl border border-violet-500/20 p-5 mb-8 max-w-2xl"
+                  style={{ background: "linear-gradient(135deg, rgba(139,92,246,0.10) 0%, rgba(11,9,23,1) 100%)" }}
+                >
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+                    <div className="shrink-0 leading-none">
+                      <span
+                        className="font-black text-transparent bg-clip-text"
+                        style={{ fontSize: "clamp(40px, 5vw, 60px)", backgroundImage: "linear-gradient(135deg, #a78bfa, #e879f9)" }}
                       >
-                        {plan.cta}
-                      </Link>
-                    </SignedIn>
+                        20×
+                      </span>
+                    </div>
+                    <div>
+                      <p className="text-white font-semibold text-sm leading-snug mb-1">
+                        recuperas la inversión con tu primera venta web.
+                      </p>
+                      <p className="text-violet-200 text-xs leading-relaxed">
+                        Los usuarios de Huntly pagan <span className="text-violet-100">$9 al mes</span>. Una sola web vale 200€ o más. Cierra uno y el plan está pagado 20 veces.
+                      </p>
+                    </div>
                   </div>
+                </div>
+              </Reveal>
+
+              {/* Cards */}
+              <div className="grid md:grid-cols-3 gap-4">
+                {PLANS.map((plan, i) => (
+                  <Reveal key={i} delay={i * 60}>
+                    <div
+                      className={`group relative rounded-3xl flex flex-col p-6 h-full transition-all duration-200 ${
+                        !plan.popular ? "hover:-translate-y-1" : ""
+                      }`}
+                      style={{
+                        background: plan.popular
+                          ? "linear-gradient(160deg, rgba(139,92,246,0.18) 0%, rgba(11,9,23,1) 55%)"
+                          : "rgba(139,92,246,0.04)",
+                        boxShadow: plan.popular
+                          ? "0 0 0 1px rgba(139,92,246,0.40), 0 0 60px rgba(139,92,246,0.12), inset 0 1px 0 rgba(255,255,255,0.05)"
+                          : "0 0 0 1px rgba(139,92,246,0.10), inset 0 1px 0 rgba(255,255,255,0.02)",
+                      }}
+                    >
+                      {/* Hover glow on non-popular cards */}
+                      {!plan.popular && (
+                        <div
+                          className="absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none"
+                          style={{ boxShadow: "0 0 0 1px rgba(139,92,246,0.28), 0 0 40px rgba(139,92,246,0.08)" }}
+                        />
+                      )}
+
+                      {plan.popular && (
+                        <div
+                          className="absolute top-0 left-8 right-8 h-px"
+                          style={{ background: "linear-gradient(to right, transparent, rgba(167,139,250,0.9), transparent)" }}
+                        />
+                      )}
+
+                      <div className="flex items-center justify-between mb-5">
+                        <span className="text-[10px] font-mono text-violet-300/90 uppercase tracking-widest">{plan.name}</span>
+                        {plan.popular && (
+                          <span className="text-[10px] font-semibold text-violet-300 bg-violet-500/15 border border-violet-500/25 px-2.5 py-1 rounded-full uppercase tracking-wider">
+                            {t("pricingSection.mostPopular")}
+                          </span>
+                        )}
+                      </div>
+
+                      <div className="mb-5">
+                        <div className="flex items-baseline gap-1.5">
+                          <span
+                            className="font-black tracking-tight"
+                            style={{
+                              fontSize: "clamp(36px, 4vw, 52px)",
+                              color: plan.popular ? "#fff" : "rgba(221,214,254,0.65)",
+                            }}
+                          >
+                            {plan.price}
+                          </span>
+                          <span className="text-violet-400 text-sm">{plan.period}</span>
+                        </div>
+                        <p className="text-xs text-violet-200 mt-1.5 leading-relaxed">{plan.desc}</p>
+                      </div>
+
+                      <ul className="space-y-2.5 mb-7 flex-1">
+                        {plan.features.map((feat, j) => (
+                          <li key={j} className="flex items-start gap-2.5">
+                            {feat.ok ? (
+                              <CheckCircle className={`w-3.5 h-3.5 shrink-0 mt-0.5 ${plan.popular ? "text-violet-400" : "text-emerald-500/80"}`} />
+                            ) : (
+                              <span className="w-3.5 h-3.5 shrink-0 mt-1.5 flex items-center"><span className="w-2.5 h-px bg-violet-700/40 block" /></span>
+                            )}
+                            <span className={`text-xs leading-snug ${feat.ok ? (plan.popular ? "text-white" : "text-violet-200") : "text-violet-600"}`}>
+                              {feat.text}
+                            </span>
+                          </li>
+                        ))}
+                      </ul>
+
+                      <SignedOut>
+                        {"checkoutKey" in plan && plan.checkoutKey ? (
+                          <SignInButton mode="modal" forceRedirectUrl={`/checkout/${plan.checkoutKey}`}>
+                            <button className={`w-full py-3 rounded-2xl text-sm font-bold transition-all ${
+                              plan.popular
+                                ? "bg-violet-600 hover:bg-violet-500 text-white shadow-[0_0_20px_rgba(139,92,246,0.35)]"
+                                : "bg-violet-500/[0.09] hover:bg-violet-500/[0.18] text-violet-200 border border-violet-500/20"
+                            }`}>
+                              {plan.cta}
+                            </button>
+                          </SignInButton>
+                        ) : (
+                          <SignInButton mode="modal">
+                            <button className={`w-full py-3 rounded-2xl text-sm font-bold transition-all ${
+                              plan.popular
+                                ? "bg-violet-600 hover:bg-violet-500 text-white shadow-[0_0_20px_rgba(139,92,246,0.35)]"
+                                : "bg-violet-500/[0.09] hover:bg-violet-500/[0.18] text-violet-200 border border-violet-500/20"
+                            }`}>
+                              {plan.cta}
+                            </button>
+                          </SignInButton>
+                        )}
+                      </SignedOut>
+                      <SignedIn>
+                        <Link
+                          href={"checkoutKey" in plan && plan.checkoutKey ? `/checkout/${plan.checkoutKey}` : "/pricing"}
+                          className={`block text-center w-full py-3 rounded-2xl text-sm font-bold transition-all ${
+                            plan.popular
+                              ? "bg-violet-600 hover:bg-violet-500 text-white shadow-[0_0_20px_rgba(139,92,246,0.35)]"
+                              : "bg-violet-500/[0.09] hover:bg-violet-500/[0.18] text-violet-200 border border-violet-500/20"
+                          }`}
+                        >
+                          {plan.cta}
+                        </Link>
+                      </SignedIn>
+                    </div>
+                  </Reveal>
                 ))}
               </div>
             </div>
           </section>
 
           {/* ── FAQ ── */}
-          <section className="bg-[#0d0d14]">
-            <div className="max-w-2xl mx-auto px-6 py-24">
-              <p className="text-xs font-mono text-indigo-500 uppercase tracking-wide mb-4">{t("faq.label")}</p>
-              <h2 className="text-3xl font-black tracking-tighter text-white mb-10">{t("faq.title")}</h2>
+          <section className="px-6 py-20 md:py-28" style={{ background: BG.mid }}>
+            <div className="max-w-2xl mx-auto">
+              <Reveal>
+                <p className="text-[10px] font-mono text-violet-400 uppercase tracking-widest mb-4">{t("faq.label")}</p>
+                <h2
+                  className="font-black tracking-tighter text-white mb-10"
+                  style={{ fontSize: "clamp(22px, 3vw, 36px)" }}
+                >
+                  {t("faq.title")}
+                </h2>
+              </Reveal>
               <div itemScope itemType="https://schema.org/FAQPage" className="space-y-2">
                 {FAQS.map((faq, i) => (
-                  <details
-                    key={i}
-                    itemProp="mainEntity"
-                    itemScope
-                    itemType="https://schema.org/Question"
-                    name="faq"
-                    className="group bg-[#0f1117] border border-white/[0.06] rounded-xl overflow-hidden open:border-white/[0.10]"
-                  >
-                    <summary className="flex items-center justify-between gap-4 px-5 py-4 cursor-pointer list-none select-none [&::-webkit-details-marker]:hidden">
-                      <span itemProp="name" className="text-sm font-semibold text-white">{faq.q}</span>
-                      <svg
-                        className="w-4 h-4 text-zinc-500 shrink-0 transition-transform duration-200 group-open:rotate-180"
-                        fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}
-                      >
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-                      </svg>
-                    </summary>
-                    <div
-                      itemProp="acceptedAnswer"
+                  <Reveal key={i} delay={i * 35}>
+                    <details
+                      itemProp="mainEntity"
                       itemScope
-                      itemType="https://schema.org/Answer"
-                      className="px-5 pb-5"
+                      itemType="https://schema.org/Question"
+                      name="faq"
+                      className="group border border-violet-500/[0.10] rounded-xl overflow-hidden open:border-violet-500/[0.20]"
+                      style={{ background: "rgba(139,92,246,0.04)" }}
                     >
-                      <p itemProp="text" className="text-zinc-300 text-sm leading-relaxed border-t border-white/[0.05] pt-4">
-                        {faq.a}
-                      </p>
-                    </div>
-                  </details>
+                      <summary className="flex items-center justify-between gap-4 px-5 py-4 cursor-pointer list-none select-none [&::-webkit-details-marker]:hidden">
+                        <span itemProp="name" className="text-sm font-semibold text-white">{faq.q}</span>
+                        <svg
+                          className="w-4 h-4 text-violet-500 shrink-0 transition-transform duration-200 group-open:rotate-180"
+                          fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}
+                        >
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                        </svg>
+                      </summary>
+                      <div
+                        itemProp="acceptedAnswer"
+                        itemScope
+                        itemType="https://schema.org/Answer"
+                        className="px-5 pb-5"
+                      >
+                        <p itemProp="text" className="text-sm text-violet-200 leading-relaxed border-t border-violet-500/[0.08] pt-4">
+                          {faq.a}
+                        </p>
+                      </div>
+                    </details>
+                  </Reveal>
                 ))}
               </div>
             </div>
           </section>
 
           {/* ── CTA FINAL ── */}
-          <section className="bg-[#0f1117]">
-            <div className="max-w-6xl mx-auto px-6 py-28">
-              <div className="grid md:grid-cols-[1fr_auto] gap-10 items-center">
-                <div>
-                  <h2 className="text-4xl md:text-5xl font-black tracking-tighter leading-[1.0] text-white mb-4">
-                    {t("finalCta.title1")}
-                    <br />
-                    <span className="text-indigo-400">{t("finalCta.title2")}</span>
-                  </h2>
-                  <p className="text-zinc-400 text-sm mt-2">
-                    {t("finalCta.subtitle")}
-                  </p>
-                  <p className="text-zinc-500 text-xs mt-3">{t("finalCta.freeNote")}</p>
-                </div>
-                <div className="flex flex-col gap-3 min-w-[220px]">
+          <section
+            className="relative px-6 py-28 md:py-40 text-center overflow-hidden"
+            style={{ background: `linear-gradient(to bottom, ${BG.mid}, ${BG.base})` }}
+          >
+            <div aria-hidden className="absolute inset-0 pointer-events-none"
+              style={{ background: "radial-gradient(ellipse 60% 50% at 50% 50%, rgba(139,92,246,0.09) 0%, transparent 70%)" }}
+            />
+            <div className="relative max-w-4xl mx-auto">
+              <Reveal>
+                <p className="text-[10px] font-mono text-violet-400 uppercase tracking-widest mb-8">Empieza ahora</p>
+                <h2
+                  className="font-black tracking-tighter leading-[0.95] text-white mb-5"
+                  style={{ fontSize: "clamp(28px, 5vw, 66px)" }}
+                >
+                  {t("finalCta.title1")}
+                  <br />
+                  <span className="text-violet-400">{t("finalCta.title2")}</span>
+                </h2>
+                <p className="text-violet-200 text-base mb-10">{t("finalCta.subtitle")}</p>
+              </Reveal>
+              <Reveal delay={100}>
+                <div className="flex flex-col items-center gap-4">
                   <SignedOut>
                     <SignInButton mode="modal">
-                      <button className="group flex items-center justify-center gap-2 w-full px-7 py-3.5 bg-white text-[#0d0d14] text-sm font-bold rounded-xl hover:bg-zinc-100 transition-colors">
+                      <button
+                        className="group flex items-center gap-2.5 px-9 py-4 bg-white text-[#0e0b1e] font-bold text-[15px] rounded-2xl hover:bg-violet-50 transition-all"
+                        style={{ boxShadow: "0 0 60px rgba(139,92,246,0.12)" }}
+                      >
                         {t("finalCta.ctaButton")}
                         <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
                       </button>
                     </SignInButton>
                   </SignedOut>
                   <SignedIn>
-                    <Link href="/dashboard" className="group flex items-center justify-center gap-2 w-full px-7 py-3.5 bg-white text-[#0d0d14] text-sm font-bold rounded-xl hover:bg-zinc-100 transition-colors">
+                    <Link href="/dashboard"
+                      className="group flex items-center gap-2.5 px-9 py-4 bg-white text-[#0e0b1e] font-bold text-[15px] rounded-2xl hover:bg-violet-50 transition-all"
+                    >
                       {t("finalCta.ctaDashboard")}
                       <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
                     </Link>
                   </SignedIn>
-                  <Link href="#precios" className="text-center text-xs text-zinc-400 hover:text-white transition-colors py-2">
+                  <span className="text-xs text-violet-400">{t("finalCta.freeNote")}</span>
+                  <Link href="#precios" className="text-xs text-violet-400 hover:text-violet-200 transition-colors">
                     {t("finalCta.viewPlans")}
                   </Link>
                 </div>
-              </div>
+              </Reveal>
             </div>
           </section>
 
           {/* ── FOOTER ── */}
-          <footer className="bg-[#0d0d14] border-t border-white/[0.05] py-8">
-            <div className="max-w-6xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <footer className="border-t border-violet-500/[0.07] py-8 px-6" style={{ background: BG.base }}>
+            <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
               <div className="flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-indigo-600" />
-                <span className="text-sm font-semibold text-zinc-500">Huntly</span>
+                <Sparkles className="w-4 h-4 text-violet-600" />
+                <span className="text-sm font-semibold text-violet-400/75">Huntly</span>
               </div>
-              <div className="flex items-center gap-6 text-sm text-zinc-700">
-                <Link href="#como-funciona" className="hover:text-zinc-400 transition-colors">{t("footer.howItWorks")}</Link>
-                <Link href="#precios" className="hover:text-zinc-400 transition-colors">{t("footer.pricing")}</Link>
-                <Link href="mailto:huntly@outlook.es" className="hover:text-zinc-400 transition-colors">{t("footer.contact")}</Link>
+              <div className="flex items-center gap-6 text-sm text-violet-400/75">
+                <Link href="#como-funciona" className="hover:text-violet-200 transition-colors">{t("footer.howItWorks")}</Link>
+                <Link href="#precios" className="hover:text-violet-200 transition-colors">{t("footer.pricing")}</Link>
+                <Link href="mailto:huntly@outlook.es" className="hover:text-violet-200 transition-colors">{t("footer.contact")}</Link>
               </div>
-              <p className="text-sm text-zinc-700">© {new Date().getFullYear()} Huntly</p>
+              <p className="text-sm text-violet-300/20">© {new Date().getFullYear()} Huntly</p>
             </div>
           </footer>
 

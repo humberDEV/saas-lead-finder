@@ -37,9 +37,13 @@ interface PaywallStats {
   totalSearches: number;
 }
 
+import { useFlashOffer, FLASH_COUPON } from "@/hooks/useFlashOffer";
+
 function PaywallModal({ onClose }: { onClose: () => void }) {
   const [loadingCheckout, setLoadingCheckout] = useState(false);
+  const [loadingFlash, setLoadingFlash] = useState(false);
   const [stats, setStats] = useState<PaywallStats | null>(null);
+  const flash = useFlashOffer();
 
   useEffect(() => {
     fetch("/api/stats")
@@ -48,19 +52,23 @@ function PaywallModal({ onClose }: { onClose: () => void }) {
       .catch(() => {});
   }, []);
 
-  async function handleCheckout() {
-    setLoadingCheckout(true);
+  async function handleCheckout(withFlash = false) {
+    if (withFlash) setLoadingFlash(true);
+    else setLoadingCheckout(true);
     try {
+      const body: Record<string, string> = { planKey: "go" };
+      if (withFlash) body.coupon = FLASH_COUPON;
       const res = await fetch("/api/stripe/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ planKey: "go" }),
+        body: JSON.stringify(body),
       });
       const data = await res.json();
       if (data.url) window.location.href = data.url;
-      else setLoadingCheckout(false);
+      else { setLoadingCheckout(false); setLoadingFlash(false); }
     } catch {
       setLoadingCheckout(false);
+      setLoadingFlash(false);
     }
   }
 
@@ -100,35 +108,56 @@ function PaywallModal({ onClose }: { onClose: () => void }) {
               </div>
             ))}
           </div>
-          <p className="text-[11px] text-zinc-600 text-center mt-3 leading-relaxed">
-            Estás viendo solo una parte. Con Go tienes historial, cartera y 100 búsquedas al mes.
-          </p>
         </div>
       )}
 
-      {/* Go CTA */}
-      <button
-        onClick={handleCheckout}
-        disabled={loadingCheckout}
-        className="w-full flex items-center justify-center gap-2 py-3.5 bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 text-white font-black text-sm rounded-xl transition-all shadow-[0_0_24px_rgba(99,102,241,0.35)] hover:shadow-[0_0_36px_rgba(99,102,241,0.5)] disabled:opacity-60"
-      >
-        {loadingCheckout ? (
-          <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-        ) : (
-          <>
-            Continuar con Go · $9/mes
-            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
-          </>
+      {/* ── CTA ── */}
+      <div className="mb-3">
+        {flash.active && (
+          <div className="flex items-baseline gap-2 mb-3">
+            <p className="text-xs text-amber-400/75 italic">Oferta de bienvenida</p>
+            <span className="text-xl font-black text-amber-400 tabular-nums leading-none">$4.50</span>
+            <span className="text-zinc-600 text-xs line-through">$9</span>
+            <span className="text-[11px] tabular-nums ml-auto" style={{ color: "rgba(245,158,11,0.4)" }}>
+              {flash.mm}:{flash.ss}
+            </span>
+          </div>
         )}
-      </button>
-      <p className="text-[10px] text-zinc-600 mt-2 text-center">
-        100 búsquedas/mes · historial completo · cartera de leads
-      </p>
+
+        <button
+          onClick={() => handleCheckout(flash.active)}
+          disabled={loadingCheckout || loadingFlash}
+          className="w-full flex items-center justify-center gap-2 py-3.5 text-white font-black text-sm rounded-xl transition-all disabled:opacity-60"
+          style={flash.active ? {
+            background: "linear-gradient(135deg, #d97706, #f59e0b)",
+            boxShadow: "0 0 28px rgba(245,158,11,0.25)",
+          } : {
+            background: "#4f46e5",
+            boxShadow: "0 0 24px rgba(99,102,241,0.3)",
+          }}
+        >
+          {(loadingCheckout || loadingFlash) ? (
+            <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+          ) : flash.active ? (
+            <>Empezar con Go · $4.50 primer mes <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg></>
+          ) : (
+            <>Empezar con Go · $9/mes <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg></>
+          )}
+        </button>
+
+        {flash.active && (
+          <button
+            onClick={() => handleCheckout(false)}
+            disabled={loadingCheckout}
+            className="w-full text-center text-[11px] text-zinc-600 hover:text-zinc-400 transition-colors mt-2"
+          >
+            Continuar sin descuento · $9/mes
+          </button>
+        )}
+      </div>
 
       {/* Secondary: all plans */}
-      <div className="mt-4 pt-4 border-t border-neutral-800/60 text-center">
+      <div className="pt-3 border-t border-neutral-800/60 text-center">
         <Link
           href="/pricing"
           onClick={onClose}

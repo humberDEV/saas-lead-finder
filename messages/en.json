@@ -1,10 +1,10 @@
 {
   "metadata": {
-    "title": "Huntly — Find Local Businesses With No Website",
-    "description": "Search any niche and city to instantly find local businesses with no website. Get their phone, score leads, and send a WhatsApp pitch in minutes. 3 free searches.",
-    "keywords": "sell websites, find web clients, businesses without website, local leads, freelance web, prospecting",
-    "ogTitle": "Huntly — Find Local Businesses With No Website",
-    "ogDescription": "Find businesses with no website by niche and city. Score leads, grab their phone, pitch on WhatsApp. 3 free searches, no card."
+    "title": "Huntly — Find Businesses Without a Website and Get Web Clients",
+    "description": "Huntly scans Google Maps by niche and city to find local businesses with no website in seconds. Get their phone number, score leads and reach out via WhatsApp. Prospecting tool for freelancers and web agencies. 3 free searches.",
+    "keywords": "businesses without website, find web design clients, local leads google maps, freelance web prospecting, web agency clients, businesses no website, local business leads",
+    "ogTitle": "Huntly — Find Businesses With No Website in Seconds",
+    "ogDescription": "Scan Google Maps by niche and city. Huntly spots businesses with no website, extracts their phone and scores them. Automated local prospecting for freelancers and web agencies."
   },
   "landing": {
     "nav": {
@@ -14,10 +14,10 @@
       "dashboard": "Dashboard"
     },
     "hero": {
-      "title1": "Find businesses",
-      "title2": "with no website that need",
-      "title3": "what you sell.",
-      "subtitle": "Search by niche and city. Huntly gives you businesses with no website, a phone number, and a message ready to send.",
+      "title1": "Find local businesses",
+      "title2": "with no website",
+      "title3": "in seconds.",
+      "subtitle": "Search by niche and city. Huntly gives you businesses with no website, their phone number, and a message ready to send.",
       "ctaPrimary": "Find clients now",
       "ctaDashboard": "Go to Dashboard",
       "ctaDemo": "See how it works",
@@ -83,8 +83,8 @@
     },
     "pricingSection": {
       "label": "Pricing",
-      "title": "No commitment.",
-      "titleHighlight": " Cancel anytime.",
+      "title": "Cheaper than Netflix.",
+      "titleHighlight": " Real clients.",
       "valueNote": "One web client can bring you $200 or more. Huntly Go costs $9.",
       "valueHighlight": "Close just one and the plan pays for itself 20 times over.",
       "mostPopular": "Most popular"
@@ -153,10 +153,6 @@
   },
   "faqs": [
     {
-      "q": "Does Huntly guarantee I'll get clients?",
-      "a": "No. Huntly helps you find businesses with opportunity signals, but closing clients depends on your offer, message, and follow-up."
-    },
-    {
       "q": "Where do the results come from?",
       "a": "Huntly uses public data from local businesses and organizes it so you can spot opportunities faster."
     },
@@ -175,6 +171,18 @@
     {
       "q": "What if a business already has a website?",
       "a": "Huntly prioritizes businesses without websites or with opportunity signals, but there may be cases where you need to review the lead manually."
+    },
+    {
+      "q": "Which countries and cities does Huntly work in?",
+      "a": "Huntly works in any city across Spain, Mexico, Argentina, Colombia, Peru, Chile and other Spanish-speaking countries. You can search by neighborhood, area or city — from Madrid or Barcelona to Mexico City, Buenos Aires or Bogotá."
+    },
+    {
+      "q": "How does Huntly detect businesses with no website?",
+      "a": "Huntly queries public Google Maps data, identifies businesses with no linked website, extracts available phone numbers and automatically assigns an opportunity score based on reviews, rating and activity signals."
+    },
+    {
+      "q": "Does Huntly guarantee I'll get clients?",
+      "a": "No. Huntly helps you find businesses with opportunity signals, but closing clients depends on your offer, message, and follow-up."
     }
   ],
   "dashboard": {
@@ -299,8 +307,8 @@
   },
   "pricing": {
     "label": "Pricing",
-    "title": "No commitment.",
-    "titleHighlight": " Cancel anytime.",
+    "title": "Cheaper than Netflix.",
+    "titleHighlight": " Real clients.",
     "subtitle": "One web client can be worth way more than a month of Huntly.",
     "currentPlan": "Current plan:",
     "searchesRemaining": "{count} searches remaining this month",

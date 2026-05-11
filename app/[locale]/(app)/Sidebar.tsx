@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useSidebar } from "./SidebarContext";
+import { PLAN_LIMITS as PLAN_LIMITS_CONFIG } from "@/lib/plans";
 
 interface HistoryItem {
   id: string;
@@ -25,7 +26,7 @@ interface SidebarProps {
   onToggle: () => void;
 }
 
-const PLAN_LIMITS: Record<string, number> = { free: 5, go: 100, pro: 250 };
+const PLAN_LIMITS = PLAN_LIMITS_CONFIG;
 
 function useTimeAgo() {
   const t = useTranslations("dashboard.timeAgo");

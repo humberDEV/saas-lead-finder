@@ -10,7 +10,7 @@ export async function POST(request: Request) {
   const { userId } = await auth();
   if (!userId) return new NextResponse("Unauthorized", { status: 401 });
 
-  const { planKey } = await request.json();
+  const { planKey, coupon } = await request.json();
   const planConfig = STRIPE_PLANS[planKey];
   if (!planConfig) {
     return NextResponse.json({ error: "Plan inválido" }, { status: 400 });
@@ -23,8 +23,19 @@ export async function POST(request: Request) {
 
   const email = clerkUser?.emailAddresses?.[0]?.emailAddress ?? user.email ?? undefined;
 
-  // Reusar o crear el customer de Stripe
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+  const cookieStore = await cookies();
+
+  // Reusar customer de Stripe. Si el ID guardado es de otra cuenta (ej. al cambiar
+  // de producción a test) Stripe lanza "No such customer" — creamos uno nuevo.
   let stripeCustomerId = user.stripeCustomerId ?? undefined;
+  if (stripeCustomerId) {
+    try {
+      await stripe.customers.retrieve(stripeCustomerId);
+    } catch {
+      stripeCustomerId = undefined;
+    }
+  }
   if (!stripeCustomerId) {
     const customer = await stripe.customers.create({
       email,
@@ -37,14 +48,11 @@ export async function POST(request: Request) {
     });
   }
 
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
-
-  const cookieStore = await cookies();
-
   const session = await stripe.checkout.sessions.create({
     customer: stripeCustomerId,
     mode: "subscription",
     line_items: [{ price: planConfig.priceId, quantity: 1 }],
+    ...(coupon ? { discounts: [{ coupon }] } : { allow_promotion_codes: true }),
     success_url: `${baseUrl}/dashboard?upgraded=1`,
     cancel_url: `${baseUrl}/pricing`,
     metadata: {
