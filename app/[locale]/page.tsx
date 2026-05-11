@@ -489,6 +489,7 @@ export default async function LandingPage() {
                     desc: "Prospecta en 5 minutos lo que antes te llevaba horas revisando Google Maps a mano. Encuentra negocios locales sin web listos para contratar.",
                     stat: "20+ leads listos en menos de 30 segundos",
                     color: "#a78bfa",
+                    cta: "Encontrar mi primer cliente",
                   },
                   {
                     num: "02",
@@ -497,6 +498,7 @@ export default async function LandingPage() {
                     desc: "Llena tu pipeline de oportunidades de venta sin contratar a nadie para prospección. Búsquedas ilimitadas por ciudad y nicho.",
                     stat: "Pipeline lleno sin contratar a nadie",
                     color: "#e879f9",
+                    cta: "Llenar mi pipeline ahora",
                   },
                   {
                     num: "03",
@@ -505,6 +507,7 @@ export default async function LandingPage() {
                     desc: "Haces webs en pocas horas con Framer, Webflow o herramientas de IA. Huntly te encuentra los clientes que todavía no las tienen.",
                     stat: "Clientes que necesitan exactamente lo que ofreces",
                     color: "#38bdf8",
+                    cta: "Buscar clientes sin web",
                   },
                 ].map((item, i) => (
                   <Reveal key={i} delay={i * 70}>
@@ -568,17 +571,17 @@ export default async function LandingPage() {
                         <div className="shrink-0 md:self-center">
                           <SignedOut>
                             <SignInButton mode="modal">
-                              <button className="flex items-center gap-2 text-sm font-bold text-white bg-violet-600 hover:bg-violet-500 active:bg-violet-700 px-4 py-2 rounded-xl transition-colors shadow-[0_0_20px_rgba(139,92,246,0.25)]">
-                                Probarlo gratis <ArrowRight className="w-3.5 h-3.5" />
+                              <button className="flex items-center gap-2 text-sm font-bold text-white bg-violet-600 hover:bg-violet-500 active:bg-violet-700 px-4 py-2 rounded-xl transition-colors shadow-[0_0_20px_rgba(139,92,246,0.25)] whitespace-nowrap">
+                                {item.cta} <ArrowRight className="w-3.5 h-3.5 shrink-0" />
                               </button>
                             </SignInButton>
                           </SignedOut>
                           <SignedIn>
                             <Link
                               href="/search"
-                              className="flex items-center gap-2 text-sm font-bold text-white bg-violet-600 hover:bg-violet-500 active:bg-violet-700 px-4 py-2 rounded-xl transition-colors shadow-[0_0_20px_rgba(139,92,246,0.25)]"
+                              className="flex items-center gap-2 text-sm font-bold text-white bg-violet-600 hover:bg-violet-500 active:bg-violet-700 px-4 py-2 rounded-xl transition-colors shadow-[0_0_20px_rgba(139,92,246,0.25)] whitespace-nowrap"
                             >
-                              Buscar clientes <ArrowRight className="w-3.5 h-3.5" />
+                              {item.cta} <ArrowRight className="w-3.5 h-3.5 shrink-0" />
                             </Link>
                           </SignedIn>
                         </div>
