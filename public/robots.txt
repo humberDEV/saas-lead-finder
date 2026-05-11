@@ -1,0 +1,18 @@
+User-agent: *
+Allow: /
+
+# Block authenticated-only routes
+Disallow: /en/dashboard
+Disallow: /es/dashboard
+Disallow: /en/search
+Disallow: /es/search
+Disallow: /en/crm
+Disallow: /es/crm
+Disallow: /en/settings
+Disallow: /es/settings
+Disallow: /en/checkout
+Disallow: /es/checkout
+Disallow: /admin
+Disallow: /api/
+
+Sitemap: https://tryhuntly.com/sitemap.xml

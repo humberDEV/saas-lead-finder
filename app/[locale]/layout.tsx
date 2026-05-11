@@ -22,10 +22,21 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "metadata" });
 
+  const BASE = "https://tryhuntly.com";
+
   return {
     title: t("title"),
     description: t("description"),
     keywords: t("keywords"),
+    metadataBase: new URL(BASE),
+    alternates: {
+      canonical: `${BASE}/${locale}`,
+      languages: {
+        "en": `${BASE}/en`,
+        "es": `${BASE}/es`,
+        "x-default": `${BASE}/en`,
+      },
+    },
     icons: {
       icon: "/icon.png",
       shortcut: "/icon.png",
@@ -34,14 +45,17 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     openGraph: {
       title: t("ogTitle"),
       description: t("ogDescription"),
-      images: ["/og-image.png"],
+      url: `${BASE}/${locale}`,
+      images: [{ url: "/og-image.png", width: 1200, height: 630 }],
       type: "website",
       siteName: "Huntly",
+      locale: locale === "es" ? "es_ES" : "en_US",
     },
     twitter: {
-      card: "summary",
+      card: "summary_large_image",
       title: t("ogTitle"),
       description: t("ogDescription"),
+      images: ["/og-image.png"],
     },
   };
 }
