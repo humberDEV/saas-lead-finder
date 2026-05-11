@@ -96,7 +96,7 @@ export default async function LandingPage() {
   ];
 
   return (
-    <div className="min-h-screen text-white antialiased" style={{ background: BG.base }}>
+    <div className="min-h-screen text-white antialiased overflow-x-hidden" style={{ background: BG.base }}>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -267,67 +267,62 @@ export default async function LandingPage() {
 
             {/* ── Comparison ── */}
             <div className="relative z-10 max-w-4xl mx-auto pb-16">
-              <div className="grid grid-cols-[1fr_auto_1fr] gap-6 items-start">
 
-                {/* Sin Huntly */}
+              {/* Desktop: 3-col grid */}
+              <div className="hidden md:grid grid-cols-[1fr_auto_1fr] gap-6 items-start">
                 <div className="flex flex-col gap-4">
-                  <p
-                    className="font-black tracking-tighter leading-none text-center"
-                    style={{ fontSize: "clamp(22px, 3vw, 36px)", color: "rgba(248,113,113,0.55)" }}
-                  >
-                    Sin Huntly
-                  </p>
-
-                  {/* Imagen Google Maps */}
+                  <p className="font-black tracking-tighter leading-none text-center" style={{ fontSize: "clamp(22px, 3vw, 36px)", color: "rgba(248,113,113,0.55)" }}>Sin Huntly</p>
                   <div className="w-full rounded-2xl overflow-hidden" style={{ border: "1px solid rgba(248,113,113,0.12)" }}>
                     <img src="/maps.png" alt="Búsqueda manual en Google Maps" className="w-full block" style={{ opacity: 0.8 }} />
                   </div>
-
                   <p className="text-center font-semibold" style={{ fontSize: "clamp(13px, 1.5vw, 16px)", color: "rgba(248,113,113,0.5)" }}>
-                    3–4 horas por semana<br />
-                    <span style={{ color: "rgba(248,113,113,0.35)", fontSize: "0.85em" }}>buscando a mano</span>
+                    3–4 horas por semana<br /><span style={{ color: "rgba(248,113,113,0.35)", fontSize: "0.85em" }}>buscando a mano</span>
                   </p>
                 </div>
-
-                {/* Flecha */}
                 <div className="flex flex-col items-center justify-center gap-2 pt-10 self-stretch">
                   <div className="flex-1 w-px" style={{ background: "linear-gradient(to bottom, transparent, rgba(139,92,246,0.3))" }} />
-                  <div
-                    className="shrink-0 w-11 h-11 rounded-full flex items-center justify-center"
-                    style={{
-                      background: "linear-gradient(135deg, rgba(139,92,246,0.20), rgba(167,139,250,0.08))",
-                      border: "1px solid rgba(139,92,246,0.50)",
-                      boxShadow: "0 0 24px rgba(139,92,246,0.30), 0 0 48px rgba(139,92,246,0.12)",
-                    }}
-                  >
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(167,139,250,1)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M5 12h14M13 6l6 6-6 6" />
-                    </svg>
+                  <div className="shrink-0 w-11 h-11 rounded-full flex items-center justify-center" style={{ background: "linear-gradient(135deg, rgba(139,92,246,0.20), rgba(167,139,250,0.08))", border: "1px solid rgba(139,92,246,0.50)", boxShadow: "0 0 24px rgba(139,92,246,0.30)" }}>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(167,139,250,1)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
                   </div>
                   <div className="flex-1 w-px" style={{ background: "linear-gradient(to bottom, rgba(139,92,246,0.3), transparent)" }} />
                 </div>
-
-                {/* Con Huntly */}
                 <div className="flex flex-col gap-4">
-                  <p
-                    className="font-black tracking-tighter leading-none text-center text-white"
-                    style={{ fontSize: "clamp(22px, 3vw, 36px)", textShadow: "0 0 40px rgba(139,92,246,0.5)" }}
-                  >
-                    Con Huntly
-                  </p>
-
-                  {/* Imagen Huntly */}
+                  <p className="font-black tracking-tighter leading-none text-center text-white" style={{ fontSize: "clamp(22px, 3vw, 36px)", textShadow: "0 0 40px rgba(139,92,246,0.5)" }}>Con Huntly</p>
                   <div className="w-full rounded-2xl overflow-hidden" style={{ border: "1px solid rgba(139,92,246,0.22)", boxShadow: "0 0 40px rgba(139,92,246,0.10)" }}>
                     <img src="/huntly.png" alt="Dashboard Huntly con leads filtrados" className="w-full block" />
                   </div>
-
                   <p className="text-center font-semibold text-violet-300" style={{ fontSize: "clamp(13px, 1.5vw, 16px)" }}>
-                    10 segundos por búsqueda<br />
-                    <span className="text-violet-400/60" style={{ fontSize: "0.85em" }}>leads listos para contactar</span>
+                    10 segundos por búsqueda<br /><span className="text-violet-400/60" style={{ fontSize: "0.85em" }}>leads listos para contactar</span>
                   </p>
                 </div>
-
               </div>
+
+              {/* Mobile: stacked */}
+              <div className="md:hidden flex flex-col gap-5">
+                <div className="flex flex-col gap-3">
+                  <p className="font-black tracking-tighter text-center text-lg" style={{ color: "rgba(248,113,113,0.55)" }}>Sin Huntly</p>
+                  <div className="w-full rounded-2xl overflow-hidden" style={{ border: "1px solid rgba(248,113,113,0.12)" }}>
+                    <img src="/maps.png" alt="Búsqueda manual en Google Maps" className="w-full block" style={{ opacity: 0.8 }} />
+                  </div>
+                  <p className="text-center text-sm font-semibold" style={{ color: "rgba(248,113,113,0.5)" }}>3–4 horas por semana buscando a mano</p>
+                </div>
+
+                {/* Down arrow */}
+                <div className="flex justify-center">
+                  <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: "linear-gradient(135deg, rgba(139,92,246,0.20), rgba(167,139,250,0.08))", border: "1px solid rgba(139,92,246,0.50)", boxShadow: "0 0 20px rgba(139,92,246,0.25)" }}>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(167,139,250,1)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14M6 13l6 6 6-6" /></svg>
+                  </div>
+                </div>
+
+                <div className="flex flex-col gap-3">
+                  <p className="font-black tracking-tighter text-center text-lg text-white" style={{ textShadow: "0 0 30px rgba(139,92,246,0.5)" }}>Con Huntly</p>
+                  <div className="w-full rounded-2xl overflow-hidden" style={{ border: "1px solid rgba(139,92,246,0.22)", boxShadow: "0 0 30px rgba(139,92,246,0.10)" }}>
+                    <img src="/huntly.png" alt="Dashboard Huntly con leads filtrados" className="w-full block" />
+                  </div>
+                  <p className="text-center text-sm font-semibold text-violet-300">10 segundos por búsqueda · leads listos para contactar</p>
+                </div>
+              </div>
+
             </div>
           </section>
 
