@@ -163,7 +163,7 @@ export default async function LandingPage() {
             <div className="flex items-center gap-2">
               <SignedOut>
                 <SignInButton mode="modal">
-                  <button className="hidden sm:flex items-center gap-1.5 text-sm font-semibold px-4 py-1.5 rounded-lg border border-violet-500/30 text-violet-200 hover:bg-violet-500/10 hover:border-violet-400/50 transition-all">
+                  <button className="flex items-center gap-1.5 text-sm font-semibold px-4 py-1.5 rounded-lg border border-violet-500/30 text-violet-200 hover:bg-violet-500/10 hover:border-violet-400/50 transition-all">
                     {t("nav.signIn")}
                   </button>
                 </SignInButton>
