@@ -2,13 +2,14 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Search, Clock, Briefcase, Settings } from "lucide-react";
+import { Search, Clock, Briefcase, Settings, LayoutDashboard } from "lucide-react";
 
 const TABS = [
-  { href: "/search",   icon: Search,   label: "Buscar"   },
-  { href: "/history",  icon: Clock,    label: "Historial" },
-  { href: "/crm",      icon: Briefcase,label: "Cartera"  },
-  { href: "/settings", icon: Settings, label: "Cuenta"   },
+  { href: "/search",    icon: Search,          label: "Buscar"    },
+  { href: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
+  { href: "/history",   icon: Clock,           label: "Historial" },
+  { href: "/crm",       icon: Briefcase,       label: "Cartera"   },
+  { href: "/settings",  icon: Settings,        label: "Cuenta"    },
 ] as const;
 
 export default function MobileNav() {
