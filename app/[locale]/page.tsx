@@ -8,7 +8,7 @@ import {
 } from "lucide-react";
 import CursorGlow from "./CursorGlow";
 import Reveal from "./Reveal";
-import GlobeMap from "./GlobeMap";
+import AnimatedSteps from "./AnimatedSteps";
 
 const TICKER_ITEMS = [
   { name: "Barbería El Rincón", city: "Madrid", rating: "4.8" },
@@ -75,20 +75,69 @@ export default async function LandingPage() {
     },
   ];
 
-  void tFaqs;
+  const FAQS = tFaqs.raw("faqs") as Array<{ q: string; a: string }>;
+
+  const HOW_IT_WORKS = [
+    {
+      n: "01",
+      title: t("howItWorks.step1Title"),
+      desc: "Selecciona el tipo de negocio — barberías, clínicas dentales, talleres mecánicos, restaurantes, fisioterapeutas y más de 35 nichos — y la ciudad o barrio donde quieres prospectar.",
+    },
+    {
+      n: "02",
+      title: t("howItWorks.step2Title"),
+      desc: "Huntly analiza Google Maps, filtra los negocios locales sin página web, extrae su teléfono disponible y les asigna un score de oportunidad según reseñas, valoración y actividad.",
+    },
+    {
+      n: "03",
+      title: t("howItWorks.step3Title"),
+      desc: "Llama directamente, envía un WhatsApp con el mensaje de apertura generado automáticamente o guarda el lead en tu cartera de clientes. Todo en una sola pantalla.",
+    },
+  ];
 
   return (
     <div className="min-h-screen text-white antialiased" style={{ background: BG.base }}>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "SoftwareApplication",
-            name: "Huntly",
-            applicationCategory: "BusinessApplication",
-            offers: { "@type": "AggregateOffer", lowPrice: "0", highPrice: "19", priceCurrency: "USD" },
-          }),
+          __html: JSON.stringify([
+            {
+              "@context": "https://schema.org",
+              "@type": "SoftwareApplication",
+              name: "Huntly",
+              applicationCategory: "BusinessApplication",
+              operatingSystem: "Web",
+              description: "Herramienta de prospección local que escanea Google Maps para encontrar negocios sin página web. Ideal para freelancers web y agencias.",
+              offers: { "@type": "AggregateOffer", lowPrice: "0", highPrice: "19", priceCurrency: "USD" },
+            },
+            {
+              "@context": "https://schema.org",
+              "@type": "HowTo",
+              name: "Cómo encontrar negocios sin web con Huntly",
+              description: "Guía paso a paso para encontrar clientes potenciales de diseño web usando Huntly",
+              step: [
+                { "@type": "HowToStep", position: 1, name: "Elige nicho y ciudad", text: "Selecciona el tipo de negocio y la ciudad o barrio donde quieres buscar clientes web." },
+                { "@type": "HowToStep", position: 2, name: "Huntly detecta negocios sin página web", text: "Huntly analiza Google Maps, filtra los negocios sin web y extrae su teléfono con un score de oportunidad." },
+                { "@type": "HowToStep", position: 3, name: "Contacta y cierra el cliente", text: "Llama o envía un WhatsApp con el mensaje generado automáticamente para cerrar la venta." },
+              ],
+            },
+            {
+              "@context": "https://schema.org",
+              "@type": "FAQPage",
+              mainEntity: FAQS.map((faq) => ({
+                "@type": "Question",
+                name: faq.q,
+                acceptedAnswer: { "@type": "Answer", text: faq.a },
+              })),
+            },
+            {
+              "@context": "https://schema.org",
+              "@type": "Organization",
+              name: "Huntly",
+              url: "https://tryhuntly.com",
+              description: "Herramienta de prospección local para encontrar negocios sin web y conseguir clientes de diseño web",
+            },
+          ]),
         }}
       />
 
@@ -105,29 +154,34 @@ export default async function LandingPage() {
           style={{ background: "rgba(14,11,30,0.92)" }}
         >
           <div className="max-w-6xl mx-auto px-6 h-full flex items-center justify-between">
-            <div className="flex items-center gap-2">
+            <Link href="#" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
               <Sparkles className="w-4 h-4 text-violet-400" />
               <span className="font-bold tracking-tight">
                 Hunt<span className="text-violet-400">ly</span>
               </span>
-            </div>
-            <div className="flex items-center gap-3">
+            </Link>
+            <div className="flex items-center gap-2">
               <SignedOut>
                 <SignInButton mode="modal">
-                  <button className="text-sm text-violet-300 hover:text-violet-100 transition-colors hidden sm:block">
+                  <button className="hidden sm:flex items-center gap-1.5 text-sm font-semibold px-4 py-1.5 rounded-lg border border-violet-500/30 text-violet-200 hover:bg-violet-500/10 hover:border-violet-400/50 transition-all">
                     {t("nav.signIn")}
                   </button>
                 </SignInButton>
-                {/* Goes straight to pricing anchor — no sign-in gate */}
                 <Link
                   href="#precios"
-                  className="flex items-center gap-1.5 text-sm font-semibold px-4 py-1.5 bg-violet-600 hover:bg-violet-500 text-white rounded-lg transition-all shadow-[0_0_20px_rgba(139,92,246,0.35)]"
+                  className="relative flex items-center gap-1.5 text-sm font-bold px-5 py-2 rounded-lg text-white overflow-hidden transition-all hover:scale-[1.03] active:scale-[0.98]"
+                  style={{
+                    background: "linear-gradient(135deg, #7c3aed, #a855f7, #7c3aed)",
+                    backgroundSize: "200% 100%",
+                    boxShadow: "0 0 0 1px rgba(167,139,250,0.3), 0 0 24px rgba(139,92,246,0.5), 0 0 48px rgba(139,92,246,0.2)",
+                  }}
                 >
-                  Comprar ahora
+                  <span className="relative z-10">Comprar ahora</span>
+                  <ArrowRight className="relative z-10 w-3.5 h-3.5" />
                 </Link>
               </SignedOut>
               <SignedIn>
-                <Link href="/dashboard" className="flex items-center gap-1.5 text-sm font-medium px-4 py-1.5 bg-violet-600 hover:bg-violet-500 rounded-lg transition-colors">
+                <Link href="/dashboard" className="flex items-center gap-1.5 text-sm font-semibold px-4 py-1.5 bg-violet-600 hover:bg-violet-500 rounded-lg transition-colors text-white">
                   {t("nav.dashboard")} <ArrowRight className="w-3.5 h-3.5" />
                 </Link>
               </SignedIn>
@@ -137,32 +191,27 @@ export default async function LandingPage() {
 
         <main className="pt-14">
 
-          {/* ── HERO ── */}
+          {/* ── HERO + COMPARISON — una sola sección ── */}
           <section
-            className="relative flex flex-col items-center justify-center text-center px-6 overflow-hidden"
-            style={{ minHeight: "calc(100svh - 56px)" }}
+            className="relative px-6 overflow-hidden"
+            style={{ background: BG.base }}
           >
-            {/* Dot grid */}
+            {/* Fondos decorativos */}
             <div aria-hidden className="absolute inset-0 pointer-events-none"
               style={{
                 backgroundImage: "radial-gradient(circle, rgba(167,139,250,0.18) 1px, transparent 1px)",
                 backgroundSize: "32px 32px",
-                maskImage: "radial-gradient(ellipse 75% 65% at 50% 50%, black 0%, transparent 100%)",
-                WebkitMaskImage: "radial-gradient(ellipse 75% 65% at 50% 50%, black 0%, transparent 100%)",
-                opacity: 0.16,
+                maskImage: "radial-gradient(ellipse 75% 50% at 50% 20%, black 0%, transparent 100%)",
+                WebkitMaskImage: "radial-gradient(ellipse 75% 50% at 50% 20%, black 0%, transparent 100%)",
+                opacity: 0.12,
               }}
             />
-            <div aria-hidden className="absolute inset-0 pointer-events-none"
-              style={{ background: "radial-gradient(ellipse 80% 60% at 50% 50%, rgba(139,92,246,0.14) 0%, transparent 70%)" }}
-            />
-            <div aria-hidden className="absolute top-0 left-0 w-96 h-96 pointer-events-none"
-              style={{ background: "radial-gradient(circle, rgba(139,92,246,0.07) 0%, transparent 70%)" }}
-            />
-            <div aria-hidden className="absolute bottom-0 right-0 w-96 h-96 pointer-events-none"
-              style={{ background: "radial-gradient(circle, rgba(168,85,247,0.07) 0%, transparent 70%)" }}
+            <div aria-hidden className="absolute top-0 inset-x-0 h-[60%] pointer-events-none"
+              style={{ background: "radial-gradient(ellipse 80% 80% at 50% 0%, rgba(139,92,246,0.11) 0%, transparent 100%)" }}
             />
 
-            <div className="relative z-10 flex flex-col items-center">
+            {/* ── Hero text ── */}
+            <div className="relative z-10 flex flex-col items-center text-center pt-10 pb-12 md:pt-14 md:pb-16">
               <Reveal delay={0}>
                 <div className="inline-flex items-center gap-2 bg-violet-500/[0.10] border border-violet-500/25 rounded-full px-4 py-1.5 mb-10">
                   <Zap className="w-3 h-3 text-violet-400" />
@@ -172,8 +221,8 @@ export default async function LandingPage() {
 
               <Reveal delay={80}>
                 <h1
-                  className="font-black tracking-tighter leading-[0.92] text-white mb-7 max-w-3xl"
-                  style={{ fontSize: "clamp(36px, 6.5vw, 88px)" }}
+                  className="font-black tracking-tighter leading-[0.92] text-white mb-6 max-w-3xl"
+                  style={{ fontSize: "clamp(36px, 6vw, 84px)" }}
                 >
                   {t("hero.title1")}
                   <br />
@@ -186,7 +235,7 @@ export default async function LandingPage() {
               </Reveal>
 
               <Reveal delay={160}>
-                <p className="text-base md:text-lg text-violet-200 mb-12 max-w-sm leading-relaxed">
+                <p className="text-base md:text-lg text-violet-200 mb-10 max-w-sm leading-relaxed">
                   {t("hero.subtitle")}
                 </p>
               </Reveal>
@@ -212,76 +261,101 @@ export default async function LandingPage() {
                     </Link>
                   </SignedIn>
                   <span className="text-xs text-violet-400">{t("hero.freeNote")}</span>
-                  <div className="flex items-center gap-3 mt-3 text-[11px] text-violet-400">
-                    <span>① Elige nicho y ciudad</span>
-                    <span className="text-violet-700">·</span>
-                    <span>② Huntly escanea</span>
-                    <span className="text-violet-700">·</span>
-                    <span>③ Contacta y cierra</span>
-                  </div>
                 </div>
               </Reveal>
             </div>
 
-            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 opacity-20">
-              <div className="w-px h-8 bg-gradient-to-b from-transparent via-violet-400 to-transparent" />
+            {/* ── Comparison ── */}
+            <div className="relative z-10 max-w-4xl mx-auto pb-16">
+              <div className="grid grid-cols-[1fr_auto_1fr] gap-6 items-start">
+
+                {/* Sin Huntly */}
+                <div className="flex flex-col gap-4">
+                  <p
+                    className="font-black tracking-tighter leading-none text-center"
+                    style={{ fontSize: "clamp(22px, 3vw, 36px)", color: "rgba(248,113,113,0.55)" }}
+                  >
+                    Sin Huntly
+                  </p>
+
+                  {/* Imagen Google Maps */}
+                  <div className="w-full rounded-2xl overflow-hidden" style={{ border: "1px solid rgba(248,113,113,0.12)" }}>
+                    <img src="/maps.png" alt="Búsqueda manual en Google Maps" className="w-full block" style={{ opacity: 0.8 }} />
+                  </div>
+
+                  <p className="text-center font-semibold" style={{ fontSize: "clamp(13px, 1.5vw, 16px)", color: "rgba(248,113,113,0.5)" }}>
+                    3–4 horas por semana<br />
+                    <span style={{ color: "rgba(248,113,113,0.35)", fontSize: "0.85em" }}>buscando a mano</span>
+                  </p>
+                </div>
+
+                {/* Flecha */}
+                <div className="flex flex-col items-center justify-center gap-2 pt-10 self-stretch">
+                  <div className="flex-1 w-px" style={{ background: "linear-gradient(to bottom, transparent, rgba(139,92,246,0.3))" }} />
+                  <div
+                    className="shrink-0 w-11 h-11 rounded-full flex items-center justify-center"
+                    style={{
+                      background: "linear-gradient(135deg, rgba(139,92,246,0.20), rgba(167,139,250,0.08))",
+                      border: "1px solid rgba(139,92,246,0.50)",
+                      boxShadow: "0 0 24px rgba(139,92,246,0.30), 0 0 48px rgba(139,92,246,0.12)",
+                    }}
+                  >
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(167,139,250,1)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M5 12h14M13 6l6 6-6 6" />
+                    </svg>
+                  </div>
+                  <div className="flex-1 w-px" style={{ background: "linear-gradient(to bottom, rgba(139,92,246,0.3), transparent)" }} />
+                </div>
+
+                {/* Con Huntly */}
+                <div className="flex flex-col gap-4">
+                  <p
+                    className="font-black tracking-tighter leading-none text-center text-white"
+                    style={{ fontSize: "clamp(22px, 3vw, 36px)", textShadow: "0 0 40px rgba(139,92,246,0.5)" }}
+                  >
+                    Con Huntly
+                  </p>
+
+                  {/* Imagen Huntly */}
+                  <div className="w-full rounded-2xl overflow-hidden" style={{ border: "1px solid rgba(139,92,246,0.22)", boxShadow: "0 0 40px rgba(139,92,246,0.10)" }}>
+                    <img src="/huntly.png" alt="Dashboard Huntly con leads filtrados" className="w-full block" />
+                  </div>
+
+                  <p className="text-center font-semibold text-violet-300" style={{ fontSize: "clamp(13px, 1.5vw, 16px)" }}>
+                    10 segundos por búsqueda<br />
+                    <span className="text-violet-400/60" style={{ fontSize: "0.85em" }}>leads listos para contactar</span>
+                  </p>
+                </div>
+
+              </div>
             </div>
           </section>
 
-          {/* ── TICKER — in flow, not fixed ── */}
+          {/* ── TICKER ── */}
           <div
-            className="border-y border-violet-500/[0.08] py-3 overflow-hidden"
-            style={{ background: "rgba(11,9,23,0.95)" }}
+            className="border-b border-violet-500/[0.07] py-5 overflow-hidden relative"
+            style={{
+              background: BG.base,
+              maskImage: "linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%)",
+              WebkitMaskImage: "linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%)",
+            }}
           >
             <div className="flex animate-marquee whitespace-nowrap">
               {[...TICKER_ITEMS, ...TICKER_ITEMS].map((item, i) => (
-                <span key={i} className="inline-flex items-center gap-3 mx-8 shrink-0">
+                <span key={i} className="inline-flex items-center gap-3 mx-10 shrink-0">
                   <span className="inline-flex items-center gap-1 text-[9px] font-bold text-emerald-400 uppercase tracking-wider bg-emerald-500/10 border border-emerald-500/20 px-1.5 py-0.5 rounded-full">
                     <span className="w-1 h-1 rounded-full bg-emerald-400" />
                     Sin web
                   </span>
                   <span className="text-xs font-medium text-violet-200">{item.name}</span>
-                  <span className="text-violet-800">·</span>
+                  <span className="text-violet-700">·</span>
                   <span className="text-xs text-violet-400">{item.city}</span>
-                  <span className="text-violet-800">·</span>
+                  <span className="text-violet-700">·</span>
                   <span className="text-xs text-yellow-400 font-medium">★ {item.rating}</span>
                 </span>
               ))}
             </div>
           </div>
-
-          {/* ── BEFORE / AFTER ── */}
-          <section className="px-6 pt-8 pb-20 md:pb-24" style={{ background: BG.alt }}>
-            <div className="max-w-5xl mx-auto">
-              <Reveal>
-                <p className="text-[10px] font-mono text-violet-400 uppercase tracking-widest mb-8 text-center">
-                  Sin Huntly · Con Huntly
-                </p>
-              </Reveal>
-              <div className="grid md:grid-cols-2 gap-4">
-                <Reveal delay={0}>
-                  <div className="rounded-2xl border border-red-500/10 p-1 h-full" style={{ background: "rgba(239,68,68,0.025)" }}>
-                    <div className="rounded-xl border border-dashed border-red-500/15 h-64 flex flex-col items-center justify-center gap-3 p-6">
-                      <span className="text-[9px] font-mono text-red-400/40 uppercase tracking-widest text-center leading-relaxed">
-                        Imagen real aquí<br />Proceso manual en Google Maps<br />800 × 480
-                      </span>
-                    </div>
-                    <p className="text-xs text-red-400/40 text-center py-2.5 font-medium">Sin Huntly</p>
-                  </div>
-                </Reveal>
-                <Reveal delay={100}>
-                  <div className="rounded-2xl border border-emerald-500/10 p-1 h-full" style={{ background: "rgba(52,211,153,0.025)" }}>
-                    <div className="rounded-xl border border-dashed border-emerald-500/15 h-64 flex flex-col items-center justify-center gap-3 p-6">
-                      <span className="text-[9px] font-mono text-emerald-400/40 uppercase tracking-widest text-center leading-relaxed">
-                        Imagen real aquí<br />Dashboard con leads en segundos<br />800 × 480
-                      </span>
-                    </div>
-                    <p className="text-xs text-emerald-400/40 text-center py-2.5 font-medium">Con Huntly</p>
-                  </div>
-                </Reveal>
-              </div>
-            </div>
-          </section>
 
           {/* ── PAIN ── */}
           <section
@@ -323,78 +397,6 @@ export default async function LandingPage() {
             </div>
           </section>
 
-          {/* ── STORYTELLING 1 ── */}
-          <section className="px-6 py-20 md:py-28" style={{ background: BG.mid }}>
-            <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-12 md:gap-20 items-center">
-              <Reveal>
-                <div>
-                  <p className="text-[10px] font-mono text-violet-400 uppercase tracking-widest mb-5">Para qué sirve</p>
-                  <h2
-                    className="font-black tracking-tighter leading-[1.05] text-white mb-5"
-                    style={{ fontSize: "clamp(24px, 3.2vw, 44px)" }}
-                  >
-                    Deja de perder horas<br />
-                    <span className="text-violet-300">buscando clientes<br />a mano en Google Maps.</span>
-                  </h2>
-                  <p className="text-sm text-violet-200 leading-relaxed max-w-xs">
-                    Huntly escanea Google Maps por ti. Filtra los negocios sin web, extrae su teléfono y los puntúa para que solo contactes los que tienen oportunidad real.
-                  </p>
-                </div>
-              </Reveal>
-              <Reveal delay={100}>
-                <div
-                  className="rounded-2xl border border-dashed border-violet-500/15 overflow-hidden"
-                  style={{ aspectRatio: "16/10", background: "rgba(139,92,246,0.03)" }}
-                >
-                  <div className="h-full flex flex-col items-center justify-center gap-3 p-6">
-                    <span className="text-[9px] font-mono text-violet-400/75 uppercase tracking-widest text-center leading-relaxed">
-                      Vídeo: búsqueda manual en Google Maps<br />aquí — 1280 × 800 recomendado
-                    </span>
-                  </div>
-                </div>
-              </Reveal>
-            </div>
-          </section>
-
-          {/* ── STORYTELLING 2 — globe ── */}
-          <section
-            className="relative px-6 py-20 md:py-28 overflow-hidden"
-            style={{ background: BG.base }}
-          >
-            <div aria-hidden className="absolute inset-0 pointer-events-none"
-              style={{ background: "radial-gradient(ellipse 50% 60% at 70% 50%, rgba(139,92,246,0.07) 0%, transparent 70%)" }}
-            />
-            <div className="relative max-w-6xl mx-auto grid md:grid-cols-2 gap-12 md:gap-20 items-center">
-              <Reveal>
-                <div>
-                  <p className="text-[10px] font-mono text-violet-400 uppercase tracking-widest mb-5">Cobertura global</p>
-                  <h2
-                    className="font-black tracking-tighter leading-[1.05] text-white mb-5"
-                    style={{ fontSize: "clamp(24px, 3.2vw, 44px)" }}
-                  >
-                    No te limites<br />
-                    <span className="text-violet-300">a tu ciudad.</span>
-                  </h2>
-                  <p className="text-sm text-violet-200 leading-relaxed max-w-xs">
-                    Huntly funciona en cualquier país hispanohablante del mundo. Busca clientes en Madrid, Ciudad de México, Buenos Aires o Bogotá con el mismo proceso.
-                  </p>
-                  <div className="mt-6 flex flex-wrap gap-2">
-                    {["España", "México", "Argentina", "Colombia", "Perú", "Chile", "+más"].map((c) => (
-                      <span key={c} className="text-[10px] font-mono text-violet-300/90 bg-violet-500/[0.07] border border-violet-500/15 rounded-full px-2.5 py-1 uppercase tracking-wide">
-                        {c}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              </Reveal>
-              <Reveal delay={100}>
-                <div className="rounded-2xl overflow-hidden border border-violet-500/15" style={{ height: 360 }}>
-                  <GlobeMap />
-                </div>
-              </Reveal>
-            </div>
-          </section>
-
           {/* ── DEMO ── */}
           <section id="demo" className="px-6 py-20 md:py-24" style={{ background: BG.mid }}>
             <div className="max-w-4xl mx-auto">
@@ -432,70 +434,169 @@ export default async function LandingPage() {
             </div>
           </section>
 
-          {/* ── SOCIAL PROOF ── */}
-          <section className="px-6 py-16 md:py-20" style={{ background: BG.alt }}>
-            <div className="max-w-6xl mx-auto">
+          {/* ── CÓMO FUNCIONA ── */}
+          <section id="como-funciona" className="px-6 py-20 md:py-28" style={{ background: BG.alt }}>
+            <div className="max-w-5xl mx-auto">
               <Reveal>
-                <p className="text-[10px] font-mono text-violet-400 uppercase tracking-widest mb-8 text-center">
-                  Lo que dicen los usuarios
-                </p>
+                <p className="text-[10px] font-mono text-violet-400 uppercase tracking-widest mb-4">{t("howItWorks.label")}</p>
+                <h2
+                  className="font-black tracking-tighter text-white mb-12"
+                  style={{ fontSize: "clamp(22px, 3vw, 40px)" }}
+                >
+                  {t("howItWorks.title")}
+                  <span className="text-violet-400">{t("howItWorks.titleHighlight")}</span>
+                </h2>
               </Reveal>
-              <div className="grid md:grid-cols-3 gap-4">
+              <AnimatedSteps steps={HOW_IT_WORKS} />
+              <Reveal delay={200}>
+                <div className="mt-10 flex justify-center">
+                  <SignedOut>
+                    <SignInButton mode="modal">
+                      <button className="inline-flex items-center gap-2 px-6 py-3 bg-violet-600 hover:bg-violet-500 text-white font-semibold rounded-xl transition-colors text-sm shadow-[0_0_24px_rgba(139,92,246,0.3)]">
+                        Probarlo gratis <ArrowRight className="w-4 h-4" />
+                      </button>
+                    </SignInButton>
+                  </SignedOut>
+                  <SignedIn>
+                    <Link href="/dashboard" className="inline-flex items-center gap-2 px-6 py-3 bg-violet-600 hover:bg-violet-500 text-white font-semibold rounded-xl transition-colors text-sm shadow-[0_0_24px_rgba(139,92,246,0.3)]">
+                      Ir al dashboard <ArrowRight className="w-4 h-4" />
+                    </Link>
+                  </SignedIn>
+                </div>
+              </Reveal>
+            </div>
+          </section>
+
+          {/* ── PARA QUIÉN ES ── */}
+          <section className="px-6 py-20 md:py-28 overflow-hidden" style={{ background: BG.mid }}>
+            <div className="max-w-5xl mx-auto">
+
+              {/* Header */}
+              <Reveal>
+                <p className="text-[10px] font-mono text-violet-400 uppercase tracking-widest mb-5">
+                  {t("audience.label")}
+                </p>
+                <h2
+                  className="font-black tracking-tighter text-white mb-16 max-w-xl"
+                  style={{ fontSize: "clamp(22px, 3vw, 40px)" }}
+                >
+                  {t("audience.title")}
+                </h2>
+              </Reveal>
+
+              {/* Editorial rows */}
+              <div className="space-y-0">
                 {[
                   {
-                    name: "Marcos",
-                    role: "freelance web · Sevilla",
-                    avatar: "M",
-                    stars: 5,
-                    text: "llevo 2 años haciendo webs y siempre fue lo mismo, mirando maps a mano buscando sin web. busqué talleres mecánicos en triana, en 5 min tenía 8 con teléfono. cerré uno esa misma semana.",
+                    num: "01",
+                    emoji: "🧑‍💻",
+                    title: "Freelancers de diseño web",
+                    desc: "Prospecta en 5 minutos lo que antes te llevaba horas revisando Google Maps a mano. Encuentra negocios locales sin web listos para contratar.",
+                    stat: "20+ leads listos en menos de 30 segundos",
+                    color: "#a78bfa",
                   },
                   {
-                    name: "Sara",
-                    role: "diseñadora freelance · Barcelona",
-                    avatar: "S",
-                    stars: 5,
-                    text: "el primer mes nada, mandé mensajes y no contestó nadie. el segundo mes ya le pillé el truco, cambié el enfoque y cerré una clínica dental en Gràcia. con eso ya recuperé los dos meses y me sobró",
+                    num: "02",
+                    emoji: "🏢",
+                    title: "Agencias web pequeñas",
+                    desc: "Llena tu pipeline de oportunidades de venta sin contratar a nadie para prospección. Búsquedas ilimitadas por ciudad y nicho.",
+                    stat: "Pipeline lleno sin contratar a nadie",
+                    color: "#e879f9",
                   },
                   {
-                    name: "Pablo",
-                    role: "hace webs con framer · Madrid",
-                    avatar: "P",
-                    stars: 4,
-                    text: "hago webs en 3-4 horas con framer. el problema siempre fue a quién vendérselas. huntly te da los datos en segundos, lo que pase después ya depende de ti. pero al menos el primer paso está resuelto",
+                    num: "03",
+                    emoji: "⚡",
+                    title: "Creadores web con IA",
+                    desc: "Haces webs en pocas horas con Framer, Webflow o herramientas de IA. Huntly te encuentra los clientes que todavía no las tienen.",
+                    stat: "Clientes que necesitan exactamente lo que ofreces",
+                    color: "#38bdf8",
                   },
-                ].map((t, i) => (
-                  <Reveal key={i} delay={i * 80}>
+                ].map((item, i) => (
+                  <Reveal key={i} delay={i * 70}>
                     <div
-                      className="rounded-2xl border border-violet-500/15 p-6 h-full flex flex-col"
-                      style={{ background: "rgba(139,92,246,0.05)" }}
+                      className="group relative py-10 md:py-12"
+                      style={{
+                        borderTop: "1px solid rgba(139,92,246,0.10)",
+                      }}
                     >
-                      {/* Stars */}
-                      <div className="flex gap-0.5 mb-4">
-                        {Array.from({ length: t.stars }).map((_, s) => (
-                          <span key={s} className="text-yellow-400 text-sm">★</span>
-                        ))}
-                      </div>
-                      {/* Quote */}
-                      <p className="text-sm text-violet-200 leading-relaxed flex-1 mb-5">
-                        "{t.text}"
-                      </p>
-                      {/* Author */}
-                      <div className="flex items-center gap-3">
-                        <div
-                          className="w-8 h-8 rounded-full flex items-center justify-center text-[10px] font-bold text-violet-200 shrink-0"
-                          style={{ background: "rgba(139,92,246,0.25)" }}
-                        >
-                          {t.avatar}
+                      {/* Hover accent line */}
+                      <div
+                        className="absolute top-0 left-0 h-px w-0 group-hover:w-full transition-all duration-500 pointer-events-none"
+                        style={{ background: `linear-gradient(to right, ${item.color}, transparent)` }}
+                      />
+
+                      <div className="flex flex-col md:flex-row md:items-start gap-6 md:gap-12">
+
+                        {/* Number + emoji */}
+                        <div className="flex md:flex-col items-center md:items-start gap-4 md:gap-3 md:w-20 shrink-0">
+                          <span
+                            className="font-black leading-none transition-all duration-300"
+                            style={{
+                              fontSize: "clamp(40px, 5vw, 64px)",
+                              color: "rgba(139,92,246,0.18)",
+                              fontVariantNumeric: "tabular-nums",
+                            }}
+                          >
+                            {item.num}
+                          </span>
+                          <span className="text-2xl md:text-3xl">{item.emoji}</span>
                         </div>
-                        <div>
-                          <p className="text-xs font-semibold text-white">{t.name}</p>
-                          <p className="text-[10px] text-violet-400">{t.role}</p>
+
+                        {/* Content */}
+                        <div className="flex-1 min-w-0">
+                          <h3
+                            className="font-black tracking-tight text-white mb-3 transition-colors duration-300 group-hover:text-violet-100"
+                            style={{ fontSize: "clamp(18px, 2.2vw, 28px)" }}
+                          >
+                            {item.title}
+                          </h3>
+                          <p className="text-sm text-violet-200/80 leading-relaxed mb-5 max-w-lg">
+                            {item.desc}
+                          </p>
+
+                          {/* Stat callout */}
+                          <div className="inline-flex items-center gap-2.5">
+                            <div
+                              className="w-1 h-4 rounded-full shrink-0"
+                              style={{ background: item.color, opacity: 0.7 }}
+                            />
+                            <span
+                              className="text-xs font-semibold"
+                              style={{ color: item.color, opacity: 0.85 }}
+                            >
+                              {item.stat}
+                            </span>
+                          </div>
                         </div>
+
+                        {/* CTA */}
+                        <div className="shrink-0 md:self-center">
+                          <SignedOut>
+                            <SignInButton mode="modal">
+                              <button className="flex items-center gap-1.5 text-xs font-semibold text-violet-400 hover:text-violet-200 transition-colors">
+                                Empezar gratis <ArrowRight className="w-3 h-3" />
+                              </button>
+                            </SignInButton>
+                          </SignedOut>
+                          <SignedIn>
+                            <Link
+                              href="/dashboard"
+                              className="flex items-center gap-1.5 text-xs font-semibold text-violet-400 hover:text-violet-200 transition-colors"
+                            >
+                              Ir al dashboard <ArrowRight className="w-3 h-3" />
+                            </Link>
+                          </SignedIn>
+                        </div>
+
                       </div>
                     </div>
                   </Reveal>
                 ))}
+
+                {/* Bottom border */}
+                <div style={{ borderTop: "1px solid rgba(139,92,246,0.10)" }} />
               </div>
+
             </div>
           </section>
 
@@ -656,6 +757,55 @@ export default async function LandingPage() {
             </div>
           </section>
 
+          {/* ── FAQ ── */}
+          <section className="px-6 py-20 md:py-28" style={{ background: BG.mid }}>
+            <div className="max-w-2xl mx-auto">
+              <Reveal>
+                <p className="text-[10px] font-mono text-violet-400 uppercase tracking-widest mb-4">{t("faq.label")}</p>
+                <h2
+                  className="font-black tracking-tighter text-white mb-10"
+                  style={{ fontSize: "clamp(22px, 3vw, 36px)" }}
+                >
+                  {t("faq.title")}
+                </h2>
+              </Reveal>
+              <div itemScope itemType="https://schema.org/FAQPage" className="space-y-2">
+                {FAQS.map((faq, i) => (
+                  <Reveal key={i} delay={i * 35}>
+                    <details
+                      itemProp="mainEntity"
+                      itemScope
+                      itemType="https://schema.org/Question"
+                      name="faq"
+                      className="group border border-violet-500/[0.10] rounded-xl overflow-hidden open:border-violet-500/[0.20]"
+                      style={{ background: "rgba(139,92,246,0.04)" }}
+                    >
+                      <summary className="flex items-center justify-between gap-4 px-5 py-4 cursor-pointer list-none select-none [&::-webkit-details-marker]:hidden">
+                        <span itemProp="name" className="text-sm font-semibold text-white">{faq.q}</span>
+                        <svg
+                          className="w-4 h-4 text-violet-500 shrink-0 transition-transform duration-200 group-open:rotate-180"
+                          fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}
+                        >
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                        </svg>
+                      </summary>
+                      <div
+                        itemProp="acceptedAnswer"
+                        itemScope
+                        itemType="https://schema.org/Answer"
+                        className="px-5 pb-5"
+                      >
+                        <p itemProp="text" className="text-sm text-violet-200 leading-relaxed border-t border-violet-500/[0.08] pt-4">
+                          {faq.a}
+                        </p>
+                      </div>
+                    </details>
+                  </Reveal>
+                ))}
+              </div>
+            </div>
+          </section>
+
           {/* ── CTA FINAL ── */}
           <section
             className="relative px-6 py-28 md:py-40 text-center overflow-hidden"
@@ -715,7 +865,7 @@ export default async function LandingPage() {
                 <span className="text-sm font-semibold text-violet-400/75">Huntly</span>
               </div>
               <div className="flex items-center gap-6 text-sm text-violet-400/75">
-                <Link href="#demo" className="hover:text-violet-200 transition-colors">{t("footer.howItWorks")}</Link>
+                <Link href="#como-funciona" className="hover:text-violet-200 transition-colors">{t("footer.howItWorks")}</Link>
                 <Link href="#precios" className="hover:text-violet-200 transition-colors">{t("footer.pricing")}</Link>
                 <Link href="mailto:huntly@outlook.es" className="hover:text-violet-200 transition-colors">{t("footer.contact")}</Link>
               </div>

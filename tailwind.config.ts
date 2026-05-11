@@ -17,10 +17,15 @@ const config: Config = {
           "0%": { transform: "translateX(0)" },
           "100%": { transform: "translateX(-50%)" },
         },
+        "step-progress": {
+          "0%": { width: "0%" },
+          "100%": { width: "100%" },
+        },
       },
       animation: {
         "fade-up": "fade-up 0.5s ease-out forwards",
         "marquee": "marquee 35s linear infinite",
+        "step-progress": "step-progress 8s linear forwards",
       },
     },
   },
