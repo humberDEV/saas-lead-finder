@@ -573,17 +573,17 @@ export default async function LandingPage() {
                         <div className="shrink-0 md:self-center">
                           <SignedOut>
                             <SignInButton mode="modal">
-                              <button className="flex items-center gap-1.5 text-xs font-semibold text-violet-400 hover:text-violet-200 transition-colors">
-                                Empezar gratis <ArrowRight className="w-3 h-3" />
+                              <button className="flex items-center gap-2 text-sm font-bold text-white bg-violet-600 hover:bg-violet-500 active:bg-violet-700 px-4 py-2 rounded-xl transition-colors shadow-[0_0_20px_rgba(139,92,246,0.25)]">
+                                Probarlo gratis <ArrowRight className="w-3.5 h-3.5" />
                               </button>
                             </SignInButton>
                           </SignedOut>
                           <SignedIn>
                             <Link
-                              href="/dashboard"
-                              className="flex items-center gap-1.5 text-xs font-semibold text-violet-400 hover:text-violet-200 transition-colors"
+                              href="/search"
+                              className="flex items-center gap-2 text-sm font-bold text-white bg-violet-600 hover:bg-violet-500 active:bg-violet-700 px-4 py-2 rounded-xl transition-colors shadow-[0_0_20px_rgba(139,92,246,0.25)]"
                             >
-                              Ir al dashboard <ArrowRight className="w-3 h-3" />
+                              Buscar clientes <ArrowRight className="w-3.5 h-3.5" />
                             </Link>
                           </SignedIn>
                         </div>

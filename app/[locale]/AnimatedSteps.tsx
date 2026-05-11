@@ -124,7 +124,7 @@ export default function AnimatedSteps({ steps }: { steps: Step[] }) {
           </span>
         </div>
 
-        <div className="p-5 md:p-6 min-h-[200px]">
+        <div className="p-5 md:p-6 h-[280px] md:h-[240px] overflow-hidden">
 
           {/* ── Step 1: Search form ── */}
           {a.step === 0 && (
