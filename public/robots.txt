@@ -12,6 +12,8 @@ Disallow: /en/settings
 Disallow: /es/settings
 Disallow: /en/checkout
 Disallow: /es/checkout
+Disallow: /en/pricing
+Disallow: /es/pricing
 Disallow: /admin
 Disallow: /api/
 
