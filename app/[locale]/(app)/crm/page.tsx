@@ -252,19 +252,36 @@ function LeadCard({
 // ── Locked free view ──────────────────────────────────────────────────────────
 function LockedPlaceholder() {
   return (
-    <div className="h-full flex items-center justify-center bg-[#0d0d14]">
-      <div className="text-center max-w-sm">
-        <Lock className="w-10 h-10 text-zinc-600 mx-auto mb-4" />
-        <h2 className="text-xl font-bold text-white mb-2">Tu cartera de clientes</h2>
-        <p className="text-sm text-zinc-500 mb-6">
-          Guarda leads, gestiona el estado de cada contacto y haz seguimiento real con el plan Go o Pro.
-        </p>
-        <Link
-          href="/pricing"
-          className="inline-flex items-center gap-2 px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm rounded-xl transition-colors"
-        >
-          Ver planes
-        </Link>
+    <div className="h-full overflow-y-auto bg-[#0b0917] text-white">
+      <div className="max-w-lg mx-auto px-4 py-6">
+        <div className="mb-6">
+          <div className="flex items-center gap-2 mb-1">
+            <Lock className="w-4 h-4 text-indigo-400" />
+            <h1 className="text-base font-black text-white">Cartera de clientes</h1>
+          </div>
+          <p className="text-xs text-zinc-500">Guarda leads y gestiona el estado de cada contacto.</p>
+        </div>
+        <div className="flex flex-col items-center gap-5 py-16 text-center">
+          <div className="w-16 h-16 rounded-3xl bg-gradient-to-br from-indigo-500/20 to-violet-500/10 border border-indigo-500/20 flex items-center justify-center">
+            <Lock className="w-7 h-7 text-indigo-400" />
+          </div>
+          <div>
+            <p className="text-base font-black text-white mb-2">Desbloquea la cartera</p>
+            <p className="text-xs text-zinc-500 leading-relaxed max-w-xs">
+              Guarda leads, cambia su estado y haz seguimiento real con un plan de pago. Todo en un tablero visual.
+            </p>
+          </div>
+          <div className="flex flex-col gap-2 w-full max-w-xs">
+            <Link
+              href="/pricing"
+              className="flex items-center justify-center gap-2 px-5 py-3 bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 text-white font-bold text-sm rounded-2xl transition-colors shadow-[0_2px_12px_rgba(99,102,241,0.3)]"
+            >
+              Ver planes
+              <ChevronRight className="w-3.5 h-3.5" />
+            </Link>
+            <p className="text-[10px] text-zinc-600">Desde $9/mes · cancela cuando quieras</p>
+          </div>
+        </div>
       </div>
     </div>
   );

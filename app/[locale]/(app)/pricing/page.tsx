@@ -64,6 +64,7 @@ export default function Pricing() {
       cta: tPlans("pro.cta"),
       planKey: "pro",
       popular: false,
+      secondary: true,
     },
   ];
 
@@ -109,23 +110,27 @@ export default function Pricing() {
           <p className="text-sm text-violet-200 max-w-md">
             {t("subtitle")}
           </p>
-          {remaining !== null && (
-            <div className="inline-flex items-center gap-2 mt-5 border border-violet-500/20 px-4 py-2 rounded-full text-sm"
-              style={{ background: "rgba(139,92,246,0.08)" }}>
-              <span className="text-violet-300 font-medium">{t("currentPlan")}</span>
-              <span className="text-white font-bold capitalize">{currentPlan}</span>
-              <span className="text-violet-700">·</span>
-              <span className="text-violet-200">{t("searchesRemaining", { count: remaining })}</span>
-            </div>
-          )}
         </div>
 
         {/* 20× value callout */}
         <div
-          className="rounded-2xl border border-violet-500/20 p-5 mb-8 max-w-2xl"
+          className="rounded-2xl border border-violet-500/20 mb-8 max-w-2xl"
           style={{ background: "linear-gradient(135deg, rgba(139,92,246,0.10) 0%, rgba(11,9,23,1) 100%)" }}
         >
-          <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+          {/* Mobile: compact horizontal strip */}
+          <div className="flex md:hidden items-center gap-3 px-4 py-3">
+            <span
+              className="font-black text-transparent bg-clip-text shrink-0 leading-none"
+              style={{ fontSize: 28, backgroundImage: "linear-gradient(135deg, #a78bfa, #e879f9)" }}
+            >
+              20×
+            </span>
+            <p className="text-xs text-violet-200 leading-snug">
+              Una venta cubre el plan <span className="text-violet-100 font-semibold">20 veces</span>.
+            </p>
+          </div>
+          {/* Desktop: original layout */}
+          <div className="hidden md:flex items-center gap-4 p-5">
             <div className="shrink-0 leading-none">
               <span
                 className="font-black text-transparent bg-clip-text"
@@ -146,56 +151,95 @@ export default function Pricing() {
         </div>
 
         {/* Plan cards */}
-        <div className="grid md:grid-cols-3 gap-4">
+        <div className="grid md:grid-cols-3 gap-4 items-start">
           {PLANS.map((plan) => {
             const isCurrentPlan = currentPlan === plan.planKey;
             const isLoading = loadingPlan === plan.planKey;
+            const isFree = plan.planKey === "free";
+            const k = plan.planKey as "free" | "go" | "pro";
+
+            // ── Per-tier visual tokens ────────────────────────────────────────
+            const card = {
+              free: {
+                bg:     "rgba(7,5,16,0.97)",
+                shadow: "0 0 0 1px rgba(255,255,255,0.04)",
+                hoverShadow: "0 0 0 1px rgba(255,255,255,0.08)",
+                topLine: null,
+                nameColor: "text-zinc-600",
+                priceColor: "rgba(113,113,122,0.65)",
+                periodColor: "text-zinc-700",
+                descColor: "text-zinc-600",
+                checkColor: "text-zinc-700",
+                featOk: "text-zinc-500",
+                featNo: "text-zinc-700",
+                dashColor: "bg-zinc-800",
+              },
+              go: {
+                bg:     "linear-gradient(155deg, rgba(124,58,237,0.22) 0%, rgba(139,92,246,0.07) 50%, transparent 100%)",
+                shadow: "0 0 0 1px rgba(139,92,246,0.55), 0 0 80px rgba(139,92,246,0.20), 0 0 28px rgba(124,58,237,0.14), inset 0 1px 0 rgba(255,255,255,0.08)",
+                hoverShadow: "",
+                topLine: "linear-gradient(to right, transparent, rgba(167,139,250,1), transparent)",
+                nameColor: "text-violet-300",
+                priceColor: "#ffffff",
+                periodColor: "text-violet-300",
+                descColor: "text-violet-200",
+                checkColor: "text-violet-400",
+                featOk: "text-white",
+                featNo: "",
+                dashColor: "",
+              },
+              pro: {
+                bg:     "linear-gradient(155deg, rgba(22,18,50,0.97) 0%, rgba(10,8,24,0.99) 100%)",
+                shadow: "0 0 0 1px rgba(148,163,184,0.11), 0 8px 40px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.05)",
+                hoverShadow: "0 0 0 1px rgba(148,163,184,0.18), 0 8px 40px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.07)",
+                topLine: "linear-gradient(to right, transparent, rgba(255,255,255,0.14), transparent)",
+                nameColor: "text-slate-400",
+                priceColor: "rgba(255,255,255,0.92)",
+                periodColor: "text-slate-500",
+                descColor: "text-slate-400",
+                checkColor: "text-violet-400/60",
+                featOk: "text-zinc-200",
+                featNo: "",
+                dashColor: "",
+              },
+            }[k];
 
             return (
               <div
                 key={plan.name}
-                className={`group relative rounded-3xl flex flex-col p-6 h-full transition-all duration-200 ${
-                  !plan.popular ? "hover:-translate-y-1" : ""
-                }`}
-                style={{
-                  background: plan.popular
-                    ? "linear-gradient(160deg, rgba(139,92,246,0.18) 0%, rgba(11,9,23,1) 55%)"
-                    : "rgba(139,92,246,0.04)",
-                  boxShadow: plan.popular
-                    ? "0 0 0 1px rgba(139,92,246,0.40), 0 0 60px rgba(139,92,246,0.12), inset 0 1px 0 rgba(255,255,255,0.05)"
-                    : "0 0 0 1px rgba(139,92,246,0.10), inset 0 1px 0 rgba(255,255,255,0.02)",
-                }}
+                className={`group relative rounded-3xl flex flex-col p-6 h-full transition-all duration-200 hover:-translate-y-0.5 ${isFree ? "hidden md:flex" : "flex"}`}
+                style={{ background: card.bg, boxShadow: card.shadow }}
               >
-                {/* Hover glow on non-popular */}
-                {!plan.popular && (
+                {/* Hover shadow swap (free + pro only) */}
+                {k !== "go" && (
                   <div
                     className="absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none"
-                    style={{ boxShadow: "0 0 0 1px rgba(139,92,246,0.28), 0 0 40px rgba(139,92,246,0.08)" }}
+                    style={{ boxShadow: card.hoverShadow }}
                   />
                 )}
 
-                {/* Top gradient line on popular */}
-                {plan.popular && (
+                {/* Decorative top line */}
+                {card.topLine && (
                   <div
                     className="absolute top-0 left-8 right-8 h-px"
-                    style={{ background: "linear-gradient(to right, transparent, rgba(167,139,250,0.9), transparent)" }}
+                    style={{ background: card.topLine }}
                   />
                 )}
 
                 {/* Card header */}
                 <div className="flex items-center justify-between gap-2 mb-5">
-                  <span className="text-[10px] font-mono text-violet-300/90 uppercase tracking-widest">
+                  <span className={`text-[10px] font-mono uppercase tracking-widest ${card.nameColor}`}>
                     {plan.name}
                   </span>
                   <div className="flex items-center gap-1.5">
-                    {plan.popular && (
-                      <span className="text-[10px] font-semibold text-violet-300 bg-violet-500/15 border border-violet-500/25 px-2.5 py-1 rounded-full uppercase tracking-wider">
+                    {k === "go" && (
+                      <span className="text-[10px] font-bold text-violet-200 bg-violet-500/20 border border-violet-400/30 px-2.5 py-1 rounded-full uppercase tracking-wider">
                         {t("mostPopular")}
                       </span>
                     )}
-                    {isCurrentPlan && (
-                      <span className="text-[10px] font-semibold text-emerald-300 bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-1 rounded-full uppercase tracking-wider">
-                        {t("yourPlan")}
+                    {k === "pro" && (
+                      <span className="text-[10px] font-semibold text-slate-400 bg-white/[0.04] border border-white/[0.08] px-2.5 py-1 rounded-full uppercase tracking-wider">
+                        Agencias
                       </span>
                     )}
                   </div>
@@ -203,14 +247,11 @@ export default function Pricing() {
 
                 {/* Price */}
                 <div className="mb-5">
-                  {plan.planKey === "go" && flash.active ? (
+                  {k === "go" && flash.active ? (
                     <>
                       <p className="text-xs text-amber-400/80 italic mb-2">Oferta de bienvenida</p>
                       <div className="flex items-baseline gap-2 mb-1">
-                        <span
-                          className="font-black tracking-tight"
-                          style={{ fontSize: "clamp(36px, 4vw, 52px)", color: "#fbbf24" }}
-                        >
+                        <span className="font-black tracking-tight" style={{ fontSize: "clamp(36px, 4vw, 52px)", color: "#fbbf24" }}>
                           $4.50
                         </span>
                         <span className="text-amber-400/60 text-sm">/mes</span>
@@ -226,7 +267,9 @@ export default function Pricing() {
                     <>
                       {"originalPrice" in plan && plan.originalPrice && (
                         <div className="flex items-center gap-2 mb-1.5">
-                          <span className="text-sm text-violet-600 line-through">{plan.originalPrice}</span>
+                          <span className={`text-sm line-through ${k === "free" ? "text-zinc-700" : "text-violet-600"}`}>
+                            {plan.originalPrice}
+                          </span>
                           <span className="text-[10px] font-black text-emerald-400 uppercase tracking-wider bg-emerald-500/10 border border-emerald-500/15 px-1.5 py-0.5 rounded">
                             -{Math.round((1 - parseInt(plan.price.replace("$", "")) / parseInt((plan.originalPrice as string).replace("$", ""))) * 100)}%
                           </span>
@@ -235,18 +278,15 @@ export default function Pricing() {
                       <div className="flex items-baseline gap-1.5">
                         <span
                           className="font-black tracking-tight"
-                          style={{
-                            fontSize: "clamp(36px, 4vw, 52px)",
-                            color: plan.popular ? "#fff" : "rgba(221,214,254,0.65)",
-                          }}
+                          style={{ fontSize: "clamp(36px, 4vw, 52px)", color: card.priceColor }}
                         >
                           {plan.price}
                         </span>
-                        <span className="text-violet-400 text-sm">{plan.period}</span>
+                        <span className={`text-sm ${card.periodColor}`}>{plan.period}</span>
                       </div>
                     </>
                   )}
-                  <p className="text-xs text-violet-200 mt-1.5 leading-relaxed">{plan.desc}</p>
+                  <p className={`text-xs mt-1.5 leading-relaxed ${card.descColor}`}>{plan.desc}</p>
                 </div>
 
                 {/* Features */}
@@ -254,13 +294,13 @@ export default function Pricing() {
                   {plan.features.map((feat, j) => (
                     <li key={j} className="flex items-start gap-2.5">
                       {feat.ok ? (
-                        <CheckCircle className={`w-3.5 h-3.5 shrink-0 mt-0.5 ${plan.popular ? "text-violet-400" : "text-emerald-500/80"}`} />
+                        <CheckCircle className={`w-3.5 h-3.5 shrink-0 mt-0.5 ${card.checkColor}`} />
                       ) : (
                         <span className="w-3.5 h-3.5 shrink-0 mt-1.5 flex items-center">
-                          <span className="w-2.5 h-px bg-violet-700/40 block" />
+                          <span className={`w-2.5 h-px block ${card.dashColor}`} />
                         </span>
                       )}
-                      <span className={`text-xs leading-snug ${feat.ok ? (plan.popular ? "text-white" : "text-violet-200") : "text-violet-600"}`}>
+                      <span className={`text-xs leading-snug ${feat.ok ? card.featOk : card.featNo || "text-zinc-700"}`}>
                         {feat.text}
                       </span>
                     </li>
@@ -271,45 +311,45 @@ export default function Pricing() {
                 {isCurrentPlan ? (
                   <Link
                     href="/dashboard"
-                    className="block text-center w-full py-3 rounded-2xl text-sm font-bold transition-all bg-violet-500/[0.07] text-violet-500 border border-violet-500/15 cursor-default"
+                    className="block text-center w-full py-3 rounded-2xl text-sm font-bold bg-white/[0.04] text-zinc-500 border border-white/[0.06] cursor-default"
                   >
                     {t("activePlan")}
                   </Link>
-                ) : plan.planKey === "free" ? (
+                ) : k === "free" ? (
                   <Link
                     href="/dashboard"
-                    className="block text-center w-full py-3 rounded-2xl text-sm font-bold transition-all bg-violet-500/[0.09] hover:bg-violet-500/[0.18] text-violet-200 border border-violet-500/20"
+                    className="block text-center w-full py-3 rounded-2xl text-sm font-semibold transition-all text-zinc-600 border border-white/[0.05] hover:border-white/[0.10] hover:text-zinc-400"
                   >
                     {t("goToDashboard")}
                   </Link>
                 ) : (
                   <button
-                    onClick={() => handleCheckout(plan.planKey, plan.planKey === "go" && flash.active)}
+                    onClick={() => handleCheckout(k, k === "go" && flash.active)}
                     disabled={!!loadingPlan}
                     className="flex items-center justify-center gap-2 w-full py-3 rounded-2xl text-sm font-bold transition-all disabled:opacity-60 disabled:cursor-not-allowed"
                     style={
-                      plan.planKey === "go" && flash.active
+                      k === "go" && flash.active
                         ? {
                             background: "linear-gradient(135deg, #f59e0b, #fbbf24)",
                             color: "#0d0d14",
                             boxShadow: "0 0 24px rgba(245,158,11,0.35)",
                           }
-                        : plan.popular
+                        : k === "go"
                         ? {
-                            background: "#7c3aed",
+                            background: "linear-gradient(135deg, #7c3aed, #6d28d9)",
                             color: "#fff",
-                            boxShadow: "0 0 20px rgba(139,92,246,0.35)",
+                            boxShadow: "0 0 28px rgba(139,92,246,0.50)",
                           }
                         : {
-                            background: "rgba(139,92,246,0.09)",
-                            color: "rgba(221,214,254,0.9)",
-                            border: "1px solid rgba(139,92,246,0.20)",
+                            background: "rgba(255,255,255,0.03)",
+                            color: "rgba(226,232,240,0.85)",
+                            border: "1px solid rgba(148,163,184,0.14)",
                           }
                     }
                   >
                     {isLoading ? (
                       <Loader2 className="w-4 h-4 animate-spin" />
-                    ) : plan.planKey === "go" && flash.active ? (
+                    ) : k === "go" && flash.active ? (
                       <>Reclamar oferta · $4.50 primer mes <ArrowRight className="w-3.5 h-3.5" /></>
                     ) : (
                       <>{plan.cta} <ArrowRight className="w-3.5 h-3.5" /></>
