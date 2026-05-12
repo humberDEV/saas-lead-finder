@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Clock, Search, MapPin, ChevronRight, Lock } from "lucide-react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { useSidebar } from "../SidebarContext";
 
 interface HistoryItem {
@@ -14,22 +15,24 @@ interface HistoryItem {
   created_at: string;
 }
 
-function timeAgo(dateStr: string): string {
-  const diff = Date.now() - new Date(dateStr).getTime();
-  const mins  = Math.floor(diff / 60000);
-  const hours = Math.floor(diff / 3600000);
-  const days  = Math.floor(diff / 86400000);
-  if (mins < 60)  return `hace ${mins}m`;
-  if (hours < 24) return `hace ${hours}h`;
-  if (days < 7)   return `hace ${days}d`;
-  return `hace ${Math.floor(days / 7)}sem`;
-}
-
 export default function HistoryPage() {
+  const t = useTranslations("historyPage");
+  const tTimeAgo = useTranslations("dashboard.timeAgo");
   const [history, setHistory] = useState<HistoryItem[]>([]);
   const [loading, setLoading] = useState(true);
   const { plan, credits: sidebarCredits, setPendingHistoryId, historyVersion } = useSidebar();
   const router = useRouter();
+
+  function timeAgo(dateStr: string): string {
+    const diff = Date.now() - new Date(dateStr).getTime();
+    const mins  = Math.floor(diff / 60000);
+    const hours = Math.floor(diff / 3600000);
+    const days  = Math.floor(diff / 86400000);
+    if (mins < 60)  return tTimeAgo("minutes", { count: mins });
+    if (hours < 24) return tTimeAgo("hours", { count: hours });
+    if (days < 7)   return tTimeAgo("days", { count: days });
+    return tTimeAgo("weeks", { count: Math.floor(days / 7) });
+  }
 
   useEffect(() => {
     if (sidebarCredits === null || plan === "free") return;
@@ -58,9 +61,9 @@ export default function HistoryPage() {
         <div className="mb-6">
           <div className="flex items-center gap-2 mb-1">
             <Clock className="w-4 h-4 text-indigo-400" />
-            <h1 className="text-base font-black text-white">Historial</h1>
+            <h1 className="text-base font-black text-white">{t("title")}</h1>
           </div>
-          <p className="text-xs text-zinc-500">Tus búsquedas recientes — toca una para recargar los resultados.</p>
+          <p className="text-xs text-zinc-500">{t("subtitle")}</p>
         </div>
 
         {plan === "free" ? (
@@ -69,9 +72,9 @@ export default function HistoryPage() {
               <Lock className="w-7 h-7 text-indigo-400" />
             </div>
             <div>
-              <p className="text-base font-black text-white mb-2">Desbloquea el historial</p>
+              <p className="text-base font-black text-white mb-2">{t("lockedTitle")}</p>
               <p className="text-xs text-zinc-500 leading-relaxed max-w-xs">
-                Guarda y relanza búsquedas anteriores con un plan de pago. Accede a tus leads cuando quieras, sin repetir la búsqueda.
+                {t("lockedDesc")}
               </p>
             </div>
             <div className="flex flex-col gap-2 w-full max-w-xs">
@@ -79,10 +82,10 @@ export default function HistoryPage() {
                 href="/pricing"
                 className="flex items-center justify-center gap-2 px-5 py-3 bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 text-white font-bold text-sm rounded-2xl transition-colors shadow-[0_2px_12px_rgba(99,102,241,0.3)]"
               >
-                Ver planes
+                {t("viewPlans")}
                 <ChevronRight className="w-3.5 h-3.5" />
               </Link>
-              <p className="text-[10px] text-zinc-600">Desde $9/mes · cancela cuando quieras</p>
+              <p className="text-[10px] text-zinc-600">{t("priceFrom")}</p>
             </div>
           </div>
         ) : loading ? (
@@ -99,15 +102,15 @@ export default function HistoryPage() {
               <Search className="w-5 h-5 text-indigo-400" />
             </div>
             <div>
-              <p className="text-sm font-bold text-white mb-1">Aún no hay búsquedas</p>
-              <p className="text-xs text-zinc-500">Haz tu primera búsqueda y aparecerá aquí.</p>
+              <p className="text-sm font-bold text-white mb-1">{t("emptyTitle")}</p>
+              <p className="text-xs text-zinc-500">{t("emptyDesc")}</p>
             </div>
             <Link
               href="/search"
               className="flex items-center gap-2 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm rounded-2xl transition-colors"
             >
               <Search className="w-3.5 h-3.5" />
-              Buscar ahora
+              {t("searchNow")}
             </Link>
           </div>
         ) : (

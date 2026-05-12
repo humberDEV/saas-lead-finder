@@ -205,7 +205,7 @@ export async function GET(request: Request) {
       console.error("[search_history] Error al guardar:", err);
     }
 
-    return NextResponse.json({ results: uniquePlaces as any[], historyId });
+    return NextResponse.json({ results: uniquePlaces as any[], historyId, hasOpportunities });
   } catch (error: any) {
     return NextResponse.json(
       { error: error.message || "Internal Server Error" },

@@ -17,6 +17,7 @@ const BG = {
 export default function Pricing() {
   const t = useTranslations("pricing");
   const tPlans = useTranslations("plans");
+  const period = t("period");
   const { plan: currentPlan, credits: remaining } = useSidebar();
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
   const flash = useFlashOffer();
@@ -33,7 +34,7 @@ export default function Pricing() {
     {
       name: tPlans("free.name"),
       price: "$0",
-      period: "/mes",
+      period,
       desc: tPlans("free.desc"),
       features: [
         ...((tPlans.raw("free.features") as string[]).map((text: string) => ({ text, ok: true }))),
@@ -47,7 +48,7 @@ export default function Pricing() {
       name: tPlans("go.name"),
       price: "$9",
       originalPrice: "$19",
-      period: "/mes",
+      period,
       desc: tPlans("go.desc"),
       features: (tPlans.raw("go.features") as string[]).map((text: string) => ({ text, ok: true })),
       cta: tPlans("go.cta"),
@@ -58,7 +59,7 @@ export default function Pricing() {
       name: tPlans("pro.name"),
       price: "$19",
       originalPrice: "$39",
-      period: "/mes",
+      period,
       desc: tPlans("pro.desc"),
       features: (tPlans.raw("pro.features") as string[]).map((text: string) => ({ text, ok: true })),
       cta: tPlans("pro.cta"),
@@ -126,7 +127,7 @@ export default function Pricing() {
               20×
             </span>
             <p className="text-xs text-violet-200 leading-snug">
-              Una venta cubre el plan <span className="text-violet-100 font-semibold">20 veces</span>.
+              {t("valueCalloutMobile")} <span className="text-violet-100 font-semibold">{t("valueCalloutMobileHighlight")}</span>.
             </p>
           </div>
           {/* Desktop: original layout */}
@@ -141,10 +142,10 @@ export default function Pricing() {
             </div>
             <div>
               <p className="text-white font-semibold text-sm leading-snug mb-1">
-                recuperas la inversión con tu primera venta web.
+                {t("valueCalloutTitle")}
               </p>
               <p className="text-violet-200 text-xs leading-relaxed">
-                Los usuarios de Huntly pagan <span className="text-violet-100">$9 al mes</span>. Una sola web vale 200€ o más. Cierra uno y el plan está pagado 20 veces.
+                {t("valueCalloutBody")}
               </p>
             </div>
           </div>
@@ -239,7 +240,7 @@ export default function Pricing() {
                     )}
                     {k === "pro" && (
                       <span className="text-[10px] font-semibold text-slate-400 bg-white/[0.04] border border-white/[0.08] px-2.5 py-1 rounded-full uppercase tracking-wider">
-                        Agencias
+                        {t("agencies")}
                       </span>
                     )}
                   </div>
@@ -249,19 +250,19 @@ export default function Pricing() {
                 <div className="mb-5">
                   {k === "go" && flash.active ? (
                     <>
-                      <p className="text-xs text-amber-400/80 italic mb-2">Oferta de bienvenida</p>
+                      <p className="text-xs text-amber-400/80 italic mb-2">{t("flashTitle")}</p>
                       <div className="flex items-baseline gap-2 mb-1">
                         <span className="font-black tracking-tight" style={{ fontSize: "clamp(36px, 4vw, 52px)", color: "#fbbf24" }}>
                           $4.50
                         </span>
-                        <span className="text-amber-400/60 text-sm">/mes</span>
+                        <span className="text-amber-400/60 text-sm">{period}</span>
                         <span className="text-zinc-600 text-sm line-through">$9</span>
                       </div>
-                      <p className="text-xs italic mt-0.5" style={{ color: "rgba(245,158,11,0.45)" }}>expira en</p>
+                      <p className="text-xs italic mt-0.5" style={{ color: "rgba(245,158,11,0.45)" }}>{t("flashExpires")}</p>
                       <p className="text-3xl font-black tabular-nums leading-none" style={{ color: "rgba(245,158,11,0.9)" }}>
                         {flash.mm}:{flash.ss}
                       </p>
-                      <p className="text-[11px] tabular-nums" style={{ color: "rgba(245,158,11,0.35)" }}>luego $9/mes</p>
+                      <p className="text-[11px] tabular-nums" style={{ color: "rgba(245,158,11,0.35)" }}>{t("flashThen")}</p>
                     </>
                   ) : (
                     <>
@@ -350,7 +351,7 @@ export default function Pricing() {
                     {isLoading ? (
                       <Loader2 className="w-4 h-4 animate-spin" />
                     ) : k === "go" && flash.active ? (
-                      <>Reclamar oferta · $4.50 primer mes <ArrowRight className="w-3.5 h-3.5" /></>
+                      <>{t("flashCta")} <ArrowRight className="w-3.5 h-3.5" /></>
                     ) : (
                       <>{plan.cta} <ArrowRight className="w-3.5 h-3.5" /></>
                     )}

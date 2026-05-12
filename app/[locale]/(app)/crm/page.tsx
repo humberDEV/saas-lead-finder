@@ -40,12 +40,29 @@ function normalizeStatus(status: string): Status {
   return "PENDIENTE";
 }
 
-const STATUS_META: Record<Status, { label: string; color: string; icon: React.ReactNode; border: string; bg: string }> = {
-  PENDIENTE:   { label: "Pendiente",   color: "text-amber-400",   icon: <Clock className="text-amber-400 w-4 h-4" />,     border: "border-amber-500/25",   bg: "bg-amber-500/10" },
-  CONTACTADO:  { label: "Contactado",  color: "text-indigo-400",  icon: <Phone className="text-indigo-400 w-4 h-4" />,    border: "border-indigo-500/25",  bg: "bg-indigo-500/10" },
-  INTERESADO:  { label: "Interesado",  color: "text-blue-400",    icon: <ThumbsUp className="text-blue-400 w-4 h-4" />,   border: "border-blue-500/25",    bg: "bg-blue-500/10" },
-  CERRADO:     { label: "Cerrado",     color: "text-emerald-400", icon: <CheckCircle className="text-emerald-400 w-4 h-4" />, border: "border-emerald-500/25", bg: "bg-emerald-500/10" },
-  DESCARTADO:  { label: "Descartado",  color: "text-zinc-500",    icon: <XCircle className="text-zinc-500 w-4 h-4" />,    border: "border-zinc-700",       bg: "bg-zinc-800/40" },
+// Visual tokens only — no labels (those come from translations)
+const STATUS_VISUAL: Record<Status, { color: string; icon: React.ReactNode; border: string; bg: string }> = {
+  PENDIENTE:   { color: "text-amber-400",   icon: <Clock className="text-amber-400 w-4 h-4" />,     border: "border-amber-500/25",   bg: "bg-amber-500/10" },
+  CONTACTADO:  { color: "text-indigo-400",  icon: <Phone className="text-indigo-400 w-4 h-4" />,    border: "border-indigo-500/25",  bg: "bg-indigo-500/10" },
+  INTERESADO:  { color: "text-blue-400",    icon: <ThumbsUp className="text-blue-400 w-4 h-4" />,   border: "border-blue-500/25",    bg: "bg-blue-500/10" },
+  CERRADO:     { color: "text-emerald-400", icon: <CheckCircle className="text-emerald-400 w-4 h-4" />, border: "border-emerald-500/25", bg: "bg-emerald-500/10" },
+  DESCARTADO:  { color: "text-zinc-500",    icon: <XCircle className="text-zinc-500 w-4 h-4" />,    border: "border-zinc-700",       bg: "bg-zinc-800/40" },
+};
+
+const STATUS_LABEL_KEYS: Record<Status, string> = {
+  PENDIENTE:  "labelPending",
+  CONTACTADO: "labelContacted",
+  INTERESADO: "labelInterested",
+  CERRADO:    "labelClosed",
+  DESCARTADO: "labelDiscarded",
+};
+
+const STATUS_COLUMN_KEYS: Record<Status, string> = {
+  PENDIENTE:  "columnPending",
+  CONTACTADO: "columnContacted",
+  INTERESADO: "columnInterested",
+  CERRADO:    "columnAccepted",
+  DESCARTADO: "labelDiscarded",
 };
 
 const ACTIVE_STATUSES: Status[] = ["PENDIENTE", "CONTACTADO", "INTERESADO", "CERRADO"];
@@ -85,6 +102,7 @@ function DraggableCard({ lead, children, isBeingDragged }: { lead: Lead; childre
 
 // ── Quick note ────────────────────────────────────────────────────────────────
 function QuickNote({ leadId, initial, onSave }: { leadId: string; initial: string | null; onSave: (id: string, note: string) => void }) {
+  const t = useTranslations("crm");
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState(initial ?? "");
   const [saved, setSaved] = useState(false);
@@ -100,7 +118,7 @@ function QuickNote({ leadId, initial, onSave }: { leadId: string; initial: strin
       <button
         onClick={() => setOpen((o) => !o)}
         className={`p-1.5 rounded-lg transition-all ${open ? "bg-amber-500/20 text-amber-400" : "bg-neutral-800/60 hover:bg-neutral-700 text-zinc-400 hover:text-white"}`}
-        title="Añadir nota"
+        title={t("addNote")}
       >
         <StickyNote className="w-3.5 h-3.5" />
       </button>
@@ -116,7 +134,7 @@ function QuickNote({ leadId, initial, onSave }: { leadId: string; initial: strin
             <textarea
               autoFocus
               className="flex-1 text-xs bg-neutral-800 border border-neutral-700 text-white rounded-lg px-3 py-2 resize-none h-16 focus:outline-none focus:border-indigo-500/50 placeholder:text-zinc-600"
-              placeholder="Escribe una nota..."
+              placeholder={t("notePlaceholder")}
               value={value}
               onChange={(e) => setValue(e.target.value)}
             />
@@ -147,13 +165,15 @@ function LeadCard({
   onSaveNote: (id: string, note: string) => void;
   onDelete: (id: string) => void;
 }) {
+  const t = useTranslations("crm");
   const [confirmDelete, setConfirmDelete] = useState(false);
   const normalStatus = normalizeStatus(lead.status);
   const cleanPhone = lead.phone?.replace(/[^0-9+]/g, "") ?? "";
   const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(lead.name + " " + lead.address)}`;
   const statusIdx = STATUSES.indexOf(normalStatus);
-  const meta = STATUS_META[normalStatus];
+  const visual = STATUS_VISUAL[normalStatus];
   const isDiscarded = normalStatus === "DESCARTADO";
+  const statusLabel = t(STATUS_LABEL_KEYS[normalStatus]);
 
   return (
     <div className={`bg-neutral-900 border border-neutral-800 rounded-2xl p-4 flex flex-col gap-3 cursor-grab active:cursor-grabbing ${isDiscarded ? "opacity-50" : ""}`}>
@@ -179,10 +199,10 @@ function LeadCard({
       <div className="flex flex-col gap-1.5 text-xs text-zinc-400">
         <span className="flex items-center gap-1.5"><MapPin className="w-3 h-3 shrink-0 text-zinc-600" /><span className="line-clamp-1">{lead.address}</span></span>
         {lead.phone && <span className="flex items-center gap-1.5 text-indigo-400"><Navigation2 className="w-3 h-3 shrink-0" />{lead.phone}</span>}
-        {lead.rating > 0 && <span className="flex items-center gap-1.5"><Star className="w-3 h-3 shrink-0 text-emerald-400" />{lead.rating} <span className="text-zinc-600">({lead.reviewCount} reseñas)</span></span>}
+        {lead.rating > 0 && <span className="flex items-center gap-1.5"><Star className="w-3 h-3 shrink-0 text-emerald-400" />{lead.rating} <span className="text-zinc-600">({lead.reviewCount} {t("reviews")})</span></span>}
         <span className="flex items-center gap-1.5">
           <Globe className="w-3 h-3 shrink-0 text-zinc-600" />
-          {lead.hasWebsite ? <span className="text-zinc-500 truncate">{lead.website || "Tiene web"}</span> : <span className="text-emerald-400 font-semibold">Sin web</span>}
+          {lead.hasWebsite ? <span className="text-zinc-500 truncate">{lead.website || t("hasWeb")}</span> : <span className="text-emerald-400 font-semibold">{t("noWeb")}</span>}
         </span>
       </div>
 
@@ -209,7 +229,7 @@ function LeadCard({
             onClick={e => e.stopPropagation()}
             className="flex-1 flex items-center justify-center gap-1.5 py-2 bg-neutral-800 hover:bg-neutral-700 text-white text-xs font-bold rounded-lg transition-all"
           >
-            Llamar
+            {t("call")}
           </a>
         </div>
       )}
@@ -246,7 +266,7 @@ function LeadCard({
               ? "bg-red-500/20 text-red-400 border border-red-500/30"
               : "bg-neutral-800/60 hover:bg-red-500/15 text-zinc-500 hover:text-red-400"
           }`}
-          title={confirmDelete ? "Confirmar eliminación" : "Eliminar lead"}
+          title={confirmDelete ? t("confirmDelete") : t("deleteLead")}
         >
           <Trash2 className="w-3.5 h-3.5" />
         </button>
@@ -257,8 +277,8 @@ function LeadCard({
           className="p-1.5 rounded-lg transition-all disabled:opacity-20 disabled:cursor-not-allowed bg-neutral-800/60 hover:bg-neutral-700 text-zinc-400 hover:text-white"
         ><ChevronLeft className="w-3.5 h-3.5" /></button>
 
-        <span className={`text-[10px] font-bold px-2 py-1 rounded-lg ${meta?.bg ?? ""} ${meta?.color ?? ""}`}>
-          {meta?.label ?? lead.status}
+        <span className={`text-[10px] font-bold px-2 py-1 rounded-lg ${visual?.bg ?? ""} ${visual?.color ?? ""}`}>
+          {statusLabel}
         </span>
 
         <button
@@ -273,24 +293,25 @@ function LeadCard({
 
 // ── Locked free view ──────────────────────────────────────────────────────────
 function LockedPlaceholder() {
+  const t = useTranslations("crm");
   return (
     <div className="h-full overflow-y-auto bg-[#0b0917] text-white">
       <div className="max-w-lg mx-auto px-4 py-6">
         <div className="mb-6">
           <div className="flex items-center gap-2 mb-1">
             <Lock className="w-4 h-4 text-indigo-400" />
-            <h1 className="text-base font-black text-white">Cartera de clientes</h1>
+            <h1 className="text-base font-black text-white">{t("lockedHeader")}</h1>
           </div>
-          <p className="text-xs text-zinc-500">Guarda leads y gestiona el estado de cada contacto.</p>
+          <p className="text-xs text-zinc-500">{t("lockedHeaderDesc")}</p>
         </div>
         <div className="flex flex-col items-center gap-5 py-16 text-center">
           <div className="w-16 h-16 rounded-3xl bg-gradient-to-br from-indigo-500/20 to-violet-500/10 border border-indigo-500/20 flex items-center justify-center">
             <Lock className="w-7 h-7 text-indigo-400" />
           </div>
           <div>
-            <p className="text-base font-black text-white mb-2">Desbloquea la cartera</p>
+            <p className="text-base font-black text-white mb-2">{t("unlockTitle")}</p>
             <p className="text-xs text-zinc-500 leading-relaxed max-w-xs">
-              Guarda leads, cambia su estado y haz seguimiento real con un plan de pago. Todo en un tablero visual.
+              {t("unlockDesc")}
             </p>
           </div>
           <div className="flex flex-col gap-2 w-full max-w-xs">
@@ -298,10 +319,10 @@ function LockedPlaceholder() {
               href="/pricing"
               className="flex items-center justify-center gap-2 px-5 py-3 bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 text-white font-bold text-sm rounded-2xl transition-colors shadow-[0_2px_12px_rgba(99,102,241,0.3)]"
             >
-              Ver planes
+              {t("viewPlans")}
               <ChevronRight className="w-3.5 h-3.5" />
             </Link>
-            <p className="text-[10px] text-zinc-600">Desde $9/mes · cancela cuando quieras</p>
+            <p className="text-[10px] text-zinc-600">{t("priceFrom")}</p>
           </div>
         </div>
       </div>
@@ -311,6 +332,7 @@ function LockedPlaceholder() {
 
 // ── Page ──────────────────────────────────────────────────────────────────────
 export default function CRM() {
+  const t = useTranslations("crm");
   const { plan } = useSidebar();
   const [leads, setLeads] = useState<Lead[]>([]);
   const [loading, setLoading] = useState(true);
@@ -384,40 +406,41 @@ export default function CRM() {
   const activeLead = leads.find(l => l.id === activeId);
   const activeLeads = leads.filter(l => normalizeStatus(l.status) !== "DESCARTADO");
   const discardedLeads = leads.filter(l => normalizeStatus(l.status) === "DESCARTADO");
+  const pendingCount = activeLeads.filter(l => normalizeStatus(l.status) === "PENDIENTE").length;
 
   return (
     <div className="h-full overflow-y-auto bg-[#0A0A0A] bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(120,119,198,0.08),transparent)]">
       <main className="max-w-6xl mx-auto p-4 md:p-8 pb-24">
         <header className="mb-8 flex items-start justify-between gap-4 flex-wrap">
           <div>
-            <h1 className="text-3xl font-black text-white mb-1">Mi Cartera</h1>
+            <h1 className="text-3xl font-black text-white mb-1">{t("title")}</h1>
             <p className="text-zinc-400 text-sm font-medium">
-              {leads.length} leads guardados · {activeLeads.filter(l => normalizeStatus(l.status) === "PENDIENTE").length} pendientes de contactar
+              {t("leadsCount", { total: leads.length, pending: pendingCount })}
             </p>
           </div>
           <Link
             href="/search"
             className="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-bold rounded-xl transition-colors"
           >
-            + Buscar leads
+            {t("searchLeads")}
           </Link>
         </header>
 
         {loading ? (
-          <div className="text-zinc-500 text-center py-20">Cargando...</div>
+          <div className="text-zinc-500 text-center py-20">{t("loading")}</div>
         ) : (
           <DndContext sensors={sensors} collisionDetection={closestCenter} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
             {/* Mobile tabs */}
             <div className="md:hidden mb-5">
               <div className="flex gap-1 bg-neutral-900 p-1 rounded-xl border border-neutral-800 mb-4 overflow-x-auto">
                 {ACTIVE_STATUSES.map(s => {
-                  const meta = STATUS_META[s];
+                  const visual = STATUS_VISUAL[s];
                   const count = leads.filter(l => normalizeStatus(l.status) === s).length;
                   return (
                     <button key={s} onClick={() => setMobileTab(s)}
                       className={`flex-1 flex items-center justify-center gap-1.5 py-2 px-2 rounded-lg text-xs font-bold transition-all whitespace-nowrap ${mobileTab === s ? "bg-neutral-700 text-white" : "text-zinc-500 hover:text-zinc-300"}`}
                     >
-                      {meta.icon}
+                      {visual.icon}
                       <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-black ${mobileTab === s ? "bg-white/10 text-white" : "bg-neutral-800 text-zinc-600"}`}>{count}</span>
                     </button>
                   );
@@ -430,7 +453,7 @@ export default function CRM() {
                   ))}
                 </AnimatePresence>
                 {leads.filter(l => normalizeStatus(l.status) === mobileTab).length === 0 && (
-                  <p className="text-xs text-zinc-600 border border-neutral-800 border-dashed rounded-xl p-8 text-center">Sin leads en esta columna</p>
+                  <p className="text-xs text-zinc-600 border border-neutral-800 border-dashed rounded-xl p-8 text-center">{t("emptyColumn")}</p>
                 )}
               </div>
             </div>
@@ -438,13 +461,14 @@ export default function CRM() {
             {/* Desktop kanban — 4 active columns */}
             <div className="hidden md:grid md:grid-cols-4 gap-4">
               {ACTIVE_STATUSES.map(status => {
-                const meta = STATUS_META[status];
+                const visual = STATUS_VISUAL[status];
                 const colLeads = leads.filter(l => normalizeStatus(l.status) === status);
+                const columnLabel = t(STATUS_COLUMN_KEYS[status]);
                 return (
                   <section key={status}>
-                    <div className={`flex items-center gap-2 mb-4 pb-3 border-b ${meta.border}`}>
-                      {meta.icon}
-                      <h2 className="text-sm font-black text-white uppercase tracking-wider">{meta.label}</h2>
+                    <div className={`flex items-center gap-2 mb-4 pb-3 border-b ${visual.border}`}>
+                      {visual.icon}
+                      <h2 className="text-sm font-black text-white uppercase tracking-wider">{columnLabel}</h2>
                       <span className="ml-auto text-xs font-bold text-zinc-600 bg-neutral-800 px-2 py-0.5 rounded-full">{colLeads.length}</span>
                     </div>
                     <DroppableColumn status={status}>
@@ -456,7 +480,7 @@ export default function CRM() {
                         ))}
                       </AnimatePresence>
                       {colLeads.length === 0 && (
-                        <p className="text-xs text-zinc-600 border border-neutral-800 border-dashed rounded-xl p-8 text-center">Sin leads</p>
+                        <p className="text-xs text-zinc-600 border border-neutral-800 border-dashed rounded-xl p-8 text-center">{t("emptyColumnShort")}</p>
                       )}
                     </DroppableColumn>
                   </section>
@@ -472,7 +496,9 @@ export default function CRM() {
                   className="flex items-center gap-2 text-xs font-bold text-zinc-500 hover:text-zinc-300 transition-colors mb-4"
                 >
                   <XCircle className="w-3.5 h-3.5" />
-                  {showDiscarded ? "Ocultar" : "Mostrar"} descartados ({discardedLeads.length})
+                  {showDiscarded
+                    ? t("hideDiscarded", { count: discardedLeads.length })
+                    : t("showDiscarded", { count: discardedLeads.length })}
                 </button>
                 <AnimatePresence>
                   {showDiscarded && (

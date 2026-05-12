@@ -9,6 +9,7 @@ import {
   Zap, CheckCircle, User,
 } from "lucide-react";
 import { motion } from "framer-motion";
+import { useTranslations } from "next-intl";
 import { useSidebar } from "../SidebarContext";
 
 const PLAN_LABELS: Record<string, { label: string; color: string; bg: string }> = {
@@ -77,6 +78,7 @@ function Row({
 }
 
 export default function SettingsPage() {
+  const t = useTranslations("settings");
   const { user } = useUser();
   const { signOut } = useClerk();
   const { plan, credits } = useSidebar();
@@ -87,7 +89,7 @@ export default function SettingsPage() {
   const planMeta = PLAN_LABELS[plan] ?? PLAN_LABELS.free;
   const displayName = user?.firstName
     ? `${user.firstName}${user.lastName ? " " + user.lastName : ""}`
-    : user?.username ?? "Usuario";
+    : user?.username ?? "User";
   const email = user?.emailAddresses?.[0]?.emailAddress ?? "";
 
   const handleManagePlan = async () => {
@@ -112,12 +114,12 @@ export default function SettingsPage() {
 
         {/* Header */}
         <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.25 }} className="mb-8">
-          <h1 className="text-2xl font-black text-white tracking-tight">Configuración</h1>
-          <p className="text-zinc-500 text-sm mt-1">Gestiona tu cuenta, plan y preferencias.</p>
+          <h1 className="text-2xl font-black text-white tracking-tight">{t("title")}</h1>
+          <p className="text-zinc-500 text-sm mt-1">{t("subtitle")}</p>
         </motion.div>
 
         {/* Account */}
-        <Section title="Cuenta">
+        <Section title={t("sectionAccount")}>
           <div className="flex items-center gap-4 px-5 py-4">
             <div className="shrink-0">
               {user?.imageUrl ? (
@@ -143,27 +145,27 @@ export default function SettingsPage() {
         </Section>
 
         {/* Plan */}
-        <Section title="Plan">
+        <Section title={t("sectionPlan")}>
           {plan === "free" ? (
             <>
               <Row
                 icon={<Zap className="w-4 h-4" />}
-                label="Actualizar a Go"
-                sub="100 búsquedas/mes · $9"
+                label={t("upgradeLabel")}
+                sub={t("upgradeSub")}
                 href="/pricing"
               />
               <Row
                 icon={<CheckCircle className="w-4 h-4" />}
-                label="Ver todos los planes"
-                sub="Compara Go y Pro"
+                label={t("viewPlansLabel")}
+                sub={t("viewPlansSub")}
                 href="/pricing"
               />
             </>
           ) : (
             <Row
               icon={<CreditCard className="w-4 h-4" />}
-              label={loadingPortal ? "Abriendo portal..." : "Gestionar plan"}
-              sub={`Plan ${planMeta.label} · ${credits ?? "—"} búsquedas restantes`}
+              label={loadingPortal ? t("managePlanLoading") : t("managePlanLabel")}
+              sub={t("managePlanSub", { plan: planMeta.label, count: credits ?? "—" })}
               onClick={handleManagePlan}
               right={
                 loadingPortal ? (
@@ -174,28 +176,28 @@ export default function SettingsPage() {
           )}
         </Section>
 
-        {/* Soporte */}
-        <Section title="Soporte">
+        {/* Support */}
+        <Section title={t("sectionSupport")}>
           <Row
             icon={<MessageCircle className="w-4 h-4" />}
-            label="Enviar feedback"
-            sub="Cuéntanos qué mejorarías"
+            label={t("feedbackLabel")}
+            sub={t("feedbackSub")}
             href="mailto:huntly@outlook.es?subject=Feedback%20Huntly"
           />
         </Section>
 
-        {/* Sesión */}
-        <Section title="Sesión">
+        {/* Session */}
+        <Section title={t("sectionSession")}>
           <Row
             icon={<User className="w-4 h-4" />}
-            label="Cuenta conectada"
+            label={t("connectedLabel")}
             sub={email}
             right={<span className="text-xs text-zinc-600">Clerk</span>}
           />
           <Row
             icon={<LogOut className="w-4 h-4" />}
-            label={signingOut ? "Cerrando sesión..." : "Cerrar sesión"}
-            sub="Salir de Huntly"
+            label={signingOut ? t("signOutLoading") : t("signOutLabel")}
+            sub={t("signOutSub")}
             onClick={handleSignOut}
             danger
             right={

@@ -178,7 +178,7 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
             {credits !== null && (
               <div>
                 <div className="flex items-center justify-between mb-1">
-                  <span className="text-[10px] text-zinc-600">Búsquedas restantes</span>
+                  <span className="text-[10px] text-zinc-600">{t("searchesRemaining")}</span>
                   <span className={`text-[10px] font-black ${outOfCredits ? "text-red-400" : isLow ? "text-amber-400" : "text-zinc-400"}`}>
                     {credits}/{planLimit}
                   </span>
@@ -227,7 +227,7 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
       <div className={`shrink-0 ${isOpen ? "px-3 pb-2" : "px-2 pb-2"}`}>
         <div className="space-y-0.5">
           <NavItem href="/dashboard" icon={<LayoutDashboard className="w-4 h-4" />} label="Dashboard" active={isDashboard} isOpen={isOpen} accent="indigo" />
-          <NavItem href="/crm" icon={<Briefcase className="w-4 h-4" />} label="Mi Cartera" active={isCrm} isOpen={isOpen} accent="violet" />
+          <NavItem href="/crm" icon={<Briefcase className="w-4 h-4" />} label={t("portfolio")} active={isCrm} isOpen={isOpen} accent="violet" />
         </div>
       </div>
 
@@ -236,7 +236,7 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
         {isOpen ? (
           <>
             <div className="flex items-center gap-2 px-1 mb-1.5 mt-1">
-              <p className="text-[9px] font-black text-zinc-700 uppercase tracking-widest flex-1">Historial</p>
+              <p className="text-[9px] font-black text-zinc-700 uppercase tracking-widest flex-1">{t("history")}</p>
               <Clock className="w-2.5 h-2.5 text-zinc-700" />
             </div>
             {plan === "free" ? (
@@ -292,10 +292,10 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
         <Link
           href="/settings"
           className={`flex items-center gap-2.5 px-2 py-2 rounded-lg hover:bg-white/[0.04] transition-colors text-zinc-500 hover:text-zinc-200 ${!isOpen && "justify-center w-9 h-9"} ${pathname.includes("/settings") ? "bg-white/[0.04] text-zinc-200" : ""}`}
-          title="Configuración"
+          title={t("settings")}
         >
           <Settings className="w-3.5 h-3.5 shrink-0" />
-          {isOpen && <span className="text-xs">Configuración</span>}
+          {isOpen && <span className="text-xs">{t("settings")}</span>}
         </Link>
       </div>
 

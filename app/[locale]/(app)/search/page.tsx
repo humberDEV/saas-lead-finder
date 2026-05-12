@@ -40,6 +40,7 @@ interface PaywallStats {
 import { useFlashOffer, startFlashOffer, FLASH_COUPON } from "@/hooks/useFlashOffer";
 
 function PaywallModal({ onClose }: { onClose: () => void }) {
+  const tPw = useTranslations("paywall");
   const [loadingCheckout, setLoadingCheckout] = useState(false);
   const [loadingFlash, setLoadingFlash] = useState(false);
   const [stats, setStats] = useState<PaywallStats | null>(null);
@@ -79,13 +80,13 @@ function PaywallModal({ onClose }: { onClose: () => void }) {
       {/* Header */}
       <div className="mb-5">
         <p className="text-[10px] font-black text-amber-400/90 uppercase tracking-widest mb-2">
-          Has usado tus búsquedas gratis
+          {tPw("used")}
         </p>
         <h2 className="text-xl font-black text-white leading-tight">
-          Mira lo que ya encontraste.
+          {tPw("title")}
         </h2>
         <p className="text-sm text-zinc-400 mt-1">
-          Ahora desbloquéalo para trabajarlo bien.
+          {tPw("subtitle")}
         </p>
       </div>
 
@@ -93,14 +94,14 @@ function PaywallModal({ onClose }: { onClose: () => void }) {
       {stats && totalSearches > 0 && (
         <div className="bg-neutral-800/60 border border-neutral-700/50 rounded-2xl p-4 mb-5">
           <p className="text-[10px] font-black text-zinc-600 uppercase tracking-widest mb-3">
-            En tus {totalSearches} búsqueda{totalSearches !== 1 ? "s" : ""}, Huntly encontró
+            {tPw("statsLabel", { count: totalSearches })}
           </p>
           <div className="grid grid-cols-2 gap-2">
             {[
-              { n: stats.noWebsiteFound,   label: "negocios sin web" },
-              { n: stats.contactableLeads, label: "leads contactables" },
-              { n: stats.whatsappCount,    label: "con WhatsApp" },
-              { n: stats.searchesThisMonth, label: "búsquedas este mes" },
+              { n: stats.noWebsiteFound,    label: tPw("noWebsite") },
+              { n: stats.contactableLeads,  label: tPw("contactable") },
+              { n: stats.whatsappCount,     label: tPw("whatsapp") },
+              { n: stats.searchesThisMonth, label: tPw("thisMonth") },
             ].map(({ n, label }) => (
               <div key={label} className="text-center py-2.5 bg-neutral-900/60 rounded-xl border border-neutral-800">
                 <p className="text-xl font-black text-white leading-none">{n}</p>
@@ -115,7 +116,7 @@ function PaywallModal({ onClose }: { onClose: () => void }) {
       <div className="mb-3">
         {flash.active && (
           <div className="flex items-baseline gap-2 mb-3">
-            <p className="text-xs text-amber-400/75 italic">Oferta de bienvenida</p>
+            <p className="text-xs text-amber-400/75 italic">{tPw("used")}</p>
             <span className="text-xl font-black text-amber-400 tabular-nums leading-none">$4.50</span>
             <span className="text-zinc-600 text-xs line-through">$9</span>
             <span className="text-2xl font-black tabular-nums ml-auto leading-none" style={{ color: "rgba(245,158,11,0.85)" }}>
@@ -139,9 +140,9 @@ function PaywallModal({ onClose }: { onClose: () => void }) {
           {(loadingCheckout || loadingFlash) ? (
             <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
           ) : flash.active ? (
-            <>Empezar con Go · $4.50 primer mes <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg></>
+            <>{tPw("ctaFlash")} <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg></>
           ) : (
-            <>Empezar con Go · $9/mes <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg></>
+            <>{tPw("ctaGo")} <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg></>
           )}
         </button>
 
@@ -151,7 +152,7 @@ function PaywallModal({ onClose }: { onClose: () => void }) {
             disabled={loadingCheckout}
             className="w-full text-center text-[11px] text-zinc-600 hover:text-zinc-400 transition-colors mt-2"
           >
-            Continuar sin descuento · $9/mes
+            {tPw("noDiscount")}
           </button>
         )}
       </div>
@@ -163,7 +164,7 @@ function PaywallModal({ onClose }: { onClose: () => void }) {
           onClick={onClose}
           className="text-xs text-zinc-500 hover:text-zinc-300 transition-colors"
         >
-          Ver todos los planes →
+          {tPw("viewAllPlans")}
         </Link>
       </div>
     </div>
@@ -270,6 +271,7 @@ export default function Dashboard() {
   // Paywall modal
   const [showPaywallModal, setShowPaywallModal] = useState(false);
   const [fakeLoading, setFakeLoading] = useState(false);
+  const [showNoLeadsNotice, setShowNoLeadsNotice] = useState(false);
 
   const triggerPaywall = () => {
     startFlashOffer(); // arranca el timer de 10 min la primera vez que llega a 0 créditos
@@ -358,6 +360,7 @@ export default function Dashboard() {
     setHiddenIndexes([]);
     setHistoryContext(null);
     setHasSearched(true);
+    setShowNoLeadsNotice(false);
 
     try {
       const res = await fetch(
@@ -378,7 +381,12 @@ export default function Dashboard() {
       setCurrentHistoryId(data.historyId ?? null);
 
       if (!data.cached) {
-        decrementCredits();
+        if (data.hasOpportunities) {
+          decrementCredits();
+        } else {
+          setShowNoLeadsNotice(true);
+          setTimeout(() => setShowNoLeadsNotice(false), 6000);
+        }
         refreshHistory();
       }
 
@@ -742,6 +750,39 @@ export default function Dashboard() {
         ref={mainRef}
         className="flex-1 overflow-y-auto bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(120,119,198,0.08),transparent)]"
       >
+        {/* No leads notice */}
+        <AnimatePresence>
+          {showNoLeadsNotice && (
+            <motion.div
+              initial={{ opacity: 0, y: 40, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 20, scale: 0.95 }}
+              transition={{ duration: 0.3, ease: "easeOut" }}
+              className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 px-5 py-4 rounded-2xl border border-amber-500/30 bg-neutral-900/95 backdrop-blur-xl shadow-[0_0_40px_rgba(245,158,11,0.15)] max-w-sm w-[calc(100vw-3rem)]"
+            >
+              <div className="flex items-center justify-center w-9 h-9 rounded-full bg-amber-500/15 border border-amber-500/30 shrink-0">
+                <span className="text-base">🔍</span>
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-black text-white leading-tight">Sin posibles clientes aquí</p>
+                <p className="text-xs text-amber-400/80 mt-0.5 leading-snug">No encontramos negocios reales — no te cobramos esta búsqueda.</p>
+              </div>
+              <button
+                onClick={() => setShowNoLeadsNotice(false)}
+                className="shrink-0 text-zinc-600 hover:text-zinc-400 transition-colors"
+              >
+                <X className="w-4 h-4" />
+              </button>
+              <motion.div
+                className="absolute bottom-0 left-0 h-0.5 bg-amber-500/50 rounded-full"
+                initial={{ width: "100%" }}
+                animate={{ width: "0%" }}
+                transition={{ duration: 6, ease: "linear" }}
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         {/* Toast */}
         <AnimatePresence>
           {showToast && (
