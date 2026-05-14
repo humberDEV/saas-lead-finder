@@ -15,9 +15,12 @@ import * as React from "react";
 interface LimitReachedEmailProps {
   name?: string | null;
   appUrl: string;
+  /** Totals accumulated across all free searches */
+  noWebsite?: number;
+  contactable?: number;
 }
 
-export function LimitReachedEmail({ name, appUrl }: LimitReachedEmailProps) {
+export function LimitReachedEmail({ name, appUrl, noWebsite, contactable }: LimitReachedEmailProps) {
   const firstName = name?.split(" ")[0] ?? "ahí";
 
   return (
@@ -59,10 +62,20 @@ export function LimitReachedEmail({ name, appUrl }: LimitReachedEmailProps) {
             </Button>
           </Section>
 
-          <Text style={callout}>
-            💡 Con 100 búsquedas al mes tienes potencial para contactar miles
-            de negocios. Un solo cliente cierra el plan entero.
-          </Text>
+          {noWebsite && contactable ? (
+            <Text style={callout}>
+              💡 En tus 3 búsquedas encontraste{" "}
+              <strong>{noWebsite} negocios sin web</strong> y{" "}
+              <strong>{contactable} leads contactables</strong>. Con un plan de
+              100 búsquedas eso se multiplica por 33 — un solo cliente de esos
+              cubre el plan Go de sobra.
+            </Text>
+          ) : (
+            <Text style={callout}>
+              💡 Con 100 búsquedas al mes tienes potencial para contactar miles
+              de negocios. Un solo cliente cierra el plan entero.
+            </Text>
+          )}
 
           <Hr style={hr} />
 

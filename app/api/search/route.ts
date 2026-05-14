@@ -6,6 +6,7 @@ import { calculateOpportunityScore } from "@/lib/score";
 import { generateContactMessage } from "@/lib/message";
 import { trackEvent } from "@/lib/events";
 import { sendLimitReachedEmail } from "@/lib/email";
+import { supabase } from "@/lib/supabase";
 import { parsePhoneNumber } from "libphonenumber-js/max";
 
 const CACHE_DAYS = 7; // Re-use results for 7 days before hitting Google again
@@ -186,7 +187,31 @@ export async function GET(request: Request) {
         });
         await trackEvent(user.id, "free_limit_reached");
         if (user.email) {
-          sendLimitReachedEmail(user.email, user.name).catch(() => {});
+          // Aggregate totals across all free searches for the email callout (fire-and-forget)
+          (async () => {
+            try {
+              const { data } = await supabase
+                .from("search_history")
+                .select("results")
+                .eq("user_id", user.id);
+              let noWebsite = 0;
+              let contactable = 0;
+              for (const row of data ?? []) {
+                const rows: any[] = Array.isArray(row.results) ? row.results : [];
+                for (const r of rows) {
+                  if (!r.has_website) noWebsite++;
+                  if (r.phone && r.score > 0) contactable++;
+                }
+              }
+              await sendLimitReachedEmail(
+                user.email!,
+                user.name,
+                noWebsite > 0 ? { noWebsite, contactable } : undefined
+              );
+            } catch {
+              await sendLimitReachedEmail(user.email!, user.name).catch(() => {});
+            }
+          })();
         }
       }
 

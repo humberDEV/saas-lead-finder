@@ -24,14 +24,33 @@ export async function sendWelcomeEmail(to: string, name?: string | null) {
   await send(to, "Bienvenido a Huntly — haz tu primera búsqueda", html);
 }
 
-export async function sendLimitReachedEmail(to: string, name?: string | null) {
+export async function sendLimitReachedEmail(
+  to: string,
+  name?: string | null,
+  stats?: { noWebsite: number; contactable: number }
+) {
   if (!to) return;
-  const html = await render(LimitReachedEmail({ name, appUrl: APP_URL }));
+  const html = await render(
+    LimitReachedEmail({ name, appUrl: APP_URL, ...stats })
+  );
   await send(to, "Agotaste tus búsquedas gratis — desbloquea más", html);
 }
 
-export async function sendReactivationEmail(to: string, name?: string | null) {
+export async function sendReactivationEmail(
+  to: string,
+  name?: string | null,
+  lastSearch?: { niche: string; city: string } | null,
+  tokensLeft?: number
+) {
   if (!to) return;
-  const html = await render(ReactivationEmail({ name, appUrl: APP_URL }));
+  const html = await render(
+    ReactivationEmail({
+      name,
+      appUrl: APP_URL,
+      lastNiche: lastSearch?.niche,
+      lastCity: lastSearch?.city,
+      tokensLeft,
+    })
+  );
   await send(to, "Todavía tienes búsquedas gratis esperándote", html);
 }

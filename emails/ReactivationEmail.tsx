@@ -15,10 +15,18 @@ import * as React from "react";
 interface ReactivationEmailProps {
   name?: string | null;
   appUrl: string;
+  /** Last search the user ran — personalizes the example block */
+  lastNiche?: string | null;
+  lastCity?: string | null;
+  /** Remaining free searches */
+  tokensLeft?: number;
 }
 
-export function ReactivationEmail({ name, appUrl }: ReactivationEmailProps) {
+export function ReactivationEmail({ name, appUrl, lastNiche, lastCity, tokensLeft }: ReactivationEmailProps) {
   const firstName = name?.split(" ")[0] ?? "ahí";
+  const hasLastSearch = !!(lastNiche && lastCity);
+  const remaining = tokensLeft ?? 3;
+  const searchWord = remaining === 1 ? "búsqueda gratis" : "búsquedas gratis";
 
   return (
     <Html lang="es">
@@ -30,28 +38,41 @@ export function ReactivationEmail({ name, appUrl }: ReactivationEmailProps) {
 
           <Heading style={h1}>{firstName}, ¿sigues buscando clientes?</Heading>
 
-          <Text style={text}>
-            Te registraste en Huntly hace unos días pero todavía no has hecho
-            tu primera búsqueda.
-          </Text>
+          {hasLastSearch ? (
+            <Text style={text}>
+              La última vez buscaste <strong>"{lastNiche}"</strong> en{" "}
+              <strong>{lastCity}</strong>. Todavía tienes{" "}
+              <strong>{remaining} {searchWord}</strong> — ¿quieres ver qué más
+              hay en esa zona o probar otro nicho?
+            </Text>
+          ) : (
+            <Text style={text}>
+              Te registraste en Huntly hace unos días pero todavía no has hecho
+              tu primera búsqueda. Sigues teniendo{" "}
+              <strong>{remaining} {searchWord}</strong>.
+            </Text>
+          )}
 
           <Text style={text}>
-            Sigues teniendo <strong>3 búsquedas gratis</strong>. En menos de 2
-            minutos puedes tener una lista de negocios sin web listos para
-            contactar.
+            En menos de 2 minutos tienes una lista de negocios sin web listos
+            para contactar.
           </Text>
 
           <Section style={exampleBox}>
-            <Text style={exampleTitle}>Ejemplo real:</Text>
-            <Text style={exampleItem}>🔍 "peluquerías" en Ciudad de México</Text>
-            <Text style={exampleItem}>→ 18 negocios sin web encontrados</Text>
-            <Text style={exampleItem}>→ 12 con número de teléfono o WhatsApp</Text>
+            <Text style={exampleTitle}>
+              {hasLastSearch ? `Lo que encontrarías en ${lastCity}:` : "Ejemplo real:"}
+            </Text>
+            <Text style={exampleItem}>
+              🔍 "{hasLastSearch ? lastNiche : "peluquerías"}" en {hasLastSearch ? lastCity : "Ciudad de México"}
+            </Text>
+            <Text style={exampleItem}>→ Negocios sin web listos para contactar</Text>
+            <Text style={exampleItem}>→ Teléfono y WhatsApp directos</Text>
             <Text style={exampleItem}>→ Mensaje de contacto generado automáticamente</Text>
           </Section>
 
           <Section style={btnSection}>
             <Button href={`${appUrl}/dashboard`} style={button}>
-              Hacer mi primera búsqueda →
+              {hasLastSearch ? "Continuar buscando →" : "Hacer mi primera búsqueda →"}
             </Button>
           </Section>
 
