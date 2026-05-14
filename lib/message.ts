@@ -3,82 +3,81 @@ const pick = <T>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)];
 // ─── SPANISH ──────────────────────────────────────────────────────────────────
 
 const OPENERS_ES = [
-  "Hola, buenos dias.",
-  "Hola, buenas tardes.",
   "Hola, buenas.",
+  "Hola, ¿qué tal?",
   "Buenas,",
 ];
 
 const HOW_FOUND_ES = [
-  "he visto su negocio en Google Maps y queria comentarle algo.",
-  "encontre su negocio en Google Maps y tenia una consulta.",
-  "vi su ficha en Google Maps y queria hacerle una pregunta.",
+  "vi su negocio en Google Maps y quería hacerle una consulta rápida.",
+  "encontré su local en Google Maps y quería comentarle algo.",
+  "busqué su negocio en Maps y me surgió una pregunta.",
 ];
 
 function noWebObs_ES(reviewCount: number): string {
   if (reviewCount >= 50) {
     return pick([
-      `Vi que tiene ${reviewCount} resenas en Google, que esta muy bien, pero no encontre pagina web propia.`,
-      `Tiene bastante actividad en Maps, aunque no tiene web propia.`,
+      `Tiene ${reviewCount} reseñas en Google, que está muy bien, pero no encontré página web propia.`,
+      `Buena presencia en Maps, aunque no tiene página web todavía.`,
     ]);
   }
   if (reviewCount >= 10) {
     return pick([
-      "Busque su web y no encontre ninguna.",
-      "No encontre pagina web del negocio.",
-      "Tiene presencia en Google Maps pero no web propia.",
+      "Busqué su página web y no encontré ninguna.",
+      "Tiene ficha en Google Maps pero no web propia.",
+      "No encontré página web del negocio.",
     ]);
   }
   return pick([
-    "Busque su web y no aparece ninguna.",
-    "No encontre pagina web de su negocio.",
+    "Busqué su página web y no aparece ninguna.",
+    "No encontré web del negocio.",
   ]);
 }
 
 const PROPOSALS_ES = [
-  "Me dedico al diseno web para negocios locales y, si le interesa, puedo enviarle informacion sin compromiso.",
-  "Hago paginas web para negocios como el suyo. Si le parece bien, puedo mandarle algo de informacion.",
-  "Me dedico a crear webs para negocios locales. Si le interesa, puedo enviarle una propuesta sin ningun compromiso.",
+  "Me dedico al diseño web para negocios locales. ¿Le interesaría que le envíe información?",
+  "Hago páginas web para negocios como el suyo. Si le parece bien, le mando algo sin compromiso.",
+  "Creo webs para negocios locales. ¿Le importaría que le enviara una propuesta rápida?",
 ];
 
 // ─── ENGLISH ──────────────────────────────────────────────────────────────────
 
 const OPENERS_EN = [
-  "Hi, hope you're doing well.",
-  "Hello,",
+  "Hey, hope you're well.",
   "Hi there,",
+  "Hey,",
 ];
 
 const HOW_FOUND_EN = [
-  "I came across your business on Google Maps and wanted to reach out.",
-  "I found your listing on Google Maps and had a quick question.",
-  "I noticed your business on Google Maps and thought I'd get in touch.",
+  "I came across your business on Google Maps and had a quick question.",
+  "I found your place on Google Maps and wanted to reach out.",
+  "I spotted your business on Maps and thought I'd drop you a message.",
 ];
 
 function noWebObs_EN(reviewCount: number): string {
   if (reviewCount >= 50) {
     return pick([
-      `I can see you have ${reviewCount} reviews on Google, which is great, but I couldn't find a website for your business.`,
-      `You have solid activity on Google Maps, though I didn't find a website.`,
+      `You've got ${reviewCount} Google reviews, which is great — but I couldn't find a website for you.`,
+      `Solid presence on Maps, but I didn't come across a website for your business.`,
     ]);
   }
   if (reviewCount >= 10) {
     return pick([
-      "I searched for your website but couldn't find one.",
-      "I noticed your business doesn't have its own website yet.",
-      "You're on Google Maps but I couldn't find a website for you.",
+      "I looked for your website but couldn't find one.",
+      "You're on Google Maps but don't seem to have a website yet.",
+      "Couldn't find a website for your business.",
     ]);
   }
   return pick([
-    "I searched for your website but nothing came up.",
-    "I couldn't find a website for your business.",
+    "I looked you up but couldn't find a website.",
+    "Your business doesn't seem to have a website yet.",
   ]);
 }
 
 const PROPOSALS_EN = [
-  "I build websites for local businesses and would be happy to send you some information, no commitment.",
-  "I specialize in websites for businesses like yours. If you're interested, I can send over some details.",
-  "I create websites for local businesses. If you'd like, I can put together a quick proposal for you, no strings attached.",
+  "I build websites for local businesses — would it be okay if I sent you some info?",
+  "I make websites for businesses like yours. Happy to send something over if you're curious.",
+  "I design websites for local businesses. Would you mind if I sent a quick proposal?",
 ];
 
 // ─── SHARED ───────────────────────────────────────────────────────────────────
@@ -99,7 +98,7 @@ export function generateContactMessage(
     const opener = pick(OPENERS_EN);
     if (hasWebsite) {
       const webRef = website ? ` (${stripProtocol(website)})` : "";
-      return `${opener} I found your business on Google Maps. You already have a website${webRef}, but I also help businesses that want to refresh their online presence. If that sounds interesting, I'd be happy to share some ideas with no commitment.`;
+      return `${opener} I found your business on Google Maps. You already have a website${webRef} — I also help businesses that want to freshen up their online presence. Would it be okay if I sent over a few ideas?`;
     }
     return [opener, pick(HOW_FOUND_EN), noWebObs_EN(reviewCount), pick(PROPOSALS_EN)].join(" ");
   }
@@ -108,7 +107,7 @@ export function generateContactMessage(
   const opener = pick(OPENERS_ES);
   if (hasWebsite) {
     const webRef = website ? ` (${stripProtocol(website)})` : "";
-    return `${opener} he visto su negocio en Google Maps. Tiene web${webRef}, aunque me especializo tambien en redisenos para negocios que quieran renovar su presencia online. Si le interesa, puedo enviarle algunas ideas sin compromiso.`;
+    return `${opener} vi su negocio en Google Maps. Tiene página web${webRef} — también trabajo con negocios que quieren renovar su presencia online. ¿Le importaría que le enviara algunas ideas?`;
   }
   return [opener, pick(HOW_FOUND_ES), noWebObs_ES(reviewCount), pick(PROPOSALS_ES)].join(" ");
 }
