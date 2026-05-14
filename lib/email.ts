@@ -7,7 +7,7 @@ import { ReactivationEmail } from "@/emails/ReactivationEmail";
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 const FROM = process.env.EMAIL_FROM ?? "Huntly <hola@huntly.app>";
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://huntly.app";
+const APP_URL = (process.env.NEXT_PUBLIC_APP_URL ?? "https://huntly.app").replace(/\/$/, "");
 
 /** Fire-and-forget — logs errors but never throws */
 async function send(to: string, subject: string, html: string) {

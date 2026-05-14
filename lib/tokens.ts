@@ -1,3 +1,4 @@
+import { clerkClient } from "@clerk/nextjs/server";
 import { db } from "./db";
 import { PLAN_LIMITS } from "./plans";
 import { trackEvent } from "./events";
@@ -14,16 +15,32 @@ export async function getOrCreateUser(
   let user = await db.user.findUnique({ where: { clerkId: clerkUserId } });
 
   if (!user) {
+    // If the caller didn't pass the profile, fetch it from Clerk so we
+    // always have the email at creation time (needed for the welcome email).
+    let email = clerkProfile?.email ?? null;
+    let name = clerkProfile?.name ?? null;
+    if (!email) {
+      try {
+        const client = await clerkClient();
+        const clerkUser = await client.users.getUser(clerkUserId);
+        email = clerkUser.emailAddresses[0]?.emailAddress ?? null;
+        const firstName = clerkUser.firstName ?? "";
+        const lastName = clerkUser.lastName ?? "";
+        name = name ?? (firstName || lastName ? `${firstName} ${lastName}`.trim() : null);
+      } catch {
+        // Non-fatal — user still gets created, email just won't be sent now
+      }
+    }
+
     user = await db.user.create({
       data: {
         clerkId: clerkUserId,
         tokens: PLAN_LIMITS["free"],
-        email: clerkProfile?.email ?? undefined,
-        name: clerkProfile?.name ?? undefined,
+        email: email ?? undefined,
+        name: name ?? undefined,
       },
     });
     await trackEvent(user.id, "user_signed_up");
-    // Fire-and-forget — don't block registration if email fails
     if (user.email) sendWelcomeEmail(user.email, user.name).catch(() => {});
     return user;
   }
