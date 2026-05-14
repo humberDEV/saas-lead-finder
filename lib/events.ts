@@ -9,7 +9,8 @@ export type ProductEvent =
   | "checkout_started"
   | "subscription_started"
   | "subscription_cancelled"
-  | "plan_changed";
+  | "plan_changed"
+  | "reactivation_email_sent";
 
 export async function trackEvent(
   userId: string,

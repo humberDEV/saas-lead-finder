@@ -5,6 +5,7 @@ import { getOrCreateUser } from "@/lib/tokens";
 import { calculateOpportunityScore } from "@/lib/score";
 import { generateContactMessage } from "@/lib/message";
 import { trackEvent } from "@/lib/events";
+import { sendLimitReachedEmail } from "@/lib/email";
 import { parsePhoneNumber } from "libphonenumber-js/max";
 
 const CACHE_DAYS = 7; // Re-use results for 7 days before hitting Google again
@@ -184,6 +185,9 @@ export async function GET(request: Request) {
           data: { first_limit_reached_at: now },
         });
         await trackEvent(user.id, "free_limit_reached");
+        if (user.email) {
+          sendLimitReachedEmail(user.email, user.name).catch(() => {});
+        }
       }
 
       await trackEvent(user.id, "search_completed", { niche, city, resultCount: uniquePlaces.length });

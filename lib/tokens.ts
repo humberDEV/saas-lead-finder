@@ -1,6 +1,7 @@
 import { db } from "./db";
 import { PLAN_LIMITS } from "./plans";
 import { trackEvent } from "./events";
+import { sendWelcomeEmail } from "./email";
 
 /**
  * Returns the user (creating them if needed), syncing email/name from Clerk
@@ -22,6 +23,8 @@ export async function getOrCreateUser(
       },
     });
     await trackEvent(user.id, "user_signed_up");
+    // Fire-and-forget — don't block registration if email fails
+    if (user.email) sendWelcomeEmail(user.email, user.name).catch(() => {});
     return user;
   }
 
