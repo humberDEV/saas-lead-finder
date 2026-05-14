@@ -1,13 +1,10 @@
 import {
   Body,
-  Button,
   Container,
   Head,
-  Heading,
-  Hr,
   Html,
+  Link,
   Preview,
-  Section,
   Text,
 } from "@react-email/components";
 import * as React from "react";
@@ -15,76 +12,54 @@ import * as React from "react";
 interface ReactivationEmailProps {
   name?: string | null;
   appUrl: string;
-  /** Last search the user ran — personalizes the example block */
   lastNiche?: string | null;
   lastCity?: string | null;
-  /** Remaining free searches */
   tokensLeft?: number;
 }
 
 export function ReactivationEmail({ name, appUrl, lastNiche, lastCity, tokensLeft }: ReactivationEmailProps) {
-  const firstName = name?.split(" ")[0] ?? "ahí";
+  const firstName = name?.split(" ")[0] ?? null;
   const hasLastSearch = !!(lastNiche && lastCity);
   const remaining = tokensLeft ?? 3;
-  const searchWord = remaining === 1 ? "búsqueda gratis" : "búsquedas gratis";
 
   return (
     <Html lang="es">
       <Head />
-      <Preview>Todavía tienes búsquedas gratis esperándote en Huntly</Preview>
+      <Preview>Todavía tienes búsquedas gratis en Huntly</Preview>
       <Body style={main}>
         <Container style={container}>
-          <Heading style={logo}>Huntly</Heading>
-
-          <Heading style={h1}>{firstName}, ¿sigues buscando clientes?</Heading>
+          <Text style={text}>
+            {firstName ? `Hola ${firstName},` : "Hola,"}
+          </Text>
 
           {hasLastSearch ? (
             <Text style={text}>
-              La última vez buscaste <strong>"{lastNiche}"</strong> en{" "}
-              <strong>{lastCity}</strong>. Todavía tienes{" "}
-              <strong>{remaining} {searchWord}</strong> — ¿quieres ver qué más
-              hay en esa zona o probar otro nicho?
+              La última vez buscaste "{lastNiche}" en {lastCity}. Todavía
+              tienes {remaining} {remaining === 1 ? "búsqueda" : "búsquedas"}{" "}
+              gratis esperándote.
             </Text>
           ) : (
             <Text style={text}>
-              Te registraste en Huntly hace unos días pero todavía no has hecho
-              tu primera búsqueda. Sigues teniendo{" "}
-              <strong>{remaining} {searchWord}</strong>.
+              Te registraste en Huntly hace unos días pero todavía no has
+              hecho ninguna búsqueda. Tienes {remaining} búsquedas gratis
+              esperándote.
             </Text>
           )}
 
           <Text style={text}>
-            En menos de 2 minutos tienes una lista de negocios sin web listos
-            para contactar.
+            En menos de 2 minutos tienes una lista de negocios sin web con
+            contacto directo y mensaje listo para enviar.{" "}
+            <Link href={`${appUrl}/dashboard`} style={link}>
+              {hasLastSearch ? "Seguir buscando →" : "Hacer mi primera búsqueda →"}
+            </Link>
           </Text>
 
-          <Section style={exampleBox}>
-            <Text style={exampleTitle}>
-              {hasLastSearch ? `Lo que encontrarías en ${lastCity}:` : "Ejemplo real:"}
-            </Text>
-            <Text style={exampleItem}>
-              🔍 "{hasLastSearch ? lastNiche : "peluquerías"}" en {hasLastSearch ? lastCity : "Ciudad de México"}
-            </Text>
-            <Text style={exampleItem}>→ Negocios sin web listos para contactar</Text>
-            <Text style={exampleItem}>→ Teléfono y WhatsApp directos</Text>
-            <Text style={exampleItem}>→ Mensaje de contacto generado automáticamente</Text>
-          </Section>
-
-          <Section style={btnSection}>
-            <Button href={`${appUrl}/dashboard`} style={button}>
-              {hasLastSearch ? "Continuar buscando →" : "Hacer mi primera búsqueda →"}
-            </Button>
-          </Section>
-
-          <Text style={subtext}>
-            Es gratis. No necesitas tarjeta de crédito.
-          </Text>
-
-          <Hr style={hr} />
-
-          <Text style={footer}>
+          <Text style={text}>
             Si necesitas ayuda para empezar, responde este email.
-            <br />— El equipo de Huntly
+          </Text>
+
+          <Text style={signature}>
+            — El equipo de Huntly
           </Text>
         </Container>
       </Body>
@@ -95,91 +70,31 @@ export function ReactivationEmail({ name, appUrl, lastNiche, lastCity, tokensLef
 export default ReactivationEmail;
 
 const main: React.CSSProperties = {
-  backgroundColor: "#0f0f0f",
-  fontFamily: "'Inter', 'Helvetica Neue', Arial, sans-serif",
+  backgroundColor: "#ffffff",
+  fontFamily: "Georgia, 'Times New Roman', serif",
 };
 
 const container: React.CSSProperties = {
   margin: "0 auto",
   padding: "40px 24px",
-  maxWidth: "560px",
-};
-
-const logo: React.CSSProperties = {
-  fontSize: "24px",
-  fontWeight: 700,
-  color: "#a855f7",
-  margin: "0 0 32px",
-};
-
-const h1: React.CSSProperties = {
-  fontSize: "28px",
-  fontWeight: 700,
-  color: "#ffffff",
-  margin: "0 0 16px",
+  maxWidth: "520px",
 };
 
 const text: React.CSSProperties = {
   fontSize: "16px",
-  lineHeight: "26px",
-  color: "#a1a1aa",
-  margin: "0 0 16px",
+  lineHeight: "28px",
+  color: "#1a1a1a",
+  margin: "0 0 20px",
 };
 
-const exampleBox: React.CSSProperties = {
-  backgroundColor: "#18181b",
-  borderRadius: "12px",
-  padding: "16px 24px",
-  margin: "8px 0 24px",
+const link: React.CSSProperties = {
+  color: "#1a1a1a",
+  textDecoration: "underline",
 };
 
-const exampleTitle: React.CSSProperties = {
-  fontSize: "13px",
-  fontWeight: 600,
-  color: "#71717a",
-  textTransform: "uppercase",
-  letterSpacing: "0.05em",
-  margin: "0 0 12px",
-};
-
-const exampleItem: React.CSSProperties = {
-  fontSize: "14px",
-  lineHeight: "22px",
-  color: "#d4d4d8",
-  margin: "0 0 6px",
-};
-
-const btnSection: React.CSSProperties = {
-  textAlign: "center",
-  margin: "32px 0 16px",
-};
-
-const button: React.CSSProperties = {
-  backgroundColor: "#a855f7",
-  color: "#ffffff",
+const signature: React.CSSProperties = {
   fontSize: "16px",
-  fontWeight: 600,
-  borderRadius: "8px",
-  padding: "14px 32px",
-  textDecoration: "none",
-  display: "inline-block",
-};
-
-const subtext: React.CSSProperties = {
-  fontSize: "13px",
-  color: "#52525b",
-  textAlign: "center",
-  margin: "0 0 32px",
-};
-
-const hr: React.CSSProperties = {
-  border: "none",
-  borderTop: "1px solid #27272a",
-  margin: "32px 0 24px",
-};
-
-const footer: React.CSSProperties = {
-  fontSize: "13px",
-  lineHeight: "22px",
-  color: "#52525b",
+  lineHeight: "28px",
+  color: "#555555",
+  margin: "32px 0 0",
 };
