@@ -179,39 +179,46 @@ export async function GET(request: Request) {
         },
       });
 
-      // Re-read tokens to check if free user just hit 0
+      // Atomic guard: set first_limit_reached_at only if it's still null.
+      // This prevents duplicate limit emails when two searches race with tokens=1.
       if (user.plan === "free" && user.tokens <= 1 && !user.firstLimitReachedAt) {
-        await db.user.update({
-          where: { clerkId: userId },
-          data: { first_limit_reached_at: now },
-        });
-        await trackEvent(user.id, "free_limit_reached");
-        if (user.email) {
-          // Aggregate totals across all free searches for the email callout (fire-and-forget)
-          (async () => {
-            try {
-              const { data } = await supabase
-                .from("search_history")
-                .select("results")
-                .eq("user_id", user.id);
-              let noWebsite = 0;
-              let contactable = 0;
-              for (const row of data ?? []) {
-                const rows: any[] = Array.isArray(row.results) ? row.results : [];
-                for (const r of rows) {
-                  if (!r.has_website) noWebsite++;
-                  if (r.phone && r.score > 0) contactable++;
+        const { data: claimed } = await supabase
+          .from("users")
+          .update({ first_limit_reached_at: now })
+          .eq("clerk_id", userId)
+          .is("first_limit_reached_at", null)
+          .select("id");
+
+        if (claimed && claimed.length > 0) {
+          await trackEvent(user.id, "free_limit_reached");
+          if (user.email) {
+            // Aggregate totals across all free searches for the email callout (fire-and-forget)
+            (async () => {
+              try {
+                const { data } = await supabase
+                  .from("search_history")
+                  .select("results")
+                  .eq("user_id", user.id);
+                let noWebsite = 0;
+                let contactable = 0;
+                for (const row of data ?? []) {
+                  const rows: any[] = Array.isArray(row.results) ? row.results : [];
+                  for (const r of rows) {
+                    if (!r.has_website) noWebsite++;
+                    if (r.phone && r.score > 0) contactable++;
+                  }
                 }
+                await trackEvent(user.id, "limit_reached_email_sent");
+                await sendLimitReachedEmail(
+                  user.email!,
+                  user.name,
+                  noWebsite > 0 ? { noWebsite, contactable } : undefined
+                );
+              } catch {
+                await sendLimitReachedEmail(user.email!, user.name).catch(() => {});
               }
-              await sendLimitReachedEmail(
-                user.email!,
-                user.name,
-                noWebsite > 0 ? { noWebsite, contactable } : undefined
-              );
-            } catch {
-              await sendLimitReachedEmail(user.email!, user.name).catch(() => {});
-            }
-          })();
+            })();
+          }
         }
       }
 

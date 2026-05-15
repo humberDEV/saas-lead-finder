@@ -3,6 +3,7 @@ import { db } from "./db";
 import { PLAN_LIMITS } from "./plans";
 import { trackEvent } from "./events";
 import { sendWelcomeEmail } from "./email";
+import { supabase } from "./supabase";
 
 /**
  * Returns the user (creating them if needed), syncing email/name from Clerk
@@ -32,20 +33,38 @@ export async function getOrCreateUser(
       }
     }
 
-    user = await db.user.create({
-      data: {
-        clerkId: clerkUserId,
-        tokens: PLAN_LIMITS["free"],
-        email: email ?? undefined,
-        name: name ?? undefined,
-      },
-    });
-    await trackEvent(user.id, "user_signed_up");
-    if (user.email) sendWelcomeEmail(user.email, user.name).catch(() => {});
+    // Race condition guard: if two requests arrive simultaneously for a new user,
+    // only the one that actually inserts the row should send the welcome email.
+    let isNew = false;
+    try {
+      user = await db.user.create({
+        data: {
+          clerkId: clerkUserId,
+          tokens: PLAN_LIMITS["free"],
+          email: email ?? undefined,
+          name: name ?? undefined,
+        },
+      });
+      isNew = true;
+    } catch {
+      // Another concurrent request already created the user — fetch it instead.
+      const existing = await db.user.findUnique({ where: { clerkId: clerkUserId } });
+      if (!existing) throw new Error("Failed to create user");
+      user = existing;
+    }
+
+    if (isNew) {
+      await trackEvent(user.id, "user_signed_up");
+      if (user.email) {
+        await trackEvent(user.id, "welcome_email_sent");
+        sendWelcomeEmail(user.email, user.name).catch(() => {});
+      }
+    }
     return user;
   }
 
   // Sync missing email/name from Clerk
+  const hadEmail = !!user.email;
   const needsSync =
     (clerkProfile?.email && !user.email) ||
     (clerkProfile?.name && !user.name);
@@ -73,6 +92,23 @@ export async function getOrCreateUser(
       where: { clerkId: clerkUserId },
       data: syncPatch,
     });
+  }
+
+  // If email was missing at creation and just got synced, send welcome email now.
+  // Guard via product_events to prevent duplicates if multiple requests race here.
+  if (!hadEmail && user.email) {
+    const { data: alreadySent } = await supabase
+      .from("product_events")
+      .select("id")
+      .eq("user_id", user.id)
+      .eq("event", "welcome_email_sent")
+      .limit(1)
+      .maybeSingle();
+
+    if (!alreadySent) {
+      await trackEvent(user.id, "welcome_email_sent");
+      sendWelcomeEmail(user.email, user.name).catch(() => {});
+    }
   }
 
   return user;
