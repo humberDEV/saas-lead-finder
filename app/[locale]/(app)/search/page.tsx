@@ -93,7 +93,7 @@ function PaywallModal({ onClose, source = "default" }: { onClose: () => void; so
               El mensaje personalizado con IA es exclusivo del plan Go
             </h2>
             <p className="text-sm text-zinc-400 mt-1">
-              Desbloquea mensajes listos para enviar y 40 búsquedas al mes.
+              Desbloquea mensajes listos para enviar y 100 búsquedas al mes.
             </p>
           </>
         ) : (
