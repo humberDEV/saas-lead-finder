@@ -176,7 +176,7 @@ export default async function LandingPage() {
                     boxShadow: "0 0 0 1px rgba(167,139,250,0.3), 0 0 24px rgba(139,92,246,0.5), 0 0 48px rgba(139,92,246,0.2)",
                   }}
                 >
-                  <span className="relative z-10">Comprar ahora</span>
+                  <span className="relative z-10">{t("nav.buyNow")}</span>
                   <ArrowRight className="relative z-10 w-3.5 h-3.5" />
                 </Link>
               </SignedOut>
@@ -215,7 +215,7 @@ export default async function LandingPage() {
               <Reveal delay={0}>
                 <div className="inline-flex items-center gap-2 bg-violet-500/[0.10] border border-violet-500/25 rounded-full px-4 py-1.5 mb-10">
                   <Zap className="w-3 h-3 text-violet-400" />
-                  <span className="text-xs text-violet-200 tracking-wide">Prospección local automatizada</span>
+                  <span className="text-xs text-violet-200 tracking-wide">{t("hero.badge")}</span>
                 </div>
               </Reveal>
 

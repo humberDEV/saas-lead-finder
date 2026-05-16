@@ -11,9 +11,11 @@
       "howItWorks": "Cómo funciona",
       "pricing": "Precios",
       "signIn": "Entrar",
+      "buyNow": "Comprar ahora",
       "dashboard": "Dashboard"
     },
     "hero": {
+      "badge": "Prospección local automatizada",
       "title1": "Encuentra negocios",
       "title2": "sin página web",
       "title3": "en segundos.",
