@@ -1,3 +1,14 @@
+/**
+ * Applies a rating bonus/penalty to a base score.
+ * Only for leads that passed the no-phone / inactive / has-website filters.
+ */
+function applyRatingAdjustment(score: number, rating: number): number {
+  if (rating <= 0) return score; // no rating data
+  if (rating >= 4.0) return Math.min(100, score + 5);
+  if (rating < 3.0) return Math.max(0, score - 10);
+  return score;
+}
+
 export function calculateOpportunityScore(
   hasWebsite: boolean,
   rating: number = 0,
@@ -36,33 +47,39 @@ export function calculateOpportunityScore(
     };
   }
 
-  // Sin web a partir de aquí — evaluar por volumen de reseñas
+  // Sin web — evaluar por volumen de reseñas + rating
+  const ratingNote =
+    rating >= 4.0
+      ? ` Buena valoración (${rating.toFixed(1)}⭐).`
+      : rating > 0 && rating < 3.0
+      ? ` Valoración baja (${rating.toFixed(1)}⭐).`
+      : "";
 
-  // Zona ideal: negocio consolidado sin web (10–250 reseñas)
+  // Zona ideal: negocio consolidado (10–249 reseñas)
   if (reviewCount >= 10 && reviewCount < 250) {
     return {
-      score: 95,
-      explanation: `Negocio activo con ${reviewCount} reseñas y sin web. Perfil ideal para vender una página web. Tiene clientes pero pierde los que buscan en Google.`,
+      score: applyRatingAdjustment(95, rating),
+      explanation: `Negocio activo con ${reviewCount} reseñas y sin web. Perfil ideal para vender una página web.${ratingNote}`,
       temperature: "🟢",
       label: "Oportunidad ideal",
     };
   }
 
-  // Negocio grande sin web — ticket alto pero proceso más largo
+  // Negocio grande — ticket alto, proceso más largo
   if (reviewCount >= 250) {
     return {
-      score: 80,
-      explanation: "Negocio grande sin web. Posible ticket alto, pero suelen tener procesos de decisión más lentos.",
+      score: applyRatingAdjustment(80, rating),
+      explanation: `Negocio grande sin web. Posible ticket alto, pero procesos de decisión más lentos.${ratingNote}`,
       temperature: "🟡",
       label: "Ticket alto",
     };
   }
 
   // Pocas reseñas — negocio nuevo o con poco tráfico
-  if (reviewCount > 0 && reviewCount < 10) {
+  if (reviewCount > 0) {
     return {
-      score: 60,
-      explanation: "Negocio nuevo o con poco volumen. Puede necesitar web pero quizá no tenga presupuesto aún.",
+      score: applyRatingAdjustment(60, rating),
+      explanation: `Negocio nuevo o con poco volumen. Puede necesitar web pero quizá no tenga presupuesto aún.${ratingNote}`,
       temperature: "🟠",
       label: "Explorar",
     };
@@ -70,8 +87,8 @@ export function calculateOpportunityScore(
 
   // Sin reseñas — riesgo alto
   return {
-    score: 40,
-    explanation: "Sin reseñas en Maps. Difícil saber si está activo o tiene presupuesto para una web.",
+    score: applyRatingAdjustment(40, rating),
+    explanation: `Sin reseñas en Google. Difícil saber si está activo o tiene presupuesto para una web.${ratingNote}`,
     temperature: "🟠",
     label: "Explorar",
   };
