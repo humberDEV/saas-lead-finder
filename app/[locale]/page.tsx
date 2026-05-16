@@ -598,6 +598,43 @@ export default async function LandingPage() {
             </div>
           </section>
 
+          {/* ── NICHOS + CIUDADES ── */}
+          <section className="px-6 py-16 md:py-20" style={{ background: BG.alt }}>
+            <div className="max-w-5xl mx-auto">
+              <Reveal>
+                <p className="text-[10px] font-mono text-violet-400 uppercase tracking-widest mb-4">Dónde funciona</p>
+                <h2 className="font-black tracking-tighter text-white mb-3" style={{ fontSize: "clamp(20px, 2.8vw, 36px)" }}>
+                  Más de 35 nichos. Cualquier ciudad.
+                </h2>
+                <p className="text-sm text-violet-200 mb-10 max-w-xl leading-relaxed">
+                  Barberías, clínicas dentales, talleres mecánicos, fisioterapeutas, gestorías, restaurantes y más — en Madrid, Barcelona, Valencia, Sevilla, México DF, Buenos Aires o la ciudad que elijas.
+                </p>
+              </Reveal>
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
+                {[
+                  "Barberías","Clínicas Dentales","Talleres Mecánicos","Fisioterapeutas",
+                  "Peluquerías","Gestorías","Gimnasios","Restaurantes",
+                  "Centros de Estética","Ópticas","Reformas","Psicólogos",
+                  "Fontaneros","Electricistas","Nutricionistas","Fotógrafos",
+                ].map((niche) => (
+                  <div
+                    key={niche}
+                    className="flex items-center gap-2 px-3 py-2 rounded-lg border border-violet-500/[0.10] text-xs text-violet-300 font-medium"
+                    style={{ background: "rgba(139,92,246,0.04)" }}
+                  >
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0" />
+                    {niche}
+                  </div>
+                ))}
+              </div>
+              <Reveal delay={80}>
+                <p className="text-xs text-violet-500 mt-6">
+                  ¿No ves tu nicho? Huntly también acepta búsquedas personalizadas — escribe cualquier sector o tipo de negocio.
+                </p>
+              </Reveal>
+            </div>
+          </section>
+
           {/* ── PRICING ── compact to fit in viewport ── */}
           <section id="precios" className="px-6 py-14 md:py-20" style={{ background: BG.deep }}>
             <div className="max-w-6xl mx-auto">
@@ -767,19 +804,16 @@ export default async function LandingPage() {
                   {t("faq.title")}
                 </h2>
               </Reveal>
-              <div itemScope itemType="https://schema.org/FAQPage" className="space-y-2">
+              <div className="space-y-2">
                 {FAQS.map((faq, i) => (
                   <Reveal key={i} delay={i * 35}>
                     <details
-                      itemProp="mainEntity"
-                      itemScope
-                      itemType="https://schema.org/Question"
                       name="faq"
                       className="group border border-violet-500/[0.10] rounded-xl overflow-hidden open:border-violet-500/[0.20]"
                       style={{ background: "rgba(139,92,246,0.04)" }}
                     >
                       <summary className="flex items-center justify-between gap-4 px-5 py-4 cursor-pointer list-none select-none [&::-webkit-details-marker]:hidden">
-                        <span itemProp="name" className="text-sm font-semibold text-white">{faq.q}</span>
+                        <span className="text-sm font-semibold text-white">{faq.q}</span>
                         <svg
                           className="w-4 h-4 text-violet-500 shrink-0 transition-transform duration-200 group-open:rotate-180"
                           fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}
@@ -787,13 +821,8 @@ export default async function LandingPage() {
                           <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
                         </svg>
                       </summary>
-                      <div
-                        itemProp="acceptedAnswer"
-                        itemScope
-                        itemType="https://schema.org/Answer"
-                        className="px-5 pb-5"
-                      >
-                        <p itemProp="text" className="text-sm text-violet-200 leading-relaxed border-t border-violet-500/[0.08] pt-4">
+                      <div className="px-5 pb-5">
+                        <p className="text-sm text-violet-200 leading-relaxed border-t border-violet-500/[0.08] pt-4">
                           {faq.a}
                         </p>
                       </div>
@@ -862,9 +891,12 @@ export default async function LandingPage() {
                 <Sparkles className="w-4 h-4 text-violet-600" />
                 <span className="text-sm font-semibold text-violet-400/75">Huntly</span>
               </div>
-              <div className="flex items-center gap-6 text-sm text-violet-400/75">
+              <div className="flex flex-wrap items-center gap-4 md:gap-6 text-sm text-violet-400/75">
                 <Link href="#como-funciona" className="hover:text-violet-200 transition-colors">{t("footer.howItWorks")}</Link>
                 <Link href="#precios" className="hover:text-violet-200 transition-colors">{t("footer.pricing")}</Link>
+                <Link href="/es/para-freelancers" className="hover:text-violet-200 transition-colors">Freelancers web</Link>
+                <Link href="/es/para-agencias" className="hover:text-violet-200 transition-colors">Agencias web</Link>
+                <Link href="/es/blog/conseguir-clientes-web" className="hover:text-violet-200 transition-colors">Guía de prospección</Link>
                 <Link href="mailto:huntly@outlook.es" className="hover:text-violet-200 transition-colors">{t("footer.contact")}</Link>
               </div>
               <p className="text-sm text-violet-300/20">© {new Date().getFullYear()} Huntly</p>
