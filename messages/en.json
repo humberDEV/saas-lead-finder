@@ -33,7 +33,31 @@
       "call": "Call"
     },
     "ticker": {
-      "noWeb": "NO WEBSITE"
+      "noWeb": "No website",
+      "items": [
+        { "name": "Barber Shop Elite", "city": "Miami", "rating": "4.8" },
+        { "name": "Smile Dental Clinic", "city": "Austin", "rating": "4.6" },
+        { "name": "Castro Auto Repair", "city": "Houston", "rating": "4.3" },
+        { "name": "Avant Hair Studio", "city": "Chicago", "rating": "4.9" },
+        { "name": "González Remodeling", "city": "Dallas", "rating": "4.5" },
+        { "name": "North Physio Center", "city": "Phoenix", "rating": "4.7" },
+        { "name": "Luna Aesthetics", "city": "San Diego", "rating": "4.8" },
+        { "name": "CrossFit South Zone", "city": "Denver", "rating": "4.4" },
+        { "name": "Pérez Tax Services", "city": "Orlando", "rating": "4.5" },
+        { "name": "Central Optics", "city": "Atlanta", "rating": "4.7" }
+      ]
+    },
+    "comparison": {
+      "withoutTitle": "Without Huntly",
+      "withoutImgAlt": "Manual search on Google Maps",
+      "withoutStat": "3–4 hours per week",
+      "withoutStatSub": "searching by hand",
+      "withoutStatMobile": "3–4 hours per week searching by hand",
+      "withTitle": "With Huntly",
+      "withImgAlt": "Huntly dashboard with filtered leads",
+      "withStat": "10 seconds per search",
+      "withStatSub": "leads ready to contact",
+      "withStatMobile": "10 seconds per search · leads ready to contact"
     },
     "statBar": {
       "stat1": "+680 cities available",
@@ -42,6 +66,14 @@
     },
     "problem": {
       "label": "The problem",
+      "headline1": "How many hours have you spent",
+      "headline2": "searching for clients on Google Maps?",
+      "pain1": "Opening Maps again.",
+      "pain2": "Checking if they have a website again.",
+      "pain3": "Copying the phone number again.",
+      "pain4": "Getting no answer again.",
+      "painFinal1": "Hours",
+      "painFinal2": "with nothing to show.",
       "title1": "Searching for clients manually",
       "title2": "is time that doesn't bill.",
       "subtitle": "Every hour scrolling Google Maps is an hour you're not selling websites or delivering projects.",
@@ -65,10 +97,15 @@
       "titleHighlight": " That's it.",
       "step1Title": "Pick a niche and city",
       "step1Note": "Barbershops in Miami, clinics in Austin, or any local sector.",
+      "step1Desc": "Choose a business type — barbershops, dental clinics, auto shops, restaurants, physical therapists and over 35 niches — and the city or neighborhood where you want to prospect.",
       "step2Title": "Huntly filters opportunities",
       "step2Note": "Detects businesses without a website, with available phone numbers and activity signals.",
+      "step2Desc": "Huntly scans Google Maps, filters local businesses without a website, extracts their available phone number and assigns an opportunity score based on reviews, rating and activity.",
       "step3Title": "Reach out and close",
       "step3Note": "Send a WhatsApp, call, or save the business to your portfolio and close the deal.",
+      "step3Desc": "Call directly, send a WhatsApp with the auto-generated opening message, or save the lead to your client portfolio. All in one screen.",
+      "ctaFree": "Try it for free",
+      "ctaDashboard": "Go to dashboard",
       "step3Message": "Generated message:",
       "step3Preview": "\"I do web design and noticed you have 47 reviews but no website...\"",
       "call": "Call"
@@ -76,12 +113,25 @@
     "audience": {
       "label": "Who it's for",
       "title": "Built for people who sell websites.",
-      "audience1Title": "Web freelancers",
-      "audience1Desc": "Prospect in 5 minutes what used to take hours scrolling Google Maps.",
-      "audience2Title": "Small agencies",
-      "audience2Desc": "Fill your pipeline with opportunities without hiring anyone for prospecting.",
+      "audience1Title": "Web design freelancers",
+      "audience1Desc": "Prospect in 5 minutes what used to take hours scrolling Google Maps by hand. Find local businesses with no website ready to hire.",
+      "audience1Stat": "20+ leads ready in under 30 seconds",
+      "audience1Cta": "Find my first client",
+      "audience2Title": "Small web agencies",
+      "audience2Desc": "Fill your sales pipeline with opportunities without hiring anyone for prospecting. Unlimited searches by city and niche.",
+      "audience2Stat": "Full pipeline without hiring anyone",
+      "audience2Cta": "Fill my pipeline now",
       "audience3Title": "AI web builders",
-      "audience3Desc": "You build sites in hours. Huntly finds the clients who still don't have one."
+      "audience3Desc": "You build sites in hours with Framer, Webflow or AI tools. Huntly finds the clients who still don't have one.",
+      "audience3Stat": "Clients who need exactly what you offer",
+      "audience3Cta": "Find clients without websites"
+    },
+    "nichesSection": {
+      "label": "Where it works",
+      "title": "35+ niches. Any city.",
+      "desc": "Barbershops, dental clinics, auto repair shops, physical therapists, accountants, restaurants and more — in any city across the US, Mexico, Spain, or anywhere else.",
+      "items": ["Barbershops","Dental Clinics","Auto Repair","Physical Therapists","Hair Salons","Accountants","Gyms","Restaurants","Beauty Centers","Opticians","Remodeling","Psychologists","Plumbers","Electricians","Nutritionists","Photographers"],
+      "customNote": "Don't see your niche? Huntly also accepts custom searches — type any sector or business type."
     },
     "pricingSection": {
       "label": "Pricing",
@@ -89,6 +139,8 @@
       "titleHighlight": " Real clients.",
       "valueNote": "One web client can bring you $200 or more. Huntly Go costs $9.",
       "valueHighlight": "Close just one and the plan pays for itself 20 times over.",
+      "valueCalloutTitle": "you recover your investment with your first web sale.",
+      "valueCalloutBody": "Huntly users pay $9/month. A single website is worth $200 or more. Close one and the plan is paid for 20 times over.",
       "mostPopular": "Most popular"
     },
     "faq": {
@@ -96,6 +148,7 @@
       "title": "Frequently asked questions"
     },
     "finalCta": {
+      "label": "Start now",
       "title1": "Your next web client",
       "title2": "is on Google Maps right now.",
       "subtitle": "Huntly finds them. You reach out. Done.",
@@ -107,7 +160,10 @@
     "footer": {
       "howItWorks": "How it works",
       "pricing": "Pricing",
-      "contact": "Contact"
+      "contact": "Contact",
+      "freelancers": "Web freelancers",
+      "agencies": "Web agencies",
+      "guide": "Prospecting guide"
     }
   },
   "plans": {

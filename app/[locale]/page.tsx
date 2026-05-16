@@ -10,18 +10,6 @@ import CursorGlow from "./CursorGlow";
 import Reveal from "./Reveal";
 import AnimatedSteps from "./AnimatedSteps";
 
-const TICKER_ITEMS = [
-  { name: "Barbería El Rincón", city: "Madrid", rating: "4.8" },
-  { name: "Clínica Dental Arco", city: "Valencia", rating: "4.6" },
-  { name: "Taller Mecánico Castro", city: "Barcelona", rating: "4.3" },
-  { name: "Peluquería Avant", city: "Sevilla", rating: "4.9" },
-  { name: "Reformas González", city: "Bilbao", rating: "4.5" },
-  { name: "Fisio Centro Norte", city: "Zaragoza", rating: "4.7" },
-  { name: "Estética Luna", city: "Málaga", rating: "4.8" },
-  { name: "CrossFit Zona Sur", city: "Murcia", rating: "4.4" },
-  { name: "Gestoría Pérez", city: "Alicante", rating: "4.5" },
-  { name: "Óptica Central", city: "Granada", rating: "4.7" },
-];
 
 const GRAIN_SVG = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`;
 
@@ -76,23 +64,19 @@ export default async function LandingPage() {
   ];
 
   const FAQS = tFaqs.raw("faqs") as Array<{ q: string; a: string }>;
+  const TICKER_ITEMS = t.raw("ticker.items") as Array<{ name: string; city: string; rating: string }>;
+  const NICHE_ITEMS = t.raw("nichesSection.items") as string[];
 
   const HOW_IT_WORKS = [
-    {
-      n: "01",
-      title: t("howItWorks.step1Title"),
-      desc: "Selecciona el tipo de negocio — barberías, clínicas dentales, talleres mecánicos, restaurantes, fisioterapeutas y más de 35 nichos — y la ciudad o barrio donde quieres prospectar.",
-    },
-    {
-      n: "02",
-      title: t("howItWorks.step2Title"),
-      desc: "Huntly analiza Google Maps, filtra los negocios locales sin página web, extrae su teléfono disponible y les asigna un score de oportunidad según reseñas, valoración y actividad.",
-    },
-    {
-      n: "03",
-      title: t("howItWorks.step3Title"),
-      desc: "Llama directamente, envía un WhatsApp con el mensaje de apertura generado automáticamente o guarda el lead en tu cartera de clientes. Todo en una sola pantalla.",
-    },
+    { n: "01", title: t("howItWorks.step1Title"), desc: t("howItWorks.step1Desc") },
+    { n: "02", title: t("howItWorks.step2Title"), desc: t("howItWorks.step2Desc") },
+    { n: "03", title: t("howItWorks.step3Title"), desc: t("howItWorks.step3Desc") },
+  ];
+
+  const AUDIENCE = [
+    { num: "01", emoji: "🧑‍💻", title: t("audience.audience1Title"), desc: t("audience.audience1Desc"), stat: t("audience.audience1Stat"), color: "#a78bfa", cta: t("audience.audience1Cta") },
+    { num: "02", emoji: "🏢",    title: t("audience.audience2Title"), desc: t("audience.audience2Desc"), stat: t("audience.audience2Stat"), color: "#e879f9", cta: t("audience.audience2Cta") },
+    { num: "03", emoji: "⚡",    title: t("audience.audience3Title"), desc: t("audience.audience3Desc"), stat: t("audience.audience3Stat"), color: "#38bdf8", cta: t("audience.audience3Cta") },
   ];
 
   return (
@@ -271,12 +255,12 @@ export default async function LandingPage() {
               {/* Desktop: 3-col grid */}
               <div className="hidden md:grid grid-cols-[1fr_auto_1fr] gap-6 items-start">
                 <div className="flex flex-col gap-4">
-                  <p className="font-black tracking-tighter leading-none text-center" style={{ fontSize: "clamp(22px, 3vw, 36px)", color: "rgba(248,113,113,0.55)" }}>Sin Huntly</p>
+                  <p className="font-black tracking-tighter leading-none text-center" style={{ fontSize: "clamp(22px, 3vw, 36px)", color: "rgba(248,113,113,0.55)" }}>{t("comparison.withoutTitle")}</p>
                   <div className="w-full rounded-2xl overflow-hidden" style={{ border: "1px solid rgba(248,113,113,0.12)" }}>
-                    <img src="/maps.png" alt="Búsqueda manual en Google Maps" className="w-full block" style={{ opacity: 0.8 }} />
+                    <img src="/maps.png" alt={t("comparison.withoutImgAlt")} className="w-full block" style={{ opacity: 0.8 }} />
                   </div>
                   <p className="text-center font-semibold" style={{ fontSize: "clamp(13px, 1.5vw, 16px)", color: "rgba(248,113,113,0.5)" }}>
-                    3–4 horas por semana<br /><span style={{ color: "rgba(248,113,113,0.35)", fontSize: "0.85em" }}>buscando a mano</span>
+                    {t("comparison.withoutStat")}<br /><span style={{ color: "rgba(248,113,113,0.35)", fontSize: "0.85em" }}>{t("comparison.withoutStatSub")}</span>
                   </p>
                 </div>
                 <div className="flex flex-col items-center justify-center gap-2 pt-10 self-stretch">
@@ -287,12 +271,12 @@ export default async function LandingPage() {
                   <div className="flex-1 w-px" style={{ background: "linear-gradient(to bottom, rgba(139,92,246,0.3), transparent)" }} />
                 </div>
                 <div className="flex flex-col gap-4">
-                  <p className="font-black tracking-tighter leading-none text-center text-white" style={{ fontSize: "clamp(22px, 3vw, 36px)", textShadow: "0 0 40px rgba(139,92,246,0.5)" }}>Con Huntly</p>
+                  <p className="font-black tracking-tighter leading-none text-center text-white" style={{ fontSize: "clamp(22px, 3vw, 36px)", textShadow: "0 0 40px rgba(139,92,246,0.5)" }}>{t("comparison.withTitle")}</p>
                   <div className="w-full rounded-2xl overflow-hidden" style={{ border: "1px solid rgba(139,92,246,0.22)", boxShadow: "0 0 40px rgba(139,92,246,0.10)" }}>
-                    <img src="/huntly.png" alt="Dashboard Huntly con leads filtrados" className="w-full block" />
+                    <img src="/huntly.png" alt={t("comparison.withImgAlt")} className="w-full block" />
                   </div>
                   <p className="text-center font-semibold text-violet-300" style={{ fontSize: "clamp(13px, 1.5vw, 16px)" }}>
-                    10 segundos por búsqueda<br /><span className="text-violet-400/60" style={{ fontSize: "0.85em" }}>leads listos para contactar</span>
+                    {t("comparison.withStat")}<br /><span className="text-violet-400/60" style={{ fontSize: "0.85em" }}>{t("comparison.withStatSub")}</span>
                   </p>
                 </div>
               </div>
@@ -300,11 +284,11 @@ export default async function LandingPage() {
               {/* Mobile: stacked */}
               <div className="md:hidden flex flex-col gap-5">
                 <div className="flex flex-col gap-3">
-                  <p className="font-black tracking-tighter text-center text-lg" style={{ color: "rgba(248,113,113,0.55)" }}>Sin Huntly</p>
+                  <p className="font-black tracking-tighter text-center text-lg" style={{ color: "rgba(248,113,113,0.55)" }}>{t("comparison.withoutTitle")}</p>
                   <div className="w-full rounded-2xl overflow-hidden" style={{ border: "1px solid rgba(248,113,113,0.12)" }}>
-                    <img src="/maps.png" alt="Búsqueda manual en Google Maps" className="w-full block" style={{ opacity: 0.8 }} />
+                    <img src="/maps.png" alt={t("comparison.withoutImgAlt")} className="w-full block" style={{ opacity: 0.8 }} />
                   </div>
-                  <p className="text-center text-sm font-semibold" style={{ color: "rgba(248,113,113,0.5)" }}>3–4 horas por semana buscando a mano</p>
+                  <p className="text-center text-sm font-semibold" style={{ color: "rgba(248,113,113,0.5)" }}>{t("comparison.withoutStatMobile")}</p>
                 </div>
 
                 {/* Down arrow */}
@@ -315,11 +299,11 @@ export default async function LandingPage() {
                 </div>
 
                 <div className="flex flex-col gap-3">
-                  <p className="font-black tracking-tighter text-center text-lg text-white" style={{ textShadow: "0 0 30px rgba(139,92,246,0.5)" }}>Con Huntly</p>
+                  <p className="font-black tracking-tighter text-center text-lg text-white" style={{ textShadow: "0 0 30px rgba(139,92,246,0.5)" }}>{t("comparison.withTitle")}</p>
                   <div className="w-full rounded-2xl overflow-hidden" style={{ border: "1px solid rgba(139,92,246,0.22)", boxShadow: "0 0 30px rgba(139,92,246,0.10)" }}>
-                    <img src="/huntly.png" alt="Dashboard Huntly con leads filtrados" className="w-full block" />
+                    <img src="/huntly.png" alt={t("comparison.withImgAlt")} className="w-full block" />
                   </div>
-                  <p className="text-center text-sm font-semibold text-violet-300">10 segundos por búsqueda · leads listos para contactar</p>
+                  <p className="text-center text-sm font-semibold text-violet-300">{t("comparison.withStatMobile")}</p>
                 </div>
               </div>
 
@@ -340,7 +324,7 @@ export default async function LandingPage() {
                 <span key={i} className="inline-flex items-center gap-3 mx-10 shrink-0">
                   <span className="inline-flex items-center gap-1 text-[9px] font-bold text-emerald-400 uppercase tracking-wider bg-emerald-500/10 border border-emerald-500/20 px-1.5 py-0.5 rounded-full">
                     <span className="w-1 h-1 rounded-full bg-emerald-400" />
-                    Sin web
+                    {t("ticker.noWeb")}
                   </span>
                   <span className="text-xs font-medium text-violet-200">{item.name}</span>
                   <span className="text-violet-700">·</span>
@@ -371,21 +355,21 @@ export default async function LandingPage() {
                   className="font-black tracking-tighter leading-[1.0] text-white mb-14 max-w-3xl"
                   style={{ fontSize: "clamp(24px, 4vw, 48px)" }}
                 >
-                  ¿Cuántas horas llevas<br />
-                  <span className="text-violet-300">buscando clientes en Google Maps?</span>
+                  {t("problem.headline1")}<br />
+                  <span className="text-violet-300">{t("problem.headline2")}</span>
                 </h2>
               </Reveal>
               <div className="space-y-5 md:space-y-6">
-                <Reveal delay={0}><p className="font-black tracking-tighter leading-tight text-violet-400/80" style={{ fontSize: "clamp(18px, 2.5vw, 30px)" }}>Otra vez abrir Maps.</p></Reveal>
-                <Reveal delay={60}><p className="font-black tracking-tighter leading-tight text-violet-300" style={{ fontSize: "clamp(21px, 3vw, 38px)" }}>Otra vez revisar si tienen web.</p></Reveal>
-                <Reveal delay={120}><p className="font-black tracking-tighter leading-tight text-violet-100" style={{ fontSize: "clamp(24px, 3.5vw, 44px)" }}>Otra vez copiar el teléfono.</p></Reveal>
-                <Reveal delay={180}><p className="font-black tracking-tighter leading-tight text-white" style={{ fontSize: "clamp(27px, 4.2vw, 54px)" }}>Otra vez que no contesten.</p></Reveal>
+                <Reveal delay={0}><p className="font-black tracking-tighter leading-tight text-violet-400/80" style={{ fontSize: "clamp(18px, 2.5vw, 30px)" }}>{t("problem.pain1")}</p></Reveal>
+                <Reveal delay={60}><p className="font-black tracking-tighter leading-tight text-violet-300" style={{ fontSize: "clamp(21px, 3vw, 38px)" }}>{t("problem.pain2")}</p></Reveal>
+                <Reveal delay={120}><p className="font-black tracking-tighter leading-tight text-violet-100" style={{ fontSize: "clamp(24px, 3.5vw, 44px)" }}>{t("problem.pain3")}</p></Reveal>
+                <Reveal delay={180}><p className="font-black tracking-tighter leading-tight text-white" style={{ fontSize: "clamp(27px, 4.2vw, 54px)" }}>{t("problem.pain4")}</p></Reveal>
                 <Reveal delay={240}>
                   <p
                     className="font-black tracking-tighter leading-tight"
                     style={{ fontSize: "clamp(38px, 6vw, 76px)", color: "#f87171", textShadow: "0 0 80px rgba(248,113,113,0.25)" }}
                   >
-                    Horas<br />sin facturar.
+                    {t("problem.painFinal1")}<br />{t("problem.painFinal2")}
                   </p>
                 </Reveal>
               </div>
@@ -448,13 +432,13 @@ export default async function LandingPage() {
                   <SignedOut>
                     <SignInButton mode="modal">
                       <button className="inline-flex items-center gap-2 px-6 py-3 bg-violet-600 hover:bg-violet-500 text-white font-semibold rounded-xl transition-colors text-sm shadow-[0_0_24px_rgba(139,92,246,0.3)]">
-                        Probarlo gratis <ArrowRight className="w-4 h-4" />
+                        {t("howItWorks.ctaFree")} <ArrowRight className="w-4 h-4" />
                       </button>
                     </SignInButton>
                   </SignedOut>
                   <SignedIn>
                     <Link href="/dashboard" className="inline-flex items-center gap-2 px-6 py-3 bg-violet-600 hover:bg-violet-500 text-white font-semibold rounded-xl transition-colors text-sm shadow-[0_0_24px_rgba(139,92,246,0.3)]">
-                      Ir al dashboard <ArrowRight className="w-4 h-4" />
+                      {t("howItWorks.ctaDashboard")} <ArrowRight className="w-4 h-4" />
                     </Link>
                   </SignedIn>
                 </div>
@@ -481,35 +465,7 @@ export default async function LandingPage() {
 
               {/* Editorial rows */}
               <div className="space-y-0">
-                {[
-                  {
-                    num: "01",
-                    emoji: "🧑‍💻",
-                    title: "Freelancers de diseño web",
-                    desc: "Prospecta en 5 minutos lo que antes te llevaba horas revisando Google Maps a mano. Encuentra negocios locales sin web listos para contratar.",
-                    stat: "20+ leads listos en menos de 30 segundos",
-                    color: "#a78bfa",
-                    cta: "Encontrar mi primer cliente",
-                  },
-                  {
-                    num: "02",
-                    emoji: "🏢",
-                    title: "Agencias web pequeñas",
-                    desc: "Llena tu pipeline de oportunidades de venta sin contratar a nadie para prospección. Búsquedas ilimitadas por ciudad y nicho.",
-                    stat: "Pipeline lleno sin contratar a nadie",
-                    color: "#e879f9",
-                    cta: "Llenar mi pipeline ahora",
-                  },
-                  {
-                    num: "03",
-                    emoji: "⚡",
-                    title: "Creadores web con IA",
-                    desc: "Haces webs en pocas horas con Framer, Webflow o herramientas de IA. Huntly te encuentra los clientes que todavía no las tienen.",
-                    stat: "Clientes que necesitan exactamente lo que ofreces",
-                    color: "#38bdf8",
-                    cta: "Buscar clientes sin web",
-                  },
-                ].map((item, i) => (
+                {AUDIENCE.map((item, i) => (
                   <Reveal key={i} delay={i * 70}>
                     <div
                       className="group relative py-10 md:py-12"
@@ -602,21 +558,16 @@ export default async function LandingPage() {
           <section className="px-6 py-16 md:py-20" style={{ background: BG.alt }}>
             <div className="max-w-5xl mx-auto">
               <Reveal>
-                <p className="text-[10px] font-mono text-violet-400 uppercase tracking-widest mb-4">Dónde funciona</p>
+                <p className="text-[10px] font-mono text-violet-400 uppercase tracking-widest mb-4">{t("nichesSection.label")}</p>
                 <h2 className="font-black tracking-tighter text-white mb-3" style={{ fontSize: "clamp(20px, 2.8vw, 36px)" }}>
-                  Más de 35 nichos. Cualquier ciudad.
+                  {t("nichesSection.title")}
                 </h2>
                 <p className="text-sm text-violet-200 mb-10 max-w-xl leading-relaxed">
-                  Barberías, clínicas dentales, talleres mecánicos, fisioterapeutas, gestorías, restaurantes y más — en Madrid, Barcelona, Valencia, Sevilla, México DF, Buenos Aires o la ciudad que elijas.
+                  {t("nichesSection.desc")}
                 </p>
               </Reveal>
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
-                {[
-                  "Barberías","Clínicas Dentales","Talleres Mecánicos","Fisioterapeutas",
-                  "Peluquerías","Gestorías","Gimnasios","Restaurantes",
-                  "Centros de Estética","Ópticas","Reformas","Psicólogos",
-                  "Fontaneros","Electricistas","Nutricionistas","Fotógrafos",
-                ].map((niche) => (
+                {NICHE_ITEMS.map((niche) => (
                   <div
                     key={niche}
                     className="flex items-center gap-2 px-3 py-2 rounded-lg border border-violet-500/[0.10] text-xs text-violet-300 font-medium"
@@ -629,7 +580,7 @@ export default async function LandingPage() {
               </div>
               <Reveal delay={80}>
                 <p className="text-xs text-violet-500 mt-6">
-                  ¿No ves tu nicho? Huntly también acepta búsquedas personalizadas — escribe cualquier sector o tipo de negocio.
+                  {t("nichesSection.customNote")}
                 </p>
               </Reveal>
             </div>
@@ -668,10 +619,10 @@ export default async function LandingPage() {
                     </div>
                     <div>
                       <p className="text-white font-semibold text-sm leading-snug mb-1">
-                        recuperas la inversión con tu primera venta web.
+                        {t("pricingSection.valueCalloutTitle")}
                       </p>
                       <p className="text-violet-200 text-xs leading-relaxed">
-                        Los usuarios de Huntly pagan <span className="text-violet-100">$9 al mes</span>. Una sola web vale 200€ o más. Cierra uno y el plan está pagado 20 veces.
+                        {t("pricingSection.valueCalloutBody")}
                       </p>
                     </div>
                   </div>
@@ -843,7 +794,7 @@ export default async function LandingPage() {
             />
             <div className="relative max-w-4xl mx-auto">
               <Reveal>
-                <p className="text-[10px] font-mono text-violet-400 uppercase tracking-widest mb-8">Empieza ahora</p>
+                <p className="text-[10px] font-mono text-violet-400 uppercase tracking-widest mb-8">{t("finalCta.label")}</p>
                 <h2
                   className="font-black tracking-tighter leading-[0.95] text-white mb-5"
                   style={{ fontSize: "clamp(28px, 5vw, 66px)" }}
@@ -894,9 +845,9 @@ export default async function LandingPage() {
               <div className="flex flex-wrap items-center gap-4 md:gap-6 text-sm text-violet-400/75">
                 <Link href="#como-funciona" className="hover:text-violet-200 transition-colors">{t("footer.howItWorks")}</Link>
                 <Link href="#precios" className="hover:text-violet-200 transition-colors">{t("footer.pricing")}</Link>
-                <Link href="/es/para-freelancers" className="hover:text-violet-200 transition-colors">Freelancers web</Link>
-                <Link href="/es/para-agencias" className="hover:text-violet-200 transition-colors">Agencias web</Link>
-                <Link href="/es/blog/conseguir-clientes-web" className="hover:text-violet-200 transition-colors">Guía de prospección</Link>
+                <Link href="/es/para-freelancers" className="hover:text-violet-200 transition-colors">{t("footer.freelancers")}</Link>
+                <Link href="/es/para-agencias" className="hover:text-violet-200 transition-colors">{t("footer.agencies")}</Link>
+                <Link href="/es/blog/conseguir-clientes-web" className="hover:text-violet-200 transition-colors">{t("footer.guide")}</Link>
                 <Link href="mailto:huntly@outlook.es" className="hover:text-violet-200 transition-colors">{t("footer.contact")}</Link>
               </div>
               <p className="text-sm text-violet-300/20">© {new Date().getFullYear()} Huntly</p>

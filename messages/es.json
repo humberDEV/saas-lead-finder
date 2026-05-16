@@ -33,7 +33,31 @@
       "call": "Llamar"
     },
     "ticker": {
-      "noWeb": "SIN WEB"
+      "noWeb": "Sin web",
+      "items": [
+        { "name": "Barbería El Rincón", "city": "Madrid", "rating": "4.8" },
+        { "name": "Clínica Dental Arco", "city": "Valencia", "rating": "4.6" },
+        { "name": "Taller Mecánico Castro", "city": "Barcelona", "rating": "4.3" },
+        { "name": "Peluquería Avant", "city": "Sevilla", "rating": "4.9" },
+        { "name": "Reformas González", "city": "Bilbao", "rating": "4.5" },
+        { "name": "Fisio Centro Norte", "city": "Zaragoza", "rating": "4.7" },
+        { "name": "Estética Luna", "city": "Málaga", "rating": "4.8" },
+        { "name": "CrossFit Zona Sur", "city": "Murcia", "rating": "4.4" },
+        { "name": "Gestoría Pérez", "city": "Alicante", "rating": "4.5" },
+        { "name": "Óptica Central", "city": "Granada", "rating": "4.7" }
+      ]
+    },
+    "comparison": {
+      "withoutTitle": "Sin Huntly",
+      "withoutImgAlt": "Búsqueda manual en Google Maps",
+      "withoutStat": "3–4 horas por semana",
+      "withoutStatSub": "buscando a mano",
+      "withoutStatMobile": "3–4 horas por semana buscando a mano",
+      "withTitle": "Con Huntly",
+      "withImgAlt": "Dashboard Huntly con leads filtrados",
+      "withStat": "10 segundos por búsqueda",
+      "withStatSub": "leads listos para contactar",
+      "withStatMobile": "10 segundos por búsqueda · leads listos para contactar"
     },
     "statBar": {
       "stat1": "+680 ciudades disponibles",
@@ -42,6 +66,14 @@
     },
     "problem": {
       "label": "El problema",
+      "headline1": "¿Cuántas horas llevas",
+      "headline2": "buscando clientes en Google Maps?",
+      "pain1": "Otra vez abrir Maps.",
+      "pain2": "Otra vez revisar si tienen web.",
+      "pain3": "Otra vez copiar el teléfono.",
+      "pain4": "Otra vez que no contesten.",
+      "painFinal1": "Horas",
+      "painFinal2": "sin facturar.",
       "title1": "Buscar clientes a mano",
       "title2": "es tiempo que no factura.",
       "subtitle": "Cada hora revisando Google Maps es una hora que no estás vendiendo webs ni entregando proyectos.",
@@ -65,10 +97,15 @@
       "titleHighlight": " Nada más.",
       "step1Title": "Elige nicho y ciudad",
       "step1Note": "Barberías en Madrid, clínicas en Valencia o cualquier sector local.",
+      "step1Desc": "Selecciona el tipo de negocio — barberías, clínicas dentales, talleres mecánicos, restaurantes, fisioterapeutas y más de 35 nichos — y la ciudad o barrio donde quieres prospectar.",
       "step2Title": "Huntly filtra oportunidades",
       "step2Note": "Detecta negocios sin web, con teléfono disponible y señales de actividad.",
+      "step2Desc": "Huntly analiza Google Maps, filtra los negocios locales sin página web, extrae su teléfono disponible y les asigna un score de oportunidad según reseñas, valoración y actividad.",
       "step3Title": "Contacta y haz seguimiento",
       "step3Note": "Envía un WhatsApp, llama o guarda el negocio en tu cartera y ciérralo.",
+      "step3Desc": "Llama directamente, envía un WhatsApp con el mensaje de apertura generado automáticamente o guarda el lead en tu cartera de clientes. Todo en una sola pantalla.",
+      "ctaFree": "Probarlo gratis",
+      "ctaDashboard": "Ir al dashboard",
       "step3Message": "Mensaje generado:",
       "step3Preview": "\"Me dedico al diseño web y vi que tienen 47 reseñas pero no tienen página...\"",
       "call": "Llamar"
@@ -76,12 +113,25 @@
     "audience": {
       "label": "Para quién es",
       "title": "Hecho para gente que vende webs.",
-      "audience1Title": "Freelancers web",
-      "audience1Desc": "Prospecta en 5 minutos lo que antes te llevaba horas en Google Maps.",
-      "audience2Title": "Agencias pequeñas",
-      "audience2Desc": "Llena tu pipeline de oportunidades sin contratar a nadie para prospección.",
-      "audience3Title": "Creadores de webs con IA",
-      "audience3Desc": "Creas webs en horas. Huntly te encuentra los clientes que todavía no las tienen."
+      "audience1Title": "Freelancers de diseño web",
+      "audience1Desc": "Prospecta en 5 minutos lo que antes te llevaba horas revisando Google Maps a mano. Encuentra negocios locales sin web listos para contratar.",
+      "audience1Stat": "20+ leads listos en menos de 30 segundos",
+      "audience1Cta": "Encontrar mi primer cliente",
+      "audience2Title": "Agencias web pequeñas",
+      "audience2Desc": "Llena tu pipeline de oportunidades de venta sin contratar a nadie para prospección. Búsquedas ilimitadas por ciudad y nicho.",
+      "audience2Stat": "Pipeline lleno sin contratar a nadie",
+      "audience2Cta": "Llenar mi pipeline ahora",
+      "audience3Title": "Creadores web con IA",
+      "audience3Desc": "Haces webs en pocas horas con Framer, Webflow o herramientas de IA. Huntly te encuentra los clientes que todavía no las tienen.",
+      "audience3Stat": "Clientes que necesitan exactamente lo que ofreces",
+      "audience3Cta": "Buscar clientes sin web"
+    },
+    "nichesSection": {
+      "label": "Dónde funciona",
+      "title": "Más de 35 nichos. Cualquier ciudad.",
+      "desc": "Barberías, clínicas dentales, talleres mecánicos, fisioterapeutas, gestorías, restaurantes y más — en Madrid, Barcelona, Valencia, Sevilla, México DF, Buenos Aires o la ciudad que elijas.",
+      "items": ["Barberías","Clínicas Dentales","Talleres Mecánicos","Fisioterapeutas","Peluquerías","Gestorías","Gimnasios","Restaurantes","Centros de Estética","Ópticas","Reformas","Psicólogos","Fontaneros","Electricistas","Nutricionistas","Fotógrafos"],
+      "customNote": "¿No ves tu nicho? Huntly también acepta búsquedas personalizadas — escribe cualquier sector o tipo de negocio."
     },
     "pricingSection": {
       "label": "Precios",
@@ -89,6 +139,8 @@
       "titleHighlight": " Clientes de verdad.",
       "valueNote": "Un cliente web te puede generar $200 o más. Huntly Go cuesta $9.",
       "valueHighlight": "Con cerrar uno, el plan se paga más de 20 veces.",
+      "valueCalloutTitle": "recuperas la inversión con tu primera venta web.",
+      "valueCalloutBody": "Los usuarios de Huntly pagan $9 al mes. Una sola web vale 200€ o más. Cierra uno y el plan está pagado 20 veces.",
       "mostPopular": "Más popular"
     },
     "faq": {
@@ -96,6 +148,7 @@
       "title": "Preguntas frecuentes"
     },
     "finalCta": {
+      "label": "Empieza ahora",
       "title1": "Tu próximo cliente web",
       "title2": "está en Google Maps ahora mismo.",
       "subtitle": "Huntly lo encuentra. Tú lo contactas. Cerrado.",
@@ -107,7 +160,10 @@
     "footer": {
       "howItWorks": "Cómo funciona",
       "pricing": "Precios",
-      "contact": "Contacto"
+      "contact": "Contacto",
+      "freelancers": "Freelancers web",
+      "agencies": "Agencias web",
+      "guide": "Guía de prospección"
     }
   },
   "plans": {

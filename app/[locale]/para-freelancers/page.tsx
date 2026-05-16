@@ -1,6 +1,4 @@
 import Link from "next/link";
-import { auth } from "@clerk/nextjs/server";
-import { redirect } from "next/navigation";
 import { SignedIn, SignedOut, SignInButton } from "@clerk/nextjs";
 import { ArrowRight, CheckCircle, Sparkles } from "lucide-react";
 import type { Metadata } from "next";
@@ -73,10 +71,7 @@ const FAQS = [
   },
 ];
 
-export default async function ParaFreelancersPage() {
-  const { userId } = await auth();
-  if (userId) redirect("/dashboard");
-
+export default function ParaFreelancersPage() {
   return (
     <div className="min-h-screen text-white antialiased" style={{ background: BG.base }}>
       <script
