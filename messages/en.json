@@ -231,9 +231,10 @@
     },
     "search": {
       "nicheLabel": "1. Niche",
-      "randomNiche": "RANDOM NICHE",
+      "randomNiche": "RANDOM",
       "zoneLabel": "2. Neighborhood / Zone",
-      "randomZone": "RANDOM ZONE",
+      "randomZone": "RANDOM",
+      "mapPicker": "Map",
       "customNiche": "✍️ Type manually",
       "customNichePlaceholder": "E.g.: Auto body shops",
       "cityPlaceholder": "E.g.: Downtown, Miami",

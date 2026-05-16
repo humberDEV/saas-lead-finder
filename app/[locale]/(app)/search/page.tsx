@@ -985,7 +985,7 @@ export default function Dashboard() {
                           onClick={() => setShowMapPicker(true)}
                           className="text-indigo-400 hover:text-indigo-300 text-[10px] flex items-center gap-1"
                         >
-                          <MapPinIcon className="w-3 h-3" /> Elegir en mapa
+                          <MapPinIcon className="w-3 h-3" /> {tSearch("mapPicker")}
                         </button>
                         <button
                           type="button"

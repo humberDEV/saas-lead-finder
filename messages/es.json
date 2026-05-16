@@ -231,9 +231,10 @@
     },
     "search": {
       "nicheLabel": "1. Nicho",
-      "randomNiche": "NICHO RANDOM",
+      "randomNiche": "ALEATORIO",
       "zoneLabel": "2. Barrio / Zona",
-      "randomZone": "ZONA RANDOM",
+      "randomZone": "ALEATORIO",
+      "mapPicker": "Mapa",
       "customNiche": "✍️ Escribir manualmente",
       "customNichePlaceholder": "Ej: Talleres de chapa y pintura",
       "cityPlaceholder": "Ej: Gràcia, Barcelona",
