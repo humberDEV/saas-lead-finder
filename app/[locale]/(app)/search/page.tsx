@@ -39,7 +39,7 @@ interface PaywallStats {
 
 import { useFlashOffer, startFlashOffer, FLASH_COUPON } from "@/hooks/useFlashOffer";
 
-function PaywallModal({ onClose }: { onClose: () => void }) {
+function PaywallModal({ onClose, source = "default" }: { onClose: () => void; source?: "default" | "message" }) {
   const tPw = useTranslations("paywall");
   const [loadingCheckout, setLoadingCheckout] = useState(false);
   const [loadingFlash, setLoadingFlash] = useState(false);
@@ -79,15 +79,36 @@ function PaywallModal({ onClose }: { onClose: () => void }) {
     <div>
       {/* Header */}
       <div className="mb-5">
-        <p className="text-[10px] font-black text-amber-400/90 uppercase tracking-widest mb-2">
-          {tPw("used")}
-        </p>
-        <h2 className="text-xl font-black text-white leading-tight">
-          {tPw("title")}
-        </h2>
-        <p className="text-sm text-zinc-400 mt-1">
-          {tPw("subtitle")}
-        </p>
+        {source === "message" ? (
+          <>
+            <div className="flex items-center gap-2 mb-3">
+              <div className="w-8 h-8 rounded-xl bg-indigo-500/15 border border-indigo-500/30 flex items-center justify-center shrink-0">
+                <Sparkles className="w-4 h-4 text-indigo-400" />
+              </div>
+              <p className="text-[10px] font-black text-indigo-400/90 uppercase tracking-widest">
+                Función exclusiva
+              </p>
+            </div>
+            <h2 className="text-xl font-black text-white leading-tight">
+              El mensaje personalizado con IA es exclusivo del plan Go
+            </h2>
+            <p className="text-sm text-zinc-400 mt-1">
+              Desbloquea mensajes listos para enviar y 40 búsquedas al mes.
+            </p>
+          </>
+        ) : (
+          <>
+            <p className="text-[10px] font-black text-amber-400/90 uppercase tracking-widest mb-2">
+              {tPw("used")}
+            </p>
+            <h2 className="text-xl font-black text-white leading-tight">
+              {tPw("title")}
+            </h2>
+            <p className="text-sm text-zinc-400 mt-1">
+              {tPw("subtitle")}
+            </p>
+          </>
+        )}
       </div>
 
       {/* Personalized stats */}
@@ -270,21 +291,33 @@ export default function Dashboard() {
 
   // Paywall modal
   const [showPaywallModal, setShowPaywallModal] = useState(false);
+  const [paywallSource, setPaywallSource] = useState<"default" | "message">("default");
   const [fakeLoading, setFakeLoading] = useState(false);
   const [showNoLeadsNotice, setShowNoLeadsNotice] = useState(false);
 
-  const triggerPaywall = () => {
-    startFlashOffer(); // arranca el timer de 10 min la primera vez que llega a 0 créditos
-    setFakeLoading(true);
-    setTimeout(() => {
-      setFakeLoading(false);
+  const triggerPaywall = (source: "default" | "message" = "default") => {
+    setPaywallSource(source);
+    startFlashOffer();
+    if (source === "message") {
+      // Immediate open — the user already sees the lead, no need for fake loading
       setShowPaywallModal(true);
       fetch("/api/events", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ event: "paywall_viewed", properties: { source: "dashboard_button" } }),
+        body: JSON.stringify({ event: "paywall_viewed", properties: { source: "message_lock" } }),
       }).catch(() => {});
-    }, 1500);
+    } else {
+      setFakeLoading(true);
+      setTimeout(() => {
+        setFakeLoading(false);
+        setShowPaywallModal(true);
+        fetch("/api/events", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ event: "paywall_viewed", properties: { source: "dashboard_button" } }),
+        }).catch(() => {});
+      }, 1500);
+    }
   };
 
 
@@ -417,7 +450,7 @@ export default function Dashboard() {
     if (phone) {
       const cleanPhone = phone.replace(/[^0-9+]/g, "");
       if (action === "whatsapp") {
-        window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(text)}`, "_blank");
+        window.open(`https://wa.me/${cleanPhone}`, "_blank");
       } else if (action === "call") {
         window.location.href = `tel:${cleanPhone}`;
       }
@@ -620,41 +653,70 @@ export default function Dashboard() {
 
         {(place.score >= 40 || !place.has_website) && place.phone && (
           <div className="mt-8 pt-6 border-t border-neutral-800/50">
-            <label className="block text-xs font-black text-indigo-400 uppercase tracking-wider mb-3">
+            <label className="flex items-center gap-1.5 text-xs font-black text-indigo-400 uppercase tracking-wider mb-3">
+              <Sparkles className="w-3.5 h-3.5 shrink-0" />
               {tResults("openingMessage")}
             </label>
-            <div className="relative mb-4">
-              <textarea
-                readOnly
-                className="w-full text-sm font-medium text-slate-300 bg-black/40 border border-neutral-800 rounded-xl p-5 resize-none h-28 focus:outline-none focus:border-indigo-500/50 transition-colors"
-                value={place.suggestedMessage}
-              />
-            </div>
-            <div className="flex flex-wrap gap-3 justify-end">
-              {place.has_whatsapp && (
-                <button
-                  onClick={() => copyAndAction(place.suggestedMessage, index, place.phone, "whatsapp")}
-                  className="group relative flex items-center gap-2 px-6 py-3 bg-emerald-500 hover:bg-emerald-400 text-black text-sm font-black rounded-xl transition-all shadow-[0_0_20px_rgba(16,185,129,0.2)] hover:shadow-[0_0_30px_rgba(16,185,129,0.4)]"
-                >
-                  {copiedIndex === index ? <CopyCheck className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-                  {tResults("waDirect")}
-                </button>
-              )}
-              <button
-                onClick={() => copyAndAction(place.suggestedMessage, index, place.phone, "call")}
-                className="flex items-center gap-2 px-6 py-3 bg-neutral-800 hover:bg-neutral-700 text-white text-sm font-bold rounded-xl transition-all"
+
+            {plan === "free" ? (
+              // ── Blurred message + paywall trigger ───────────────────────
+              <div
+                className="relative mb-4 cursor-pointer group/msg"
+                onClick={() => triggerPaywall("message")}
               >
-                {tResults("callDirect")}
-              </button>
-            </div>
-            <div className="flex border-t border-neutral-800/60 pt-4 mt-4 gap-2">
+                <textarea
+                  readOnly
+                  tabIndex={-1}
+                  aria-hidden
+                  className="w-full text-sm font-medium text-slate-300 bg-black/40 border border-neutral-800 rounded-xl p-5 resize-none h-28 focus:outline-none pointer-events-none select-none blur-md opacity-60"
+                  value={place.suggestedMessage}
+                />
+                <div className="absolute inset-0 flex items-center justify-center rounded-xl bg-black/25 group-hover/msg:bg-black/40 transition-colors">
+                  <div className="flex items-center gap-2 px-4 py-2.5 bg-indigo-600 group-hover/msg:bg-indigo-500 rounded-xl shadow-[0_0_24px_rgba(99,102,241,0.35)] transition-all">
+                    <Sparkles className="w-3.5 h-3.5 text-white" />
+                    <span className="text-sm font-black text-white">Plan Go — Desbloquear</span>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              // ── Full message for paid users ──────────────────────────────
+              <>
+                <div className="relative mb-4">
+                  <textarea
+                    readOnly
+                    className="w-full text-sm font-medium text-slate-300 bg-black/40 border border-neutral-800 rounded-xl p-5 resize-none h-28 focus:outline-none focus:border-indigo-500/50 transition-colors"
+                    value={place.suggestedMessage}
+                  />
+                </div>
+                <div className="flex flex-wrap gap-3 justify-end mb-4">
+                  {place.has_whatsapp && (
+                    <button
+                      onClick={() => copyAndAction(place.suggestedMessage, index, place.phone, "whatsapp")}
+                      className="group relative flex items-center gap-2 px-6 py-3 bg-emerald-500 hover:bg-emerald-400 text-black text-sm font-black rounded-xl transition-all shadow-[0_0_20px_rgba(16,185,129,0.2)] hover:shadow-[0_0_30px_rgba(16,185,129,0.4)]"
+                    >
+                      {copiedIndex === index ? <CopyCheck className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                      {tResults("waDirect")}
+                    </button>
+                  )}
+                  <button
+                    onClick={() => copyAndAction(place.suggestedMessage, index, place.phone, "call")}
+                    className="flex items-center gap-2 px-6 py-3 bg-neutral-800 hover:bg-neutral-700 text-white text-sm font-bold rounded-xl transition-all"
+                  >
+                    {tResults("callDirect")}
+                  </button>
+                </div>
+              </>
+            )}
+
+            <div className="flex border-t border-neutral-800/60 pt-4 mt-2 gap-2">
               {plan === "free" ? (
-                <Link
-                  href="/pricing"
-                  className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 bg-amber-500/10 hover:bg-amber-500/20 rounded-lg text-xs font-semibold transition-all text-amber-400 border border-amber-500/20 hover:border-amber-500/40"
+                <button
+                  onClick={() => triggerPaywall("message")}
+                  className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 bg-indigo-500/10 hover:bg-indigo-500/20 rounded-lg text-xs font-semibold transition-all text-indigo-400 border border-indigo-500/20 hover:border-indigo-500/40"
                 >
+                  <Sparkles className="w-3 h-3" />
                   {tResults("savePro")}
-                </Link>
+                </button>
               ) : (
                 <button
                   onClick={() => handleSaveLead(index, place)}
@@ -724,7 +786,7 @@ export default function Dashboard() {
                     </svg>
                   </button>
                 </div>
-                <PaywallModal onClose={() => setShowPaywallModal(false)} />
+                <PaywallModal onClose={() => setShowPaywallModal(false)} source={paywallSource} />
               </div>
             </motion.div>
           </motion.div>
