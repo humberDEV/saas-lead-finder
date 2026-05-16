@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useTranslations } from "next-intl";
 import { X, Loader2, MapPin } from "lucide-react";
 
 interface MapPickerModalProps {
@@ -9,9 +10,10 @@ interface MapPickerModalProps {
 }
 
 export default function MapPickerModal({ onClose, onSelect }: MapPickerModalProps) {
+  const t = useTranslations("mapPicker");
   const mapRef = useRef<HTMLDivElement>(null);
   const [loading, setLoading] = useState(false);
-  const [hint, setHint] = useState("Haz clic en cualquier punto del mapa");
+  const [hint, setHint] = useState<string | null>(null);
   const [detected, setDetected] = useState<string | null>(null);
 
   useEffect(() => {
@@ -33,7 +35,6 @@ export default function MapPickerModal({ onClose, onSelect }: MapPickerModalProp
       const maplibregl = (await import("maplibre-gl")).default;
       if (aborted || !mapRef.current) return;
 
-      // Detect user location
       let center: [number, number] = [10, 30];
       try {
         const geo = await fetch("https://ipapi.co/json/");
@@ -58,7 +59,6 @@ export default function MapPickerModal({ onClose, onSelect }: MapPickerModalProp
 
       mapInstance = map;
 
-      // Slow rotation to the right
       const spin = () => {
         if (!spinning || !mapInstance) return;
         map.setBearing((map.getBearing() + 0.08) % 360);
@@ -98,7 +98,7 @@ export default function MapPickerModal({ onClose, onSelect }: MapPickerModalProp
 
         setLoading(true);
         setDetected(null);
-        setHint("Detectando ciudad...");
+        setHint(t("detecting"));
 
         try {
           const res = await fetch(
@@ -117,10 +117,10 @@ export default function MapPickerModal({ onClose, onSelect }: MapPickerModalProp
             setHint(result);
             setTimeout(() => { onSelect(result); onClose(); }, 650);
           } else {
-            setHint("No hay ciudad en este punto, prueba otra zona");
+            setHint(t("noCity"));
           }
         } catch {
-          setHint("Error al detectar, inténtalo de nuevo");
+          setHint(t("error"));
         } finally {
           setLoading(false);
         }
@@ -140,7 +140,7 @@ export default function MapPickerModal({ onClose, onSelect }: MapPickerModalProp
       cancelAnimationFrame(rafId);
       if (mapInstance) { mapInstance.remove(); mapInstance = null; }
     };
-  }, [onClose, onSelect]);
+  }, [onClose, onSelect, t]);
 
   return (
     <>
@@ -181,14 +181,14 @@ export default function MapPickerModal({ onClose, onSelect }: MapPickerModalProp
                 <MapPin className="w-4 h-4 text-indigo-400" />
               </div>
               <div>
-                <p className="text-sm font-bold text-white">Elegir zona en el mapa</p>
+                <p className="text-sm font-bold text-white">{t("title")}</p>
                 <p className="text-xs mt-0.5 flex items-center gap-1.5">
                   {loading ? (
-                    <><Loader2 className="w-3 h-3 animate-spin text-indigo-400" /><span className="text-indigo-400">Detectando ciudad...</span></>
+                    <><Loader2 className="w-3 h-3 animate-spin text-indigo-400" /><span className="text-indigo-400">{t("detecting")}</span></>
                   ) : detected ? (
                     <span className="text-emerald-400 font-semibold">{detected}</span>
                   ) : (
-                    <span className="text-zinc-500">{hint}</span>
+                    <span className="text-zinc-500">{hint ?? t("hint")}</span>
                   )}
                 </p>
               </div>
@@ -203,9 +203,7 @@ export default function MapPickerModal({ onClose, onSelect }: MapPickerModalProp
           </div>
 
           <div className="px-5 py-3 border-t border-neutral-800/80 bg-neutral-900/50">
-            <p className="text-[11px] text-zinc-600 text-center">
-              Haz clic en cualquier zona para seleccionarla
-            </p>
+            <p className="text-[11px] text-zinc-600 text-center">{t("hint")}</p>
           </div>
         </div>
       </div>

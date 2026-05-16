@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { useUser } from "@clerk/nextjs";
+import { useTranslations, useLocale } from "next-intl";
 import { useSidebar } from "../SidebarContext";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -32,55 +33,6 @@ interface IntelligenceData {
   activityByDay: { date: string; searches: number; opportunities: number }[];
   topNiches: { niche: string; searches: number; whatsappRate: number; avgResults: number }[];
   recentSearches: RecentSearch[];
-}
-
-// ── Smart greeting (short, random, punchy) ───────────────────────────────────
-function getRandomGreeting(name: string): string {
-  const h = new Date().getHours();
-  const day = new Date().getDay();
-  const days = ["domingo","lunes","martes","miércoles","jueves","viernes","sábado"];
-  const D = days[day];
-  const DC = D.charAt(0).toUpperCase() + D.slice(1);
-  const tg =
-    h < 6  ? "Buena madrugada" :
-    h < 12 ? "Buenos días" :
-    h < 20 ? "Buenas tardes" : "Buenas noches";
-
-  const base = [
-    `${tg}, ${name}`,
-    `${name}, ${tg.toLowerCase()}`,
-    `Feliz ${D}`,
-    `${DC} de prospectar`,
-    `${DC} de enviar mensajes`,
-    `${DC} de llamadas en frío`,
-    `${DC} de cerrar clientes`,
-    `Vamos, ${name}`,
-    `${name}, a por ello`,
-    `Hay negocios sin web ahí fuera`,
-    `Tus próximos clientes te esperan`,
-    `Alguien necesita tu web hoy`,
-    `${DC} de convencer a alguien`,
-    `Google Maps está esperando`,
-    `${name}, ¿ya tienes el guion listo?`,
-    `${name}, empieza por una búsqueda`,
-    `${DC} de hacer magia con palabras`,
-    `Una búsqueda puede cambiarlo todo`,
-    `¿Listo para prospectar, ${name}?`,
-  ];
-
-  const extras: string[] = [];
-  if (day === 0) extras.push("Domingo estratégico", `${name}, hasta el domingo`);
-  if (day === 1) extras.push("Semana nueva, clientes nuevos", `Arranca el lunes, ${name}`, "Lunes. A por ello.");
-  if (day === 2) extras.push(`Martes de resultados, ${name}`);
-  if (day === 3) extras.push("Mitad de semana, a tope", `${name}, mitad de semana`);
-  if (day === 4) extras.push(`${DC}, casi lo tienes`, "Jueves. Casi el finde.", `${DC} de sprint final`);
-  if (day === 5) extras.push("Viernes. Termina fuerte.", `Último sprint, ${name}`, "Es viernes, a por ello");
-  if (day === 6) extras.push(`Sábado de prospección, ${name}`, "Prospectando el finde. Respeto.");
-  if (h < 6)  extras.push(`${name} madrugando. Respeto.`, `Madrugada de motivación, ${name}`);
-  if (h >= 22) extras.push(`Noche de prospección, ${name}`);
-
-  const pool = [...base, ...extras];
-  return pool[Math.floor(Math.random() * pool.length)];
 }
 
 // ── Typewriter ────────────────────────────────────────────────────────────────
@@ -118,22 +70,25 @@ function Typewriter({ text, speed = 28 }: { text: string; speed?: number }) {
 }
 
 // ── Activity bar chart ────────────────────────────────────────────────────────
-// Uses explicit px heights (not % — those break inside flex without a sized parent)
-const CHART_H = 72; // px, total bar area height
-const BAR_MAX = 60; // px, tallest possible bar
+const CHART_H = 72;
+const BAR_MAX = 60;
 
-function ActivityChart({ data }: { data: { date: string; opportunities: number }[] }) {
+function ActivityChart({
+  data,
+  emptyLabel,
+  locale,
+}: {
+  data: { date: string; opportunities: number }[];
+  emptyLabel: string;
+  locale: string;
+}) {
   const max = Math.max(...data.map((d) => d.opportunities), 1);
   const todayKey = new Date().toISOString().split("T")[0];
   const hasAny = data.some((d) => d.opportunities > 0);
 
   return (
     <div>
-      {/* Bar area */}
-      <div
-        className="flex items-end gap-[3px] w-full"
-        style={{ height: CHART_H }}
-      >
+      <div className="flex items-end gap-[3px] w-full" style={{ height: CHART_H }}>
         {data.map((d, i) => {
           const isToday = d.date === todayKey;
           const heightPx = d.opportunities > 0
@@ -143,7 +98,6 @@ function ActivityChart({ data }: { data: { date: string; opportunities: number }
           return (
             <motion.div
               key={d.date}
-              title={`${d.opportunities} oportunidades`}
               initial={{ height: 0 }}
               animate={{ height: heightPx }}
               transition={{ duration: 0.5, delay: i * 0.018, ease: "easeOut" }}
@@ -159,7 +113,6 @@ function ActivityChart({ data }: { data: { date: string; opportunities: number }
         })}
       </div>
 
-      {/* Axis labels — first, middle, last */}
       <div className="flex mt-2">
         {data.map((d, i) => {
           const show = i === 0 || i === 6 || i === 13;
@@ -171,7 +124,7 @@ function ActivityChart({ data }: { data: { date: string; opportunities: number }
                     d.date === todayKey ? "text-indigo-400 font-bold" : "text-zinc-700"
                   }`}
                 >
-                  {new Date(d.date + "T12:00:00").toLocaleDateString("es-ES", {
+                  {new Date(d.date + "T12:00:00").toLocaleDateString(locale, {
                     day: "numeric",
                     month: "short",
                   })}
@@ -183,9 +136,7 @@ function ActivityChart({ data }: { data: { date: string; opportunities: number }
       </div>
 
       {!hasAny && (
-        <p className="text-xs text-zinc-600 text-center mt-3">
-          Sin actividad en los últimos 14 días.
-        </p>
+        <p className="text-xs text-zinc-600 text-center mt-3">{emptyLabel}</p>
       )}
     </div>
   );
@@ -305,21 +256,30 @@ function getRelated(niche: string): string[] {
   return [];
 }
 
-// ── Recommendations ("you searched here → try there") ────────────────────────
+// ── Recommendations ───────────────────────────────────────────────────────────
 interface Rec {
   text: string;
   niche?: string;
   city?: string;
 }
 
-function buildRecs(d: IntelligenceData): Rec[] {
+interface RecT {
+  firstSearch: string;
+  defaultRec: string;
+  related: (niche: string, where: string, suggestion: string, extra: string) => string;
+  sameCity: (city: string) => string;
+  sameNiches: (count: number, city: string) => string;
+  inCity: (city: string) => string;
+  also: (suggestion: string) => string;
+}
+
+function buildRecs(d: IntelligenceData, tRec: RecT): Rec[] {
   if (d.totalSearches === 0) {
-    return [{ text: "Haz tu primera búsqueda para descubrir oportunidades en tu zona." }];
+    return [{ text: tRec.firstSearch }];
   }
 
   const recs: Rec[] = [];
 
-  // Most used niche → suggest a related niche they haven't tried
   const searchedNiches = new Set(d.topNiches.map((n) => n.niche.toLowerCase()));
   const topNiche = d.topNiches[0];
   if (topNiche) {
@@ -328,37 +288,31 @@ function buildRecs(d: IntelligenceData): Rec[] {
     );
     if (suggestions.length > 0) {
       const topCity = d.recentSearches[0]?.city;
-      const where = topCity ? ` en ${topCity}` : "";
+      const where = topCity ? tRec.inCity(topCity) : "";
       const suggested = suggestions[0];
-      const extra = suggestions[1] ? ` o ${suggestions[1]}` : "";
+      const extra = suggestions[1] ? tRec.also(suggestions[1]) : "";
       recs.push({
-        text: `Buscaste "${topNiche.niche}"${where}. Prueba también ${suggested}${extra} — suelen tener leads similares.`,
+        text: tRec.related(topNiche.niche, where, suggested, extra),
         niche: suggested,
         city: topCity,
       });
     }
   }
 
-  // If zone looks generic, suggest being more specific
   const topCity = d.recentSearches[0]?.city ?? "";
   const isGenericCity = topCity && !topCity.includes(",") && topCity.split(" ").length <= 2;
   const sameCity = d.recentSearches.length >= 2 &&
     d.recentSearches.every((s) => s.city.toLowerCase() === topCity.toLowerCase());
   if (isGenericCity && sameCity && recs.length < 2) {
-    recs.push({
-      text: `Has buscado varias veces en "${topCity}". Especificar el barrio o zona exacta suele mostrar negocios más locales y distintos.`,
-    });
+    recs.push({ text: tRec.sameCity(topCity) });
   }
 
-  // Multiple niches but same city → suggest another city
   if (d.topNiches.length >= 3 && sameCity && recs.length < 2) {
-    recs.push({
-      text: `Has probado ${d.topNiches.length} nichos en "${topCity}". Probar esos mismos nichos en otra ciudad puede darte muchas más oportunidades.`,
-    });
+    recs.push({ text: tRec.sameNiches(d.topNiches.length, topCity) });
   }
 
   if (recs.length === 0) {
-    recs.push({ text: "Prueba un nicho o zona diferente para ampliar tus oportunidades." });
+    recs.push({ text: tRec.defaultRec });
   }
 
   return recs.slice(0, 2);
@@ -386,6 +340,8 @@ function Skeleton() {
 export default function DashboardHome() {
   const { plan, credits } = useSidebar();
   const { user, isLoaded: userLoaded } = useUser();
+  const t = useTranslations("dashboardHome");
+  const locale = useLocale();
   const [data, setData] = useState<IntelligenceData | null>(null);
   const [loading, setLoading] = useState(true);
   const [greetingText, setGreetingText] = useState("");
@@ -399,14 +355,48 @@ export default function DashboardHome() {
   }, []);
 
   useEffect(() => {
-    if (userLoaded) {
-      const name = user?.firstName || user?.username || "ahí";
-      setGreetingText(getRandomGreeting(name));
-    }
-  }, [userLoaded, user]);
+    if (!userLoaded) return;
+    const name = user?.firstName || user?.username || "ahí";
+    const h = new Date().getHours();
+    const day = new Date().getDay();
 
-  const recs = data ? buildRecs(data) : [];
-  const monthLabel = new Date().toLocaleDateString("es-ES", {
+    const days = t.raw("greetingDays") as string[];
+    const d = days[day];
+    const dc = d.charAt(0).toUpperCase() + d.slice(1);
+    const tg =
+      h < 6  ? t("greetingLateNight") :
+      h < 12 ? t("greetingMorning") :
+      h < 20 ? t("greetingAfternoon") : t("greetingEvening");
+
+    const sub = (s: string) =>
+      s.replace(/{tg}/g, tg)
+       .replace(/{name}/g, name)
+       .replace(/{d}/g, d)
+       .replace(/{dc}/g, dc);
+
+    const base = (t.raw("greetingBase") as string[]).map(sub);
+    const dayExtras = (t.raw(`greetingByDay${day}`) as string[]).map(sub);
+    const extras: string[] = [...dayExtras];
+    if (h < 6)  extras.push(...(t.raw("greetingLateNightExtras") as string[]).map(sub));
+    if (h >= 22) extras.push(...(t.raw("greetingLateExtras") as string[]).map(sub));
+
+    const pool = [...base, ...extras];
+    setGreetingText(pool[Math.floor(Math.random() * pool.length)]);
+  }, [userLoaded, user, t]);
+
+  const tRec: RecT = {
+    firstSearch: t("recFirstSearch"),
+    defaultRec: t("recDefault"),
+    related: (niche, where, suggestion, extra) =>
+      t("recRelated", { niche, where, suggestion, extra }),
+    sameCity: (city) => t("recSameCity", { city }),
+    sameNiches: (count, city) => t("recSameNiches", { count, city }),
+    inCity: (city) => t("recIn", { city }),
+    also: (suggestion) => t("recAlso", { suggestion }),
+  };
+
+  const recs = data ? buildRecs(data, tRec) : [];
+  const monthLabel = new Date().toLocaleDateString(locale, {
     month: "long",
     year: "numeric",
   });
@@ -429,14 +419,14 @@ export default function DashboardHome() {
             <h1 className="text-2xl md:text-3xl font-black text-white tracking-tight leading-tight min-h-[2rem]">
               {greetingText ? <Typewriter text={greetingText} /> : "\u00A0"}
             </h1>
-            <p className="text-zinc-600 text-xs mt-1">Tu radar de prospección.</p>
+            <p className="text-zinc-600 text-xs mt-1">{t("radar")}</p>
           </div>
           <Link
             href="/search"
             className="group flex items-center gap-2.5 px-5 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-black text-sm rounded-xl transition-all shadow-[0_0_24px_rgba(99,102,241,0.28)] hover:shadow-[0_0_36px_rgba(99,102,241,0.45)] shrink-0"
           >
             <Search className="w-4 h-4" />
-            Nueva búsqueda
+            {t("newSearch")}
             {credits !== null && credits > 0 && (
               <span className="bg-white/15 px-1.5 py-0.5 rounded text-[10px] font-bold">
                 {credits}
@@ -465,8 +455,8 @@ export default function DashboardHome() {
                 <p className="text-2xl font-black text-white leading-none">
                   {data.noWebsiteFound}
                 </p>
-                <p className="text-xs font-semibold text-zinc-400 mt-1">Sin web encontrados</p>
-                <p className="text-[10px] text-zinc-600">acumulado total</p>
+                <p className="text-xs font-semibold text-zinc-400 mt-1">{t("statNoWeb")}</p>
+                <p className="text-[10px] text-zinc-600">{t("statNoWebSub")}</p>
               </motion.div>
 
               {/* Contactable */}
@@ -482,8 +472,8 @@ export default function DashboardHome() {
                 <p className="text-2xl font-black text-white leading-none">
                   {data.contactableLeads}
                 </p>
-                <p className="text-xs font-semibold text-zinc-400 mt-1">Leads contactables</p>
-                <p className="text-[10px] text-zinc-600">con teléfono disponible</p>
+                <p className="text-xs font-semibold text-zinc-400 mt-1">{t("statContactable")}</p>
+                <p className="text-[10px] text-zinc-600">{t("statContactableSub")}</p>
               </motion.div>
 
               {/* Unique niches */}
@@ -499,8 +489,8 @@ export default function DashboardHome() {
                 <p className="text-2xl font-black text-white leading-none">
                   {data.topNiches.length}
                 </p>
-                <p className="text-xs font-semibold text-zinc-400 mt-1">Nichos explorados</p>
-                <p className="text-[10px] text-zinc-600">en todas tus búsquedas</p>
+                <p className="text-xs font-semibold text-zinc-400 mt-1">{t("statNiches")}</p>
+                <p className="text-[10px] text-zinc-600">{t("statNichesSub")}</p>
               </motion.div>
 
               {/* Monthly progress */}
@@ -519,8 +509,8 @@ export default function DashboardHome() {
                 <p className="text-2xl font-black text-white leading-none">
                   {data.searchesThisMonth}
                 </p>
-                <p className="text-xs font-semibold text-zinc-400 mt-1">Búsquedas este mes</p>
-                <p className="text-[10px] text-zinc-600">de {data.planLimit} disponibles</p>
+                <p className="text-xs font-semibold text-zinc-400 mt-1">{t("statSearches")}</p>
+                <p className="text-[10px] text-zinc-600">{t("statSearchesSub", { limit: data.planLimit })}</p>
               </motion.div>
             </div>
 
@@ -533,11 +523,15 @@ export default function DashboardHome() {
             >
               <div className="flex items-center justify-between mb-4">
                 <p className="text-xs font-black text-zinc-400 uppercase tracking-wider">
-                  Actividad últimos 14 días
+                  {t("activityLabel")}
                 </p>
-                <span className="text-[10px] text-zinc-600">oportunidades encontradas</span>
+                <span className="text-[10px] text-zinc-600">{t("activitySub")}</span>
               </div>
-              <ActivityChart data={data.activityByDay} />
+              <ActivityChart
+                data={data.activityByDay}
+                emptyLabel={t("activityEmpty")}
+                locale={locale}
+              />
             </motion.div>
 
             {/* ── Niche + Zone analysis ── */}
@@ -552,23 +546,23 @@ export default function DashboardHome() {
                 <div className="flex items-center gap-2 mb-4">
                   <Layers className="w-3.5 h-3.5 text-violet-400 shrink-0" />
                   <p className="text-xs font-black text-zinc-400 uppercase tracking-wider">
-                    Nichos buscados
+                    {t("nichesLabel")}
                   </p>
                   <span className="text-[9px] text-zinc-700 ml-auto">
-                    % con WhatsApp
+                    {t("nichesWhatsappPct")}
                   </span>
                 </div>
                 <RankedBars
                   items={data.topNiches.map((n) => ({
                     label: n.niche,
                     rate: n.whatsappRate,
-                    sub: `${n.searches} búsqueda${n.searches !== 1 ? "s" : ""} · ${n.avgResults} resultados/búsqueda`,
+                    sub: `${n.searches === 1 ? t("nicheSearch", { count: n.searches }) : t("nicheSearchPlural", { count: n.searches })} · ${t("nicheAvg", { avg: n.avgResults })}`,
                   }))}
                   barColor="bg-violet-500"
                   emptyLabel={
                     data.totalSearches < 2
-                      ? "Haz al menos 2 búsquedas para ver qué nichos tienen más WhatsApp disponible."
-                      : "Sin datos todavía."
+                      ? t("nichesEmpty")
+                      : t("nichesNoData")
                   }
                 />
               </motion.div>
@@ -583,12 +577,12 @@ export default function DashboardHome() {
                 <div className="flex items-center gap-2 mb-4">
                   <MapPin className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
                   <p className="text-xs font-black text-zinc-400 uppercase tracking-wider">
-                    Últimas búsquedas
+                    {t("recentLabel")}
                   </p>
                 </div>
                 {data.recentSearches.length === 0 ? (
                   <p className="text-xs text-zinc-600 py-6 text-center">
-                    Aún no tienes búsquedas. ¡Empieza ahora!
+                    {t("recentEmpty")}
                   </p>
                 ) : (
                   <div className="space-y-0">
@@ -610,11 +604,11 @@ export default function DashboardHome() {
                         <div className="flex items-center gap-3 shrink-0">
                           <div className="text-right">
                             <p className="text-xs font-black text-emerald-400">{s.whatsapp}</p>
-                            <p className="text-[9px] text-zinc-600">WhatsApp</p>
+                            <p className="text-[9px] text-zinc-600">{t("recentWhatsapp")}</p>
                           </div>
                           <div className="text-right">
                             <p className="text-xs font-black text-zinc-400">{s.total}</p>
-                            <p className="text-[9px] text-zinc-600">total</p>
+                            <p className="text-[9px] text-zinc-600">{t("recentTotal")}</p>
                           </div>
                         </div>
                       </div>
@@ -645,7 +639,7 @@ export default function DashboardHome() {
                           href={`/search?niche=${encodeURIComponent(rec.niche)}${rec.city ? `&city=${encodeURIComponent(rec.city)}` : ""}`}
                           className="mt-2 inline-flex items-center gap-1.5 text-xs font-bold text-indigo-400 hover:text-indigo-300 transition-colors"
                         >
-                          Buscar {rec.niche} <ArrowRight className="w-3 h-3" />
+                          {t("recSearch", { niche: rec.niche })} <ArrowRight className="w-3 h-3" />
                         </Link>
                       )}
                     </div>
@@ -669,11 +663,11 @@ export default function DashboardHome() {
                   <Search className="w-3.5 h-3.5 text-indigo-400" />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="text-sm font-bold text-white">Nueva búsqueda</p>
+                  <p className="text-sm font-bold text-white">{t("newSearch")}</p>
                   <p className="text-[11px] text-zinc-600">
                     {credits !== null
-                      ? `${credits} restantes este mes`
-                      : "Busca leads ahora"}
+                      ? t("navSearchCredits", { count: credits })
+                      : t("navSearchDefault")}
                   </p>
                 </div>
                 <ArrowRight className="w-3.5 h-3.5 text-zinc-700 group-hover:text-indigo-400 ml-auto transition-colors" />
@@ -687,10 +681,8 @@ export default function DashboardHome() {
                   <Target className="w-3.5 h-3.5 text-violet-400" />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="text-sm font-bold text-white">Mi Cartera</p>
-                  <p className="text-[11px] text-zinc-600">
-                    Gestiona tus oportunidades guardadas
-                  </p>
+                  <p className="text-sm font-bold text-white">{t("navCRMTitle")}</p>
+                  <p className="text-[11px] text-zinc-600">{t("navCRMSub")}</p>
                 </div>
                 <ArrowRight className="w-3.5 h-3.5 text-zinc-700 group-hover:text-violet-400 ml-auto transition-colors" />
               </Link>
@@ -709,18 +701,17 @@ export default function DashboardHome() {
             <AlertCircle className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
             <div className="flex-1 min-w-0">
               <p className="text-sm font-bold text-amber-300 mb-0.5">
-                Desbloquea el análisis completo
+                {t("freeUpsellTitle")}
               </p>
               <p className="text-xs text-amber-400/70">
-                Con Go o Pro tienes 100–250 búsquedas al mes, historial completo
-                y análisis con más datos para guiarte mejor.
+                {t("freeUpsellBody")}
               </p>
             </div>
             <Link
               href="/pricing"
               className="shrink-0 flex items-center gap-1 text-xs font-bold text-amber-300 hover:text-amber-200 transition-colors whitespace-nowrap"
             >
-              Ver planes <ArrowRight className="w-3 h-3" />
+              {t("viewPlans")} <ArrowRight className="w-3 h-3" />
             </Link>
           </motion.div>
         )}

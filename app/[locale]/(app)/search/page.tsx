@@ -86,14 +86,14 @@ function PaywallModal({ onClose, source = "default" }: { onClose: () => void; so
                 <Sparkles className="w-4 h-4 text-indigo-400" />
               </div>
               <p className="text-[10px] font-black text-indigo-400/90 uppercase tracking-widest">
-                Función exclusiva
+                {tPw("messageFeature")}
               </p>
             </div>
             <h2 className="text-xl font-black text-white leading-tight">
-              El mensaje personalizado con IA es exclusivo del plan Go
+              {tPw("messageTitle")}
             </h2>
             <p className="text-sm text-zinc-400 mt-1">
-              Desbloquea mensajes listos para enviar y 100 búsquedas al mes.
+              {tPw("messageSubtitle")}
             </p>
           </>
         ) : (
@@ -675,7 +675,7 @@ export default function Dashboard() {
                   className="text-[11px] text-zinc-500 mt-1.5 mb-3 cursor-pointer hover:text-indigo-400 transition-colors flex items-center gap-1"
                 >
                   <Sparkles className="w-3 h-3" />
-                  Mensaje con IA — exclusivo del plan Go
+                  {tResults("messageHint")}
                 </p>
               </div>
             ) : (

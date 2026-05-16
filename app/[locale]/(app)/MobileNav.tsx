@@ -2,18 +2,20 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { Search, Clock, Briefcase, Settings, LayoutDashboard } from "lucide-react";
-
-const TABS = [
-  { href: "/search",    icon: Search,          label: "Buscar"    },
-  { href: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
-  { href: "/history",   icon: Clock,           label: "Historial" },
-  { href: "/crm",       icon: Briefcase,       label: "Cartera"   },
-  { href: "/settings",  icon: Settings,        label: "Cuenta"    },
-] as const;
 
 export default function MobileNav() {
   const pathname = usePathname();
+  const t = useTranslations("mobileNav");
+
+  const TABS = [
+    { href: "/search",    icon: Search,          label: t("search")    },
+    { href: "/dashboard", icon: LayoutDashboard, label: t("dashboard") },
+    { href: "/history",   icon: Clock,           label: t("history")   },
+    { href: "/crm",       icon: Briefcase,       label: t("portfolio") },
+    { href: "/settings",  icon: Settings,        label: t("account")   },
+  ];
 
   return (
     <>
