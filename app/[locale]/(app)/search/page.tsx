@@ -660,23 +660,23 @@ export default function Dashboard() {
 
             {/* Message textarea — blurred for free, full for paid */}
             {plan === "free" ? (
-              <div
-                className="relative mb-4 cursor-pointer group/msg"
-                onClick={() => triggerPaywall("message")}
-              >
+              <div className="mb-2">
                 <textarea
                   readOnly
                   tabIndex={-1}
                   aria-hidden
-                  className="w-full text-sm font-medium text-slate-300 bg-black/40 border border-neutral-800 rounded-xl p-5 resize-none h-28 focus:outline-none pointer-events-none select-none blur-md opacity-60"
+                  onClick={() => triggerPaywall("message")}
+                  className="w-full text-sm font-medium text-slate-300 bg-black/40 border border-neutral-800 rounded-xl p-5 resize-none h-28 focus:outline-none select-none cursor-pointer"
+                  style={{ filter: "blur(3px)", userSelect: "none" }}
                   value={place.suggestedMessage}
                 />
-                <div className="absolute inset-0 flex items-center justify-center rounded-xl bg-black/25 group-hover/msg:bg-black/40 transition-colors">
-                  <div className="flex items-center gap-2 px-4 py-2.5 bg-indigo-600 group-hover/msg:bg-indigo-500 rounded-xl shadow-[0_0_24px_rgba(99,102,241,0.35)] transition-all">
-                    <Sparkles className="w-3.5 h-3.5 text-white" />
-                    <span className="text-sm font-black text-white">Plan Go — Desbloquear</span>
-                  </div>
-                </div>
+                <p
+                  onClick={() => triggerPaywall("message")}
+                  className="text-[11px] text-zinc-500 mt-1.5 mb-3 cursor-pointer hover:text-indigo-400 transition-colors flex items-center gap-1"
+                >
+                  <Sparkles className="w-3 h-3" />
+                  Mensaje con IA — exclusivo del plan Go
+                </p>
               </div>
             ) : (
               <div className="relative mb-4">
