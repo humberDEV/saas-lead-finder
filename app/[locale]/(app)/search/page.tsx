@@ -658,8 +658,8 @@ export default function Dashboard() {
               {tResults("openingMessage")}
             </label>
 
+            {/* Message textarea — blurred for free, full for paid */}
             {plan === "free" ? (
-              // ── Blurred message + paywall trigger ───────────────────────
               <div
                 className="relative mb-4 cursor-pointer group/msg"
                 onClick={() => triggerPaywall("message")}
@@ -679,34 +679,40 @@ export default function Dashboard() {
                 </div>
               </div>
             ) : (
-              // ── Full message for paid users ──────────────────────────────
-              <>
-                <div className="relative mb-4">
-                  <textarea
-                    readOnly
-                    className="w-full text-sm font-medium text-slate-300 bg-black/40 border border-neutral-800 rounded-xl p-5 resize-none h-28 focus:outline-none focus:border-indigo-500/50 transition-colors"
-                    value={place.suggestedMessage}
-                  />
-                </div>
-                <div className="flex flex-wrap gap-3 justify-end mb-4">
-                  {place.has_whatsapp && (
-                    <button
-                      onClick={() => copyAndAction(place.suggestedMessage, index, place.phone, "whatsapp")}
-                      className="group relative flex items-center gap-2 px-6 py-3 bg-emerald-500 hover:bg-emerald-400 text-black text-sm font-black rounded-xl transition-all shadow-[0_0_20px_rgba(16,185,129,0.2)] hover:shadow-[0_0_30px_rgba(16,185,129,0.4)]"
-                    >
-                      {copiedIndex === index ? <CopyCheck className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-                      {tResults("waDirect")}
-                    </button>
-                  )}
-                  <button
-                    onClick={() => copyAndAction(place.suggestedMessage, index, place.phone, "call")}
-                    className="flex items-center gap-2 px-6 py-3 bg-neutral-800 hover:bg-neutral-700 text-white text-sm font-bold rounded-xl transition-all"
-                  >
-                    {tResults("callDirect")}
-                  </button>
-                </div>
-              </>
+              <div className="relative mb-4">
+                <textarea
+                  readOnly
+                  className="w-full text-sm font-medium text-slate-300 bg-black/40 border border-neutral-800 rounded-xl p-5 resize-none h-28 focus:outline-none focus:border-indigo-500/50 transition-colors"
+                  value={place.suggestedMessage}
+                />
+              </div>
             )}
+
+            {/* Action buttons — always visible; free users get empty WhatsApp */}
+            <div className="flex flex-wrap gap-3 justify-end mb-4">
+              {place.has_whatsapp && (
+                <button
+                  onClick={() => {
+                    if (plan === "free") {
+                      const cleanPhone = place.phone!.replace(/[^0-9+]/g, "");
+                      window.open(`https://wa.me/${cleanPhone}`, "_blank");
+                    } else {
+                      copyAndAction(place.suggestedMessage, index, place.phone, "whatsapp");
+                    }
+                  }}
+                  className="group relative flex items-center gap-2 px-6 py-3 bg-emerald-500 hover:bg-emerald-400 text-black text-sm font-black rounded-xl transition-all shadow-[0_0_20px_rgba(16,185,129,0.2)] hover:shadow-[0_0_30px_rgba(16,185,129,0.4)]"
+                >
+                  {copiedIndex === index ? <CopyCheck className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                  {tResults("waDirect")}
+                </button>
+              )}
+              <button
+                onClick={() => copyAndAction(place.suggestedMessage, index, place.phone, "call")}
+                className="flex items-center gap-2 px-6 py-3 bg-neutral-800 hover:bg-neutral-700 text-white text-sm font-bold rounded-xl transition-all"
+              >
+                {tResults("callDirect")}
+              </button>
+            </div>
 
             <div className="flex border-t border-neutral-800/60 pt-4 mt-2 gap-2">
               {plan === "free" ? (
