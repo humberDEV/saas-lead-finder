@@ -450,7 +450,7 @@ export default function Dashboard() {
     if (phone) {
       const cleanPhone = phone.replace(/[^0-9+]/g, "");
       if (action === "whatsapp") {
-        window.open(`https://wa.me/${cleanPhone}`, "_blank");
+        window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(text)}`, "_blank");
       } else if (action === "call") {
         window.location.href = `tel:${cleanPhone}`;
       }
