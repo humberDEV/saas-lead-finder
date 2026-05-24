@@ -11,6 +11,7 @@ import {
 import { motion } from "framer-motion";
 import { useTranslations } from "next-intl";
 import { useSidebar } from "../SidebarContext";
+import { ReferralCard } from "@/components/settings/ReferralCard";
 
 const PLAN_LABELS: Record<string, { label: string; color: string; bg: string }> = {
   free:    { label: "Free",    color: "text-zinc-400",   bg: "bg-zinc-800" },
@@ -109,7 +110,7 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="h-full overflow-y-auto bg-[#0A0A0A]">
+    <div className="h-full overflow-y-auto">
       <main className="max-w-lg mx-auto px-5 pt-10 pb-28 md:px-10 md:pt-14">
 
         {/* Header */}
@@ -162,18 +163,31 @@ export default function SettingsPage() {
               />
             </>
           ) : (
-            <Row
-              icon={<CreditCard className="w-4 h-4" />}
-              label={loadingPortal ? t("managePlanLoading") : t("managePlanLabel")}
-              sub={t("managePlanSub", { plan: planMeta.label, count: credits ?? "—" })}
-              onClick={handleManagePlan}
-              right={
-                loadingPortal ? (
-                  <div className="w-4 h-4 border-2 border-zinc-600 border-t-zinc-300 rounded-full animate-spin" />
-                ) : undefined
-              }
-            />
+            <>
+              <Row
+                icon={<CreditCard className="w-4 h-4" />}
+                label="Cambiar plan"
+                sub={`Plan actual: ${planMeta.label} · ${credits ?? "—"} búsquedas restantes`}
+                href="/pricing"
+              />
+              <Row
+                icon={<CreditCard className="w-4 h-4" />}
+                label={loadingPortal ? t("managePlanLoading") : "Facturación y tarjeta"}
+                sub="Facturas, cancelar, cambiar método de pago"
+                onClick={handleManagePlan}
+                right={
+                  loadingPortal ? (
+                    <div className="w-4 h-4 border-2 border-zinc-600 border-t-zinc-300 rounded-full animate-spin" />
+                  ) : undefined
+                }
+              />
+            </>
           )}
+        </Section>
+
+        {/* Referrals */}
+        <Section title={t("sectionReferral")}>
+          <ReferralCard />
         </Section>
 
         {/* Support */}

@@ -1,5 +1,8 @@
 import { supabase } from "./supabase";
-import { PLAN_LIMITS } from "./plans";
+import { PLAN_LIMITS, DEMO_LIMITS } from "./plans";
+
+// Re-export DEMO_LIMITS for convenience
+export { DEMO_LIMITS };
 
 // Re-export so existing imports still work
 export { PLAN_LIMITS };
@@ -12,6 +15,7 @@ function toUser(row: any) {
     email: row.email ?? null,
     name: row.name ?? null,
     tokens: row.tokens ?? 3,
+    bonusTokens: row.bonus_tokens ?? 0,
     plan: row.plan ?? "free",
     tokensResetAt: row.tokens_reset_at ?? row.created_at,
     stripeCustomerId: row.stripe_customer_id ?? null,
@@ -26,8 +30,23 @@ function toUser(row: any) {
     utmMedium: row.utm_medium ?? null,
     utmCampaign: row.utm_campaign ?? null,
     utmTerm: row.utm_term ?? null,
+    referralCode: row.referral_code ?? null,
+    referredBy: row.referred_by ?? null,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
+  };
+}
+
+function toDemo(row: any) {
+  if (!row) return null;
+  return {
+    id: row.id,
+    userId: row.user_id,
+    slug: row.slug,
+    template: row.template,
+    businessData: row.business_data,
+    viewsCount: row.views_count ?? 0,
+    createdAt: row.created_at,
   };
 }
 
@@ -68,7 +87,7 @@ export const db = {
       return toUser(data);
     },
 
-    async create({ data }: { data: { clerkId: string; tokens?: number; email?: string; name?: string } }) {
+    async create({ data }: { data: { clerkId: string; tokens?: number; email?: string; name?: string; referralCode?: string; referredBy?: string } }) {
       const { data: row, error } = await supabase
         .from("users")
         .insert({
@@ -76,13 +95,25 @@ export const db = {
           email: data.email ?? null,
           name: data.name ?? null,
           tokens: data.tokens ?? 3,
+          bonus_tokens: 0,
           plan: "free",
           tokens_reset_at: new Date().toISOString(),
+          referral_code: data.referralCode ?? null,
+          referred_by: data.referredBy ?? null,
         })
         .select()
         .single();
       if (error) throw error;
       return toUser(row)!;
+    },
+
+    async findByReferralCode(code: string) {
+      const { data } = await supabase
+        .from("users")
+        .select("*")
+        .eq("referral_code", code)
+        .single();
+      return toUser(data);
     },
 
     async findByStripeCustomerId(stripeCustomerId: string) {
@@ -101,6 +132,7 @@ export const db = {
       where: { clerkId?: string; id?: string };
       data: {
         tokens?: { decrement: number } | number;
+        bonus_tokens?: { increment: number } | { decrement: number } | number;
         plan?: string;
         email?: string;
         name?: string;
@@ -113,6 +145,8 @@ export const db = {
         first_limit_reached_at?: string;
         checkout_started_at?: string;
         last_login_at?: string;
+        referral_code?: string;
+        referred_by?: string | null;
       };
     }) {
       const column = where.clerkId ? "clerk_id" : "id";
@@ -152,6 +186,27 @@ export const db = {
       } else if (typeof data.tokens === "number") {
         patch.tokens = data.tokens;
       }
+
+      if (data.bonus_tokens !== undefined) {
+        if (typeof data.bonus_tokens === "object" && data.bonus_tokens !== null) {
+          const { data: current } = await supabase
+            .from("users")
+            .select("bonus_tokens")
+            .eq(column, value)
+            .single();
+          const cur = current?.bonus_tokens ?? 0;
+          if ("increment" in data.bonus_tokens) {
+            patch.bonus_tokens = cur + data.bonus_tokens.increment;
+          } else if ("decrement" in data.bonus_tokens) {
+            patch.bonus_tokens = Math.max(0, cur - data.bonus_tokens.decrement);
+          }
+        } else if (typeof data.bonus_tokens === "number") {
+          patch.bonus_tokens = data.bonus_tokens;
+        }
+      }
+
+      if (data.referral_code !== undefined) patch.referral_code = data.referral_code;
+      if (data.referred_by !== undefined) patch.referred_by = data.referred_by;
 
       const { data: row, error } = await supabase
         .from("users")
@@ -327,6 +382,134 @@ export const db = {
         .limit(limit);
       if (error) throw error;
       return data ?? [];
+    },
+  },
+
+  demo: {
+    async create({
+      data,
+    }: {
+      data: {
+        userId: string;
+        slug: string;
+        template: string;
+        businessData: Record<string, any>;
+      };
+    }) {
+      const { data: row, error } = await supabase
+        .from("demos")
+        .insert({
+          user_id: data.userId,
+          slug: data.slug,
+          template: data.template,
+          business_data: data.businessData,
+          views_count: 0,
+        })
+        .select()
+        .single();
+      if (error) throw error;
+      return toDemo(row)!;
+    },
+
+    async findBySlug(slug: string) {
+      const { data } = await supabase
+        .from("demos")
+        .select("*")
+        .eq("slug", slug)
+        .single();
+      return toDemo(data);
+    },
+
+    async findMany({ where }: { where: { userId: string } }) {
+      const { data, error } = await supabase
+        .from("demos")
+        .select("*")
+        .eq("user_id", where.userId)
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      return (data ?? []).map(toDemo);
+    },
+
+    async countByUser(userId: string): Promise<number> {
+      const { count, error } = await supabase
+        .from("demos")
+        .select("id", { count: "exact", head: true })
+        .eq("user_id", userId);
+      if (error) throw error;
+      return count ?? 0;
+    },
+
+    /** Demos creadas desde `since` (ISO) — cuota mensual Go. */
+    async countByUserSince(userId: string, since: string): Promise<number> {
+      const { count, error } = await supabase
+        .from("demos")
+        .select("id", { count: "exact", head: true })
+        .eq("user_id", userId)
+        .gte("created_at", since);
+      if (error) throw error;
+      return count ?? 0;
+    },
+
+    async incrementViews(slug: string) {
+      const { data: current } = await supabase
+        .from("demos")
+        .select("views_count")
+        .eq("slug", slug)
+        .single();
+      if (!current) return;
+      await supabase
+        .from("demos")
+        .update({ views_count: (current.views_count ?? 0) + 1 })
+        .eq("slug", slug);
+    },
+  },
+
+  referral: {
+    async create({ referrerUserId, referredUserId }: { referrerUserId: string; referredUserId: string }) {
+      const { error } = await supabase.from("referrals").insert({
+        referrer_user_id: referrerUserId,
+        referred_user_id: referredUserId,
+        status: "signed_up",
+      });
+      if (error) throw error;
+    },
+
+    /** Returns the unpaid referral for a given referred user, or null. */
+    async findUnpaidByReferredUser(referredUserId: string) {
+      const { data } = await supabase
+        .from("referrals")
+        .select("*")
+        .eq("referred_user_id", referredUserId)
+        .eq("status", "signed_up")
+        .single();
+      if (!data) return null;
+      return {
+        id: data.id as string,
+        referrerUserId: data.referrer_user_id as string,
+        referredUserId: data.referred_user_id as string,
+        status: data.status as string,
+        createdAt: data.created_at as string,
+      };
+    },
+
+    async markPaid(id: string) {
+      await supabase
+        .from("referrals")
+        .update({ status: "paid", rewarded_at: new Date().toISOString() })
+        .eq("id", id);
+    },
+
+    async statsByReferrer(referrerUserId: string) {
+      const { data } = await supabase
+        .from("referrals")
+        .select("status")
+        .eq("referrer_user_id", referrerUserId);
+      const rows = data ?? [];
+      return {
+        total: rows.length,
+        paid: rows.filter((r) => r.status === "paid").length,
+        pending: rows.filter((r) => r.status === "signed_up").length,
+      };
     },
   },
 };

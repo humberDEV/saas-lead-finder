@@ -90,6 +90,20 @@ export async function POST(request: Request) {
 
         if (clerkId && planKey && subscriptionId) {
           await upgradeUser(clerkId, planKey, subscriptionId);
+
+          // Referral reward: +50 bonus tokens to both sides, only on first payment
+          const paidUser = await db.user.findUnique({ where: { clerkId } });
+          if (paidUser?.referredBy) {
+            const referral = await db.referral.findUnpaidByReferredUser(paidUser.id).catch(() => null);
+            if (referral && referral.referrerUserId !== paidUser.id) {
+              await Promise.all([
+                db.user.update({ where: { id: paidUser.id }, data: { bonus_tokens: { increment: 50 } } }),
+                db.user.update({ where: { id: referral.referrerUserId }, data: { bonus_tokens: { increment: 50 } } }),
+                db.referral.markPaid(referral.id),
+              ]);
+              await trackEvent(paidUser.id, "referral_rewarded", { referrerId: referral.referrerUserId }).catch(() => {});
+            }
+          }
         }
         break;
       }
@@ -113,6 +127,30 @@ export async function POST(request: Request) {
       case "customer.subscription.deleted": {
         const subscription = event.data.object as Stripe.Subscription;
         await downgradeUser(subscription.customer as string);
+        break;
+      }
+
+      case "invoice.paid": {
+        // Subscription renewed successfully → reset tokens to plan limit
+        const invoice = event.data.object as Stripe.Invoice;
+        // Only act on subscription invoices (not one-off charges)
+        if (!("subscription" in invoice) || !invoice.subscription) break;
+
+        const user = await db.user.findByStripeCustomerId(invoice.customer as string);
+        if (!user) break;
+
+        // Skip if user is already on free (shouldn't happen, but guard)
+        if (user.plan === "free") break;
+
+        const limit = PLAN_LIMITS[user.plan] ?? 3;
+        await db.user.update({
+          where: { clerkId: user.clerkId },
+          data: {
+            tokens: limit,
+            tokens_reset_at: new Date().toISOString(),
+          },
+        });
+        await trackEvent(user.id, "tokens_reset", { plan: user.plan, tokens: limit }).catch(() => {});
         break;
       }
 

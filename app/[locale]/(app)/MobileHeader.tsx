@@ -1,31 +1,52 @@
 "use client";
 
 import Link from "next/link";
-import { Sparkles, Zap } from "lucide-react";
+import { usePathname } from "next/navigation";
+import { useTranslations } from "next-intl";
+import { Sparkles, Zap, LayoutDashboard } from "lucide-react";
 import { useUser } from "@clerk/nextjs";
 import { useSidebar } from "./SidebarContext";
 import { PLAN_LIMITS } from "@/lib/plans";
 
 export default function MobileHeader() {
+  const pathname = usePathname();
+  const t = useTranslations("mobileNav");
   const { user } = useUser();
-  const { credits, plan } = useSidebar();
+  const { credits, bonusTokens, plan } = useSidebar();
+  const onDashboard = pathname.includes("/dashboard");
   const planLimit = PLAN_LIMITS[plan] ?? 5;
-  const outOfCredits = credits !== null && credits <= 0;
-  const isLow = credits !== null && credits > 0 && credits / planLimit <= 0.2;
+  const planCredits = credits ?? 0;
+  const totalSearches = planCredits + bonusTokens;
+  const outOfCredits = credits !== null && totalSearches <= 0;
+  const isLow =
+    credits !== null && totalSearches > 0 && planCredits / planLimit <= 0.2 && bonusTokens === 0;
 
   const displayName = user?.firstName || user?.username || "User";
 
   return (
     <header className="md:hidden h-12 shrink-0 flex items-center justify-between px-4 bg-[#0c0c14] border-b border-white/[0.05]">
-      {/* Logo */}
-      <Link href="/search" className="flex items-center gap-2">
-        <Sparkles className="w-4 h-4 text-indigo-500" />
-        <span className="font-black text-white text-sm tracking-tight">
-          Hunt<span className="text-indigo-400">ly</span>
-        </span>
-      </Link>
+      <div className="flex items-center gap-2 min-w-0">
+        <Link href="/search" className="flex items-center gap-2 shrink-0">
+          <Sparkles className="w-4 h-4 text-indigo-500" />
+          <span className="font-black text-white text-sm tracking-tight">
+            Hunt<span className="text-indigo-400">ly</span>
+          </span>
+        </Link>
+        <Link
+          href="/dashboard"
+          aria-label={t("dashboard")}
+          title={t("dashboard")}
+          className={`flex items-center justify-center w-9 h-9 rounded-xl border transition-colors shrink-0 ${
+            onDashboard
+              ? "bg-indigo-500/20 border-indigo-500/35 text-indigo-300"
+              : "bg-white/[0.04] border-white/[0.06] text-zinc-500 hover:text-zinc-300 hover:bg-white/[0.07]"
+          }`}
+        >
+          <LayoutDashboard className="w-4 h-4" strokeWidth={onDashboard ? 2.2 : 1.75} />
+        </Link>
+      </div>
 
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 shrink-0">
         {/* Credits pill */}
         {credits !== null && (
           <span
@@ -37,7 +58,8 @@ export default function MobileHeader() {
                 : "bg-indigo-500/15 text-indigo-300 border border-indigo-500/20"
             }`}
           >
-            {credits}/{planLimit}
+            {planCredits}
+            {bonusTokens > 0 ? `+${bonusTokens}` : ""}/{planLimit}
           </span>
         )}
 

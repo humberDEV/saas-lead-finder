@@ -10,9 +10,12 @@ export type ProductEvent =
   | "subscription_started"
   | "subscription_cancelled"
   | "plan_changed"
+  | "tokens_reset"
   | "reactivation_email_sent"
   | "welcome_email_sent"
-  | "limit_reached_email_sent";
+  | "limit_reached_email_sent"
+  | "referral_rewarded"
+  | "referral_code_claimed";
 
 export async function trackEvent(
   userId: string,

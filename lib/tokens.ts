@@ -1,9 +1,15 @@
 import { clerkClient } from "@clerk/nextjs/server";
+import { cookies } from "next/headers";
+import { randomUUID } from "crypto";
 import { db } from "./db";
 import { PLAN_LIMITS } from "./plans";
 import { trackEvent } from "./events";
 import { sendWelcomeEmail } from "./email";
 import { supabase } from "./supabase";
+
+function generateReferralCode(): string {
+  return randomUUID().replace(/-/g, "").slice(0, 8).toUpperCase();
+}
 
 /**
  * Returns the user (creating them if needed), syncing email/name from Clerk
@@ -11,7 +17,7 @@ import { supabase } from "./supabase";
  */
 export async function getOrCreateUser(
   clerkUserId: string,
-  clerkProfile?: { email?: string | null; name?: string | null }
+  clerkProfile?: { email?: string | null; name?: string | null; referralCode?: string | null }
 ) {
   let user = await db.user.findUnique({ where: { clerkId: clerkUserId } });
 
@@ -33,6 +39,24 @@ export async function getOrCreateUser(
       }
     }
 
+    // Resolve referrer (anti-self-referral: code must belong to a different user)
+    let referralCode = clerkProfile?.referralCode ?? null;
+    if (!referralCode) {
+      try {
+        referralCode = (await cookies()).get("huntly_ref")?.value ?? null;
+      } catch {
+        // cookies() only available in a request context
+      }
+    }
+
+    let referredBy: string | undefined;
+    if (referralCode) {
+      const referrer = await db.user.findByReferralCode(referralCode).catch(() => null);
+      if (referrer && referrer.clerkId !== clerkUserId) {
+        referredBy = referrer.id;
+      }
+    }
+
     // Race condition guard: if two requests arrive simultaneously for a new user,
     // only the one that actually inserts the row should send the welcome email.
     let isNew = false;
@@ -43,6 +67,8 @@ export async function getOrCreateUser(
           tokens: PLAN_LIMITS["free"],
           email: email ?? undefined,
           name: name ?? undefined,
+          referralCode: generateReferralCode(),
+          referredBy,
         },
       });
       isNew = true;
@@ -59,8 +85,20 @@ export async function getOrCreateUser(
         await trackEvent(user.id, "welcome_email_sent");
         sendWelcomeEmail(user.email, user.name).catch(() => {});
       }
+      // Create referral record if user came via a referral link
+      if (referredBy) {
+        await db.referral.create({ referrerUserId: referredBy, referredUserId: user.id }).catch(() => {});
+      }
     }
     return user;
+  }
+
+  // Backfill referral code for existing users that don't have one yet
+  if (!user.referralCode) {
+    user = await db.user.update({
+      where: { clerkId: clerkUserId },
+      data: { referral_code: generateReferralCode() },
+    }).catch(() => user!);
   }
 
   // Sync missing email/name from Clerk
@@ -73,11 +111,14 @@ export async function getOrCreateUser(
   if (clerkProfile?.email && !user.email) syncPatch.email = clerkProfile.email;
   if (clerkProfile?.name && !user.name) syncPatch.name = clerkProfile.name;
 
-  // Monthly reset: if 30+ days since last reset, restore tokens for the plan
+  // Monthly reset for FREE users only — paid users are reset via invoice.paid webhook
+  // so their tokens align exactly with their Stripe billing date.
   const daysSinceReset =
     (Date.now() - new Date(user.tokensResetAt).getTime()) / 86_400_000;
 
-  if (daysSinceReset >= 30) {
+  const isFreeUser = user.plan === "free" || !user.stripeSubscriptionId;
+
+  if (isFreeUser && daysSinceReset >= 30) {
     const limit = PLAN_LIMITS[user.plan] ?? 3;
     user = await db.user.update({
       where: { clerkId: clerkUserId },

@@ -17,6 +17,7 @@ export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const niche = searchParams.get("niche");
   const city = searchParams.get("city");
+  const locale = searchParams.get("locale") ?? "es";
   if (!niche || !city) return NextResponse.json({ error: "niche and city required" }, { status: 400 });
 
   const apiKey = process.env.GOOGLE_API_KEY;
@@ -88,7 +89,7 @@ export async function GET(request: Request) {
         name, address: place.formattedAddress || "", phone, has_whatsapp: hasWhatsapp,
         website: place.websiteUri || null, has_website: hasWebsite, rating, user_ratings_total: userRatingsTotal,
         business_status: businessStatus, score, temperature, scoreLabel: label, scoreExplanation: explanation,
-        suggestedMessage: generateContactMessage(name, hasWebsite, userRatingsTotal, rating, "es", place.websiteUri || null),
+        suggestedMessage: generateContactMessage(name, hasWebsite, userRatingsTotal, rating, locale, place.websiteUri || null),
       };
     });
 

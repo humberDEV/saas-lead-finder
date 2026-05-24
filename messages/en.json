@@ -107,7 +107,7 @@
       "ctaFree": "Try it for free",
       "ctaDashboard": "Go to dashboard",
       "step3Message": "Generated message:",
-      "step3Preview": "\"I do web design and noticed you have 47 reviews but no website...\"",
+      "step3Preview": "\"Hey! Found you on Google. Open today or appointment only?\"",
       "call": "Call"
     },
     "audience": {
@@ -180,7 +180,8 @@
       ],
       "disabledFeatures": [
         "Save businesses to My Portfolio",
-        "Search history"
+        "Search history",
+        "Instant demos (landing page + shareable link)"
       ]
     },
     "go": {
@@ -193,6 +194,7 @@
         "WhatsApp and call in one click",
         "Save businesses to My Portfolio",
         "Full search history",
+        "10 demos/month — personalized landing + WhatsApp link",
         "Priority support",
         "Early access to new features"
       ]
@@ -204,6 +206,7 @@
       "features": [
         "250 searches per month",
         "Everything in Go",
+        "Unlimited demo pages per lead",
         "Priority support",
         "Early access to new features"
       ]
@@ -307,14 +310,30 @@
       "paywallPopular": "Most popular",
       "paywallEasiest": "Easiest to start",
       "scanning": "Scanning Zone...",
-      "extractLeads": "Extract Leads",
+      "extractLeads": "Discover clients",
       "remaining": "({count} remaining)"
     },
     "results": {
       "businessesFound": "{count} businesses found",
+      "opportunitiesFound": "{count} sales opportunities",
       "reviewResults": "Review the results below",
+      "reviewResultsWithTotal": "{count} without a website out of {total} in the area",
       "noResultsTitle": "No results in that area.",
       "noResultsTip": "Try a more specific neighborhood or a different niche.",
+      "noLeadsTitle": "No potential clients here",
+      "noLeadsSub": "We didn't find real businesses — this search wasn't charged.",
+      "weakToastTitle": "0 green opportunities in this area",
+      "weakToastSub": "Huntly did find businesses — see the summary and try a suggested niche.",
+      "weakResultsTitle": "Most businesses here already have a website",
+      "weakResultsBody": "We analyzed {total} listings: {withWeb} already have a site, {noPhone} with no phone, {inactive} inactive. Nothing's broken — this market is just very digitized.",
+      "weakResultsExplore": "You have {count} orange profiles below to explore, but another niche usually works better.",
+      "suggestNichesTitle": "Try another niche in the same city",
+      "suggestSameCity": "One click — same area, different business type",
+      "changeZone": "Change neighborhood or city",
+      "exploreOpportunities": "Worth exploring",
+      "withWebSection": "Show businesses that already have a website ({count})",
+      "hideWithWeb": "Hide businesses with websites",
+      "toastDismiss": "Dismiss",
       "emptyTitle": "Find businesses that need a website.",
       "emptyTip": "Pick a niche and a zone to discover sales opportunities.",
       "emptyFirstTitle": "Find your first potential clients",
@@ -335,9 +354,16 @@
       "callDirect": "Call Direct",
       "savePro": "🔒 Save (Pro)",
       "saveToPortfolio": "Save to my portfolio",
+      "demoCreate": "Create demo",
+      "demoCopyLink": "Copy demo link",
+      "demoGenerating": "Generating…",
+      "demoCopied": "Copied!",
+      "demoOpen": "Open demo",
       "dismiss": "Dismiss",
       "messageHint": "AI message — Go plan only",
-      "messageUnlock": "Go plan — Unlock"
+      "messageUnlock": "Go plan — Unlock",
+      "messageSeeMore": "See more",
+      "messageSeeLess": "See less"
     },
     "upgrade": {
       "planActivated": "{plan} plan activated!",
@@ -391,6 +417,35 @@
     "valueCalloutTitle": "you recoup your investment on your first web sale.",
     "valueCalloutBody": "Huntly users pay $9/month. One website is worth $200 or more. Close one client and the plan pays for itself 20 times."
   },
+  "referral": {
+    "claim": {
+      "title": "Were you invited by a friend?",
+      "desc": "Paste their code or invite link. When you pay for your first plan, you both get 50 extra searches.",
+      "placeholder": "Code or link",
+      "submit": "Link invite",
+      "skip": "No, continue without a code",
+      "hint": "You can also paste the full link (huntly.app/api/ref/…)",
+      "success": "Done! Invite linked.",
+      "errorInvalid": "Invalid code or link.",
+      "errorAlready": "You already have an invite linked.",
+      "errorSelf": "You can't use your own code."
+    },
+    "invite": {
+      "title": "50 extra searches per friend",
+      "desc": "Share your link or code. When they sign up and pay for a plan, you both get 50 bonus searches.",
+      "copyLinkLabel": "Invite link",
+      "copyCodeLabel": "Invite code",
+      "copyLink": "Copy link",
+      "copyCode": "Copy code",
+      "copied": "Copied",
+      "linkedNote": "Invite linked. When you pay for your first plan, you both get the bonus.",
+      "statInvited": "Invited",
+      "statPending": "Pending",
+      "statRewarded": "Rewarded",
+      "bonusBalance": "You have {count} bonus searches from referrals",
+      "finePrint": "Bonus searches are used before plan searches. Only each invitee's first paid subscription counts."
+    }
+  },
   "crm": {
     "title": "My Portfolio",
     "subtitle": "Manage your sales opportunities.",
@@ -401,6 +456,30 @@
     "hasWeb": "Has website",
     "noWeb": "No website ✓",
     "call": "Call",
+    "whatsapp": "WhatsApp",
+    "copyMessage": "Copy message",
+    "messageCopied": "Message copied",
+    "defaultWaMessage": "Hey! Found {name} on Google. Open today or appointment only?",
+    "notes": "Notes",
+    "saveNote": "Save",
+    "noteSaved": "Saved",
+    "moveTo": "Move to {status}",
+    "discardLead": "Discard lead",
+    "restoreLead": "Back to pipeline",
+    "openMaps": "Maps",
+    "demo": "Demo",
+    "createDemo": "Create web demo",
+    "viewDemo": "View demo",
+    "copyDemoLink": "Copy link",
+    "linkCopied": "Copied",
+    "demoLocked": "Go plan",
+    "dragHandle": "Drag",
+    "statTotal": "{count} saved",
+    "statPending": "{count} to contact",
+    "statWon": "{count} won",
+    "emptyPortfolioTitle": "Your portfolio is empty",
+    "emptyPortfolioDesc": "Save leads from search using the folder icon. Track them here until you close the deal.",
+    "emptyInterested": "Move here leads who show interest",
     "columnPending": "Pipeline",
     "columnContacted": "Contacted",
     "columnInterested": "Interested",
@@ -417,7 +496,7 @@
     "labelInterested": "Interested",
     "labelClosed": "Won",
     "labelDiscarded": "Discarded",
-    "searchLeads": "+ Find leads",
+    "searchLeads": "Find leads",
     "leadsCount": "{total} leads saved · {pending} pending contact",
     "emptyColumn": "No leads in this column",
     "emptyColumnShort": "No leads",
@@ -432,6 +511,32 @@
     "unlockTitle": "Unlock the portfolio",
     "unlockDesc": "Save leads, update their status and track your deals with a paid plan. All in one visual board.",
     "priceFrom": "From $9/mo · cancel anytime"
+  },
+  "featureGate": {
+    "ctaSecondary": "Keep finding leads",
+    "priceAnchor": "One client pays for itself.",
+    "priceFrom": "From {price}/mo",
+    "crm": {
+      "title": "Your pipeline, without spreadsheet chaos",
+      "ctaPrimary": "Unlock portfolio",
+      "benefit1": "Kanban board by stage",
+      "benefit2": "Notes & follow-up per lead",
+      "benefit3": "Synced with your searches"
+    },
+    "history": {
+      "title": "Jump back to any search in one click",
+      "ctaPrimary": "Unlock history",
+      "benefit1": "Every search saved",
+      "benefit2": "Reload results instantly",
+      "benefit3": "No repeat search or extra credits"
+    },
+    "demos": {
+      "title": "Close more with a demo in 30 seconds",
+      "ctaPrimary": "Try Go plan",
+      "benefit1": "Link ready for WhatsApp",
+      "benefit2": "Template by niche",
+      "benefit3": "Generated in seconds"
+    }
   },
   "historyPage": {
     "title": "History",
@@ -449,6 +554,7 @@
     "subtitle": "Manage your account, plan and preferences.",
     "sectionAccount": "Account",
     "sectionPlan": "Plan",
+    "sectionReferral": "Invite & earn",
     "sectionSupport": "Support",
     "sectionSession": "Session",
     "upgradeLabel": "Upgrade to Go",
@@ -484,17 +590,46 @@
   },
   "mobileNav": {
     "search": "Search",
-    "dashboard": "Dashboard",
+    "dashboard": "Home",
     "history": "History",
-    "portfolio": "Portfolio",
+    "demos": "Demos",
+    "portfolio": "CRM",
     "account": "Account"
   },
   "mapPicker": {
-    "title": "Pick a zone on the map",
-    "hint": "Click anywhere to select a zone",
+    "title": "Explore a zone",
+    "subtitle": "Click the map or try a random destination",
+    "hint": "Click on the map to mark a spot",
     "detecting": "Detecting city...",
-    "noCity": "No city found here, try another spot",
-    "error": "Detection failed, try again"
+    "teleporting": "Flying to {city}…",
+    "noCity": "No city found here — try another spot",
+    "error": "Detection failed, try again",
+    "confirm": "Use this zone",
+    "cancel": "Cancel",
+    "random": "Random destination"
+  },
+  "demosPage": {
+    "title": "Your demo pages",
+    "subtitle": "Landing ready for WhatsApp · cannot be deleted",
+    "createCta": "Create demo",
+    "quotaMonthly": "{used} of {limit} demos this month",
+    "quotaUnlimited": "Unlimited demos",
+    "quotaReset": "Resets with your plan on {date}",
+    "noDeleteNote": "Each demo counts toward your monthly quota and cannot be deleted to free a slot.",
+    "emptyTitle": "No demos yet",
+    "emptyDesc": "Go to Search, find a lead and tap ✦ to generate their demo instantly.",
+    "emptyCta": "Go search leads",
+    "copied": "Copied",
+    "copyLink": "Copy link",
+    "preview": "Preview",
+    "limitReachedTitle": "Demo limit reached",
+    "limitReachedBody": "Go plan includes {limit} demos per month. Resets on {date}. Existing demos stay live."
+  },
+  "demosQuota": {
+    "limitReachedTitle": "No demos left this cycle",
+    "limitReachedSub": "Go plan includes {limit} demos. Resets on {date}.",
+    "existingTitle": "Link copied",
+    "existingSub": "You already had a demo for this business — no extra slot used."
   },
   "dashboardHome": {
     "radar": "Your prospecting radar.",

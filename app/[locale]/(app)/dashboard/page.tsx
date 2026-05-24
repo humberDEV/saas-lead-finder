@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
 import {
-  Search, Target, Phone, Sparkles, ArrowRight,
+  Search, Target, Phone, ArrowRight,
   Building2, TrendingUp, MapPin, Layers, AlertCircle,
 } from "lucide-react";
 import { motion } from "framer-motion";
@@ -35,7 +35,7 @@ interface IntelligenceData {
   recentSearches: RecentSearch[];
 }
 
-// ── Typewriter ────────────────────────────────────────────────────────────────
+// ── Typewriter greeting ───────────────────────────────────────────────────────
 function Typewriter({ text, speed = 28 }: { text: string; speed?: number }) {
   const [displayed, setDisplayed] = useState("");
   const [done, setDone] = useState(false);
@@ -63,11 +63,16 @@ function Typewriter({ text, speed = 28 }: { text: string; speed?: number }) {
     <span>
       {displayed}
       {!done && (
-        <span className="inline-block w-[2px] h-6 bg-indigo-400 ml-0.5 align-middle animate-pulse" />
+        <span className="inline-block w-[2px] h-[1.1em] bg-indigo-400 ml-0.5 align-middle animate-pulse" />
       )}
     </span>
   );
 }
+
+// ── Shared panel chrome (aligned with /search) ───────────────────────────────
+const panelClass =
+  "relative overflow-hidden rounded-2xl border border-neutral-800/70 bg-neutral-900/35 backdrop-blur-xl";
+const panelHover = "transition-all hover:border-indigo-500/25 hover:shadow-[0_0_24px_rgba(99,102,241,0.06)]";
 
 // ── Activity bar chart ────────────────────────────────────────────────────────
 const CHART_H = 72;
@@ -167,10 +172,10 @@ function RankedBars({
       {items.map((item, i) => (
         <div key={item.label}>
           <div className="flex items-center justify-between mb-1">
-            <span className="text-xs text-zinc-200 truncate flex-1 mr-3 leading-tight">
+            <span className="text-xs text-slate-300 line-clamp-2 break-words flex-1 mr-3 leading-snug">
               {item.label}
             </span>
-            <span className="text-xs font-black text-white shrink-0">
+            <span className="text-xs font-bold text-white tabular-nums shrink-0">
               {item.rate}%
             </span>
           </div>
@@ -322,15 +327,15 @@ function buildRecs(d: IntelligenceData, tRec: RecT): Rec[] {
 function Skeleton() {
   return (
     <div className="space-y-5 animate-pulse">
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[...Array(4)].map((_, i) => (
-          <div key={i} className="h-24 bg-neutral-900/60 border border-neutral-800 rounded-2xl" />
+          <div key={i} className={`h-28 ${panelClass}`} />
         ))}
       </div>
-      <div className="h-32 bg-neutral-900/60 border border-neutral-800 rounded-2xl" />
-      <div className="grid md:grid-cols-2 gap-4">
-        <div className="h-52 bg-neutral-900/60 border border-neutral-800 rounded-2xl" />
-        <div className="h-52 bg-neutral-900/60 border border-neutral-800 rounded-2xl" />
+      <div className={`h-36 ${panelClass}`} />
+      <div className="grid md:grid-cols-2 gap-5">
+        <div className={`h-56 ${panelClass}`} />
+        <div className={`h-56 ${panelClass}`} />
       </div>
     </div>
   );
@@ -402,33 +407,31 @@ export default function DashboardHome() {
   });
 
   return (
-    <div className="h-full overflow-y-auto bg-[#0A0A0A] bg-[radial-gradient(ellipse_60%_35%_at_50%_0%,rgba(99,102,241,0.07),transparent)]">
-      <main className="max-w-4xl mx-auto p-6 md:p-10 pb-24">
+    <div className="h-full overflow-y-auto">
+      <main className="max-w-6xl mx-auto w-full px-5 sm:px-8 md:px-10 py-6 md:py-9 pb-24">
 
         {/* ── Header ── */}
         <motion.div
           initial={{ opacity: 0, y: -8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
-          className="flex items-start justify-between gap-4 mb-8 flex-wrap"
+          className="flex items-end justify-between gap-6 mb-10 flex-wrap"
         >
-          <div>
-            <p className="text-[10px] font-mono text-indigo-500/70 uppercase tracking-widest mb-1 capitalize">
-              {monthLabel}
-            </p>
-            <h1 className="text-2xl md:text-3xl font-black text-white tracking-tight leading-tight min-h-[2rem]">
+          <div className="min-w-0 flex-1">
+            <p className="text-sm text-slate-500 capitalize mb-2">{monthLabel}</p>
+            <h1 className="text-2xl md:text-[1.75rem] font-bold text-white tracking-tight leading-snug min-h-[2.25rem]">
               {greetingText ? <Typewriter text={greetingText} /> : "\u00A0"}
             </h1>
-            <p className="text-zinc-600 text-xs mt-1">{t("radar")}</p>
+            <p className="text-sm text-slate-500 mt-2">{t("radar")}</p>
           </div>
           <Link
             href="/search"
-            className="group flex items-center gap-2.5 px-5 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-black text-sm rounded-xl transition-all shadow-[0_0_24px_rgba(99,102,241,0.28)] hover:shadow-[0_0_36px_rgba(99,102,241,0.45)] shrink-0"
+            className="group flex items-center gap-2.5 px-5 py-3 bg-white text-black hover:bg-slate-200 font-bold text-sm rounded-xl transition-all shadow-[0_0_20px_rgba(255,255,255,0.06)] shrink-0"
           >
             <Search className="w-4 h-4" />
             {t("newSearch")}
             {credits !== null && credits > 0 && (
-              <span className="bg-white/15 px-1.5 py-0.5 rounded text-[10px] font-bold">
+              <span className="bg-black/10 px-1.5 py-0.5 rounded text-[10px] font-bold tabular-nums">
                 {credits}
               </span>
             )}
@@ -441,76 +444,75 @@ export default function DashboardHome() {
         ) : data ? (
           <>
             {/* ── Stat cards ── */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-5">
-              {/* No website */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3, delay: 0.06 }}
-                className="bg-neutral-900/60 border border-neutral-800 rounded-2xl p-4"
+                className={`${panelClass} border-indigo-500/25 bg-neutral-900/50 p-5 shadow-[0_0_28px_rgba(99,102,241,0.08)]`}
               >
-                <div className="w-7 h-7 rounded-lg bg-indigo-500/10 flex items-center justify-center mb-3">
-                  <Building2 className="w-3.5 h-3.5 text-indigo-400" />
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-2/3 h-px bg-gradient-to-r from-transparent via-indigo-500/60 to-transparent" />
+                <div className="w-9 h-9 rounded-xl bg-indigo-500/15 border border-indigo-500/20 flex items-center justify-center mb-4">
+                  <Building2 className="w-4 h-4 text-indigo-400" />
                 </div>
-                <p className="text-2xl font-black text-white leading-none">
+                <p className="text-3xl font-bold text-white tabular-nums leading-none">
                   {data.noWebsiteFound}
                 </p>
-                <p className="text-xs font-semibold text-zinc-400 mt-1">{t("statNoWeb")}</p>
-                <p className="text-[10px] text-zinc-600">{t("statNoWebSub")}</p>
+                <p className="text-sm font-medium text-slate-300 mt-2">{t("statNoWeb")}</p>
+                <p className="text-xs text-slate-500 mt-0.5">{t("statNoWebSub")}</p>
               </motion.div>
 
-              {/* Contactable */}
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3, delay: 0.10 }}
-                className="bg-neutral-900/60 border border-neutral-800 rounded-2xl p-4"
+                transition={{ duration: 0.3, delay: 0.1 }}
+                className={`${panelClass} ${panelHover} p-5`}
               >
-                <div className="w-7 h-7 rounded-lg bg-emerald-500/10 flex items-center justify-center mb-3">
-                  <Phone className="w-3.5 h-3.5 text-emerald-400" />
+                <div className="w-9 h-9 rounded-xl bg-emerald-500/15 border border-emerald-500/20 flex items-center justify-center mb-4">
+                  <Phone className="w-4 h-4 text-emerald-400" />
                 </div>
-                <p className="text-2xl font-black text-white leading-none">
+                <p className="text-3xl font-bold text-white tabular-nums leading-none">
                   {data.contactableLeads}
                 </p>
-                <p className="text-xs font-semibold text-zinc-400 mt-1">{t("statContactable")}</p>
-                <p className="text-[10px] text-zinc-600">{t("statContactableSub")}</p>
+                <p className="text-sm font-medium text-slate-300 mt-2">{t("statContactable")}</p>
+                <p className="text-xs text-slate-500 mt-0.5">{t("statContactableSub")}</p>
               </motion.div>
 
-              {/* Unique niches */}
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3, delay: 0.14 }}
-                className="bg-neutral-900/60 border border-neutral-800 rounded-2xl p-4"
+                className={`${panelClass} ${panelHover} p-5`}
               >
-                <div className="w-7 h-7 rounded-lg bg-amber-500/10 flex items-center justify-center mb-3">
-                  <Layers className="w-3.5 h-3.5 text-amber-400" />
+                <div className="w-9 h-9 rounded-xl bg-amber-500/15 border border-amber-500/20 flex items-center justify-center mb-4">
+                  <Layers className="w-4 h-4 text-amber-400" />
                 </div>
-                <p className="text-2xl font-black text-white leading-none">
+                <p className="text-3xl font-bold text-white tabular-nums leading-none">
                   {data.topNiches.length}
                 </p>
-                <p className="text-xs font-semibold text-zinc-400 mt-1">{t("statNiches")}</p>
-                <p className="text-[10px] text-zinc-600">{t("statNichesSub")}</p>
+                <p className="text-sm font-medium text-slate-300 mt-2">{t("statNiches")}</p>
+                <p className="text-xs text-slate-500 mt-0.5">{t("statNichesSub")}</p>
               </motion.div>
 
-              {/* Monthly progress */}
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3, delay: 0.18 }}
-                className="bg-neutral-900/60 border border-neutral-800 rounded-2xl p-4"
+                className={`${panelClass} ${panelHover} p-5`}
               >
-                <div className="flex items-start justify-between mb-2">
-                  <div className="w-7 h-7 rounded-lg bg-violet-500/10 flex items-center justify-center">
-                    <TrendingUp className="w-3.5 h-3.5 text-violet-400" />
+                <div className="flex items-start justify-between mb-4">
+                  <div className="w-9 h-9 rounded-xl bg-violet-500/15 border border-violet-500/20 flex items-center justify-center">
+                    <TrendingUp className="w-4 h-4 text-violet-400" />
                   </div>
                   <ProgressRing used={data.searchesThisMonth} limit={data.planLimit} />
                 </div>
-                <p className="text-2xl font-black text-white leading-none">
+                <p className="text-3xl font-bold text-white tabular-nums leading-none">
                   {data.searchesThisMonth}
                 </p>
-                <p className="text-xs font-semibold text-zinc-400 mt-1">{t("statSearches")}</p>
-                <p className="text-[10px] text-zinc-600">{t("statSearchesSub", { limit: data.planLimit })}</p>
+                <p className="text-sm font-medium text-slate-300 mt-2">{t("statSearches")}</p>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  {t("statSearchesSub", { limit: data.planLimit })}
+                </p>
               </motion.div>
             </div>
 
@@ -519,13 +521,13 @@ export default function DashboardHome() {
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3, delay: 0.22 }}
-              className="bg-neutral-900/60 border border-neutral-800 rounded-2xl p-5 mb-5"
+              className={`${panelClass} ${panelHover} p-6 mb-6`}
             >
-              <div className="flex items-center justify-between mb-4">
-                <p className="text-xs font-black text-zinc-400 uppercase tracking-wider">
-                  {t("activityLabel")}
-                </p>
-                <span className="text-[10px] text-zinc-600">{t("activitySub")}</span>
+              <div className="flex items-baseline justify-between gap-4 mb-5">
+                <div>
+                  <h2 className="text-sm font-semibold text-slate-200">{t("activityLabel")}</h2>
+                  <p className="text-xs text-slate-500 mt-0.5">{t("activitySub")}</p>
+                </div>
               </div>
               <ActivityChart
                 data={data.activityByDay}
@@ -535,22 +537,23 @@ export default function DashboardHome() {
             </motion.div>
 
             {/* ── Niche + Zone analysis ── */}
-            <div className="grid md:grid-cols-2 gap-4 mb-5">
-              {/* Niches */}
+            <div className="grid md:grid-cols-2 gap-5 mb-6">
               <motion.div
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3, delay: 0.28 }}
-                className="bg-neutral-900/60 border border-neutral-800 rounded-2xl p-5"
+                className={`${panelClass} ${panelHover} p-6`}
               >
-                <div className="flex items-center gap-2 mb-4">
-                  <Layers className="w-3.5 h-3.5 text-violet-400 shrink-0" />
-                  <p className="text-xs font-black text-zinc-400 uppercase tracking-wider">
-                    {t("nichesLabel")}
-                  </p>
-                  <span className="text-[9px] text-zinc-700 ml-auto">
-                    {t("nichesWhatsappPct")}
-                  </span>
+                <div className="flex items-start justify-between gap-3 mb-5">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-8 h-8 rounded-lg bg-violet-500/15 border border-violet-500/20 flex items-center justify-center shrink-0">
+                      <Layers className="w-3.5 h-3.5 text-violet-400" />
+                    </div>
+                    <div>
+                      <h2 className="text-sm font-semibold text-slate-200">{t("nichesLabel")}</h2>
+                      <p className="text-[11px] text-slate-500">{t("nichesWhatsappPct")}</p>
+                    </div>
+                  </div>
                 </div>
                 <RankedBars
                   items={data.topNiches.map((n) => ({
@@ -567,51 +570,50 @@ export default function DashboardHome() {
                 />
               </motion.div>
 
-              {/* Recent searches */}
               <motion.div
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3, delay: 0.33 }}
-                className="bg-neutral-900/60 border border-neutral-800 rounded-2xl p-5"
+                className={`${panelClass} ${panelHover} p-6`}
               >
-                <div className="flex items-center gap-2 mb-4">
-                  <MapPin className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                  <p className="text-xs font-black text-zinc-400 uppercase tracking-wider">
-                    {t("recentLabel")}
-                  </p>
+                <div className="flex items-center gap-2.5 mb-5">
+                  <div className="w-8 h-8 rounded-lg bg-emerald-500/15 border border-emerald-500/20 flex items-center justify-center shrink-0">
+                    <MapPin className="w-3.5 h-3.5 text-emerald-400" />
+                  </div>
+                  <h2 className="text-sm font-semibold text-slate-200">{t("recentLabel")}</h2>
                 </div>
                 {data.recentSearches.length === 0 ? (
-                  <p className="text-xs text-zinc-600 py-6 text-center">
+                  <p className="text-xs text-slate-500 py-8 text-center leading-relaxed">
                     {t("recentEmpty")}
                   </p>
                 ) : (
-                  <div className="space-y-0">
+                  <div className="space-y-1">
                     {data.recentSearches.map((s, i) => (
-                      <div
+                      <Link
                         key={i}
-                        className={`flex items-center gap-3 py-2.5 ${
-                          i < data.recentSearches.length - 1
-                            ? "border-b border-neutral-800/50"
-                            : ""
+                        href={`/search?niche=${encodeURIComponent(s.niche)}&city=${encodeURIComponent(s.city)}`}
+                        className={`flex items-center gap-4 py-3 px-2 -mx-2 rounded-xl hover:bg-white/[0.03] transition-colors group ${
+                          i < data.recentSearches.length - 1 ? "border-b border-neutral-800/40" : ""
                         }`}
                       >
                         <div className="flex-1 min-w-0">
-                          <p className="text-xs font-semibold text-zinc-200 truncate leading-tight">
+                          <p className="text-sm font-medium text-slate-200 line-clamp-2 break-words leading-snug group-hover:text-white transition-colors">
                             {s.niche}
                           </p>
-                          <p className="text-[10px] text-zinc-600 truncate">{s.city}</p>
+                          <p className="text-xs text-slate-500 mt-0.5 line-clamp-1">{s.city}</p>
                         </div>
-                        <div className="flex items-center gap-3 shrink-0">
+                        <div className="flex items-center gap-4 shrink-0">
                           <div className="text-right">
-                            <p className="text-xs font-black text-emerald-400">{s.whatsapp}</p>
-                            <p className="text-[9px] text-zinc-600">{t("recentWhatsapp")}</p>
+                            <p className="text-sm font-bold text-emerald-400 tabular-nums">{s.whatsapp}</p>
+                            <p className="text-[10px] text-slate-600">{t("recentWhatsapp")}</p>
                           </div>
                           <div className="text-right">
-                            <p className="text-xs font-black text-zinc-400">{s.total}</p>
-                            <p className="text-[9px] text-zinc-600">{t("recentTotal")}</p>
+                            <p className="text-sm font-bold text-slate-400 tabular-nums">{s.total}</p>
+                            <p className="text-[10px] text-slate-600">{t("recentTotal")}</p>
                           </div>
+                          <ArrowRight className="w-3.5 h-3.5 text-slate-700 group-hover:text-indigo-400 transition-colors" />
                         </div>
-                      </div>
+                      </Link>
                     ))}
                   </div>
                 )}
@@ -624,22 +626,23 @@ export default function DashboardHome() {
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3, delay: 0.43 }}
-                className="space-y-2.5 mb-5"
+                className="space-y-3 mb-6"
               >
                 {recs.map((rec, i) => (
                   <div
                     key={i}
-                    className="flex items-start gap-3 bg-indigo-500/7 border border-indigo-500/14 rounded-2xl px-5 py-3.5"
+                    className={`${panelClass} border-indigo-500/20 pl-0 pr-5 py-4 flex items-start gap-4`}
                   >
-                    <Sparkles className="w-3.5 h-3.5 text-indigo-400 shrink-0 mt-0.5" />
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm text-zinc-300 leading-relaxed">{rec.text}</p>
+                    <div className="w-1 self-stretch rounded-full bg-gradient-to-b from-indigo-400/80 to-indigo-600/20 shrink-0 ml-0" />
+                    <div className="flex-1 min-w-0 py-0.5">
+                      <p className="text-sm text-slate-300 leading-relaxed">{rec.text}</p>
                       {rec.niche && (
                         <Link
                           href={`/search?niche=${encodeURIComponent(rec.niche)}${rec.city ? `&city=${encodeURIComponent(rec.city)}` : ""}`}
-                          className="mt-2 inline-flex items-center gap-1.5 text-xs font-bold text-indigo-400 hover:text-indigo-300 transition-colors"
+                          className="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-indigo-400 hover:text-indigo-300 transition-colors"
                         >
-                          {t("recSearch", { niche: rec.niche })} <ArrowRight className="w-3 h-3" />
+                          {t("recSearch", { niche: rec.niche })}
+                          <ArrowRight className="w-3 h-3" />
                         </Link>
                       )}
                     </div>
@@ -653,38 +656,38 @@ export default function DashboardHome() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.3, delay: 0.48 }}
-              className="grid sm:grid-cols-2 gap-3"
+              className="grid sm:grid-cols-2 gap-4"
             >
               <Link
                 href="/search"
-                className="group flex items-center gap-3 bg-neutral-900/60 border border-neutral-800 hover:border-indigo-500/30 rounded-2xl p-4 transition-all"
+                className={`group ${panelClass} ${panelHover} flex items-center gap-4 p-5`}
               >
-                <div className="w-8 h-8 rounded-xl bg-indigo-500/10 flex items-center justify-center shrink-0">
-                  <Search className="w-3.5 h-3.5 text-indigo-400" />
+                <div className="w-10 h-10 rounded-xl bg-indigo-500/15 border border-indigo-500/20 flex items-center justify-center shrink-0">
+                  <Search className="w-4 h-4 text-indigo-400" />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="text-sm font-bold text-white">{t("newSearch")}</p>
-                  <p className="text-[11px] text-zinc-600">
+                  <p className="text-sm font-semibold text-white">{t("newSearch")}</p>
+                  <p className="text-xs text-slate-500 mt-0.5">
                     {credits !== null
                       ? t("navSearchCredits", { count: credits })
                       : t("navSearchDefault")}
                   </p>
                 </div>
-                <ArrowRight className="w-3.5 h-3.5 text-zinc-700 group-hover:text-indigo-400 ml-auto transition-colors" />
+                <ArrowRight className="w-4 h-4 text-slate-600 group-hover:text-indigo-400 transition-colors shrink-0" />
               </Link>
 
               <Link
                 href="/crm"
-                className="group flex items-center gap-3 bg-neutral-900/60 border border-neutral-800 hover:border-violet-500/30 rounded-2xl p-4 transition-all"
+                className={`group ${panelClass} ${panelHover} flex items-center gap-4 p-5`}
               >
-                <div className="w-8 h-8 rounded-xl bg-violet-500/10 flex items-center justify-center shrink-0">
-                  <Target className="w-3.5 h-3.5 text-violet-400" />
+                <div className="w-10 h-10 rounded-xl bg-violet-500/15 border border-violet-500/20 flex items-center justify-center shrink-0">
+                  <Target className="w-4 h-4 text-violet-400" />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="text-sm font-bold text-white">{t("navCRMTitle")}</p>
-                  <p className="text-[11px] text-zinc-600">{t("navCRMSub")}</p>
+                  <p className="text-sm font-semibold text-white">{t("navCRMTitle")}</p>
+                  <p className="text-xs text-slate-500 mt-0.5">{t("navCRMSub")}</p>
                 </div>
-                <ArrowRight className="w-3.5 h-3.5 text-zinc-700 group-hover:text-violet-400 ml-auto transition-colors" />
+                <ArrowRight className="w-4 h-4 text-slate-600 group-hover:text-violet-400 transition-colors shrink-0" />
               </Link>
             </motion.div>
           </>
@@ -696,22 +699,21 @@ export default function DashboardHome() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.55 }}
-            className="mt-5 flex items-start gap-3 bg-amber-500/7 border border-amber-500/18 rounded-2xl px-5 py-4"
+            className={`mt-6 ${panelClass} border-amber-500/20 flex items-start gap-4 px-6 py-5`}
           >
-            <AlertCircle className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+            <div className="w-9 h-9 rounded-xl bg-amber-500/15 border border-amber-500/25 flex items-center justify-center shrink-0">
+              <AlertCircle className="w-4 h-4 text-amber-400" />
+            </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-bold text-amber-300 mb-0.5">
-                {t("freeUpsellTitle")}
-              </p>
-              <p className="text-xs text-amber-400/70">
-                {t("freeUpsellBody")}
-              </p>
+              <p className="text-sm font-semibold text-amber-100 mb-1">{t("freeUpsellTitle")}</p>
+              <p className="text-xs text-amber-200/70 leading-relaxed">{t("freeUpsellBody")}</p>
             </div>
             <Link
               href="/pricing"
-              className="shrink-0 flex items-center gap-1 text-xs font-bold text-amber-300 hover:text-amber-200 transition-colors whitespace-nowrap"
+              className="shrink-0 flex items-center gap-1.5 text-xs font-semibold text-amber-300 hover:text-amber-200 transition-colors whitespace-nowrap px-3 py-2 rounded-lg border border-amber-500/25 hover:bg-amber-500/10"
             >
-              {t("viewPlans")} <ArrowRight className="w-3 h-3" />
+              {t("viewPlans")}
+              <ArrowRight className="w-3 h-3" />
             </Link>
           </motion.div>
         )}

@@ -8,6 +8,7 @@ import { trackEvent } from "@/lib/events";
 import { sendLimitReachedEmail } from "@/lib/email";
 import { supabase } from "@/lib/supabase";
 import { parsePhoneNumber } from "libphonenumber-js/max";
+import { countLeadOpportunities } from "@/lib/count-opportunities";
 
 const CACHE_DAYS = 7; // Re-use results for 7 days before hitting Google again
 
@@ -45,7 +46,7 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "Error al obtener el usuario." }, { status: 500 });
   }
 
-  if (user.tokens <= 0) {
+  if (user.tokens <= 0 && user.bonusTokens <= 0) {
     return NextResponse.json(
       { error: "Sin búsquedas disponibles. Actualiza tu plan para continuar." },
       { status: 402 }
@@ -59,8 +60,10 @@ export async function GET(request: Request) {
     });
 
     if (cached) {
+      const results = cached.results as any[];
       return NextResponse.json({
-        results: cached.results as any[],
+        results,
+        opportunityCount: countLeadOpportunities(results),
         cached: true,
         cachedAt: cached.created_at,
       });
@@ -78,7 +81,7 @@ export async function GET(request: Request) {
       "Content-Type": "application/json",
       "X-Goog-Api-Key": apiKey,
       "X-Goog-FieldMask":
-        "places.displayName,places.formattedAddress,places.websiteUri,places.rating,places.userRatingCount,places.businessStatus,places.internationalPhoneNumber,places.nationalPhoneNumber,nextPageToken",
+        "places.id,places.displayName,places.formattedAddress,places.websiteUri,places.googleMapsUri,places.rating,places.userRatingCount,places.businessStatus,places.internationalPhoneNumber,places.nationalPhoneNumber,places.photos,places.regularOpeningHours,nextPageToken",
     };
 
     // Primera página
@@ -138,6 +141,12 @@ export async function GET(request: Request) {
 
       const name = place.displayName?.text || "Sin nombre";
 
+      const placeId = place.id?.replace(/^places\//, "") ?? null;
+      const photoNames = (place.photos ?? [])
+        .slice(0, 5)
+        .map((p: { name?: string }) => p.name)
+        .filter(Boolean) as string[];
+
       return {
         name,
         address: place.formattedAddress || "",
@@ -148,6 +157,10 @@ export async function GET(request: Request) {
         rating,
         user_ratings_total: userRatingsTotal,
         business_status: businessStatus,
+        place_id: placeId,
+        google_maps_uri: place.googleMapsUri ?? null,
+        photo_names: photoNames.length ? photoNames : undefined,
+        opening_hours: place.regularOpeningHours?.weekdayDescriptions ?? null,
         score,
         temperature,
         scoreLabel: label,
@@ -168,11 +181,16 @@ export async function GET(request: Request) {
     const now = new Date().toISOString();
 
     if (hasOpportunities) {
-      // Decrement token + update activity fields
+      // Consume bonus_tokens first, then plan tokens
+      const deductField =
+        user.bonusTokens > 0
+          ? { bonus_tokens: { decrement: 1 } as const }
+          : { tokens: { decrement: 1 } as const };
+
       await db.user.update({
         where: { clerkId: userId },
         data: {
-          tokens: { decrement: 1 },
+          ...deductField,
           searches_count_increment: true,
           last_search_at: now,
           ...(!user.firstSearchAt ? { first_search_at: now } : {}),
@@ -241,7 +259,14 @@ export async function GET(request: Request) {
       console.error("[search_history] Error al guardar:", err);
     }
 
-    return NextResponse.json({ results: uniquePlaces as any[], historyId, hasOpportunities });
+    const opportunityCount = countLeadOpportunities(uniquePlaces);
+
+    return NextResponse.json({
+      results: uniquePlaces as any[],
+      opportunityCount,
+      historyId,
+      hasOpportunities,
+    });
   } catch (error: any) {
     return NextResponse.json(
       { error: error.message || "Internal Server Error" },

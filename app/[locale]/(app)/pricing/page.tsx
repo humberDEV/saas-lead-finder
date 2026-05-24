@@ -20,7 +20,11 @@ export default function Pricing() {
   const period = t("period");
   const { plan: currentPlan, credits: remaining } = useSidebar();
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
+  const [switchSuccess, setSwitchSuccess] = useState<string | null>(null);
   const flash = useFlashOffer();
+
+  // True when the user already has a paid Stripe subscription
+  const hasPaidPlan = currentPlan !== "free" && currentPlan !== null;
 
   useEffect(() => {
     fetch("/api/events", {
@@ -83,11 +87,34 @@ export default function Pricing() {
       if (data.url) {
         window.location.href = data.url;
       } else {
-        console.error("No checkout URL returned", data);
         setLoadingPlan(null);
       }
-    } catch (err) {
-      console.error("Checkout error", err);
+    } catch {
+      setLoadingPlan(null);
+    }
+  }
+
+  async function handleSwitchPlan(planKey: string) {
+    setLoadingPlan(planKey);
+    setSwitchSuccess(null);
+    try {
+      const res = await fetch("/api/stripe/switch-plan", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ planKey }),
+      });
+      const data = await res.json();
+      if (data.ok) {
+        setSwitchSuccess(planKey);
+        // Cancellation is scheduled — no reload needed (plan stays until period end)
+        // For plan upgrades/downgrades — reload so sidebar reflects new plan
+        if (!data.scheduled) {
+          setTimeout(() => window.location.reload(), 1500);
+        }
+      }
+    } catch {
+      /* silent */
+    } finally {
       setLoadingPlan(null);
     }
   }
@@ -310,20 +337,62 @@ export default function Pricing() {
 
                 {/* CTA */}
                 {isCurrentPlan ? (
-                  <Link
-                    href="/dashboard"
-                    className="block text-center w-full py-3 rounded-2xl text-sm font-bold bg-white/[0.04] text-zinc-500 border border-white/[0.06] cursor-default"
-                  >
-                    {t("activePlan")}
-                  </Link>
+                  <div className="block text-center w-full py-3 rounded-2xl text-sm font-bold bg-white/[0.04] text-zinc-500 border border-white/[0.06]">
+                    {switchSuccess === "free"
+                      ? "✓ Cancelación programada — acceso hasta fin de ciclo"
+                      : switchSuccess === k
+                      ? "✓ Plan actualizado"
+                      : t("activePlan")}
+                  </div>
                 ) : k === "free" ? (
-                  <Link
-                    href="/dashboard"
-                    className="block text-center w-full py-3 rounded-2xl text-sm font-semibold transition-all text-zinc-600 border border-white/[0.05] hover:border-white/[0.10] hover:text-zinc-400"
+                  hasPaidPlan ? (
+                    // Downgrade to free = cancel
+                    <button
+                      onClick={() => handleSwitchPlan("free")}
+                      disabled={!!loadingPlan}
+                      className="block w-full py-3 rounded-2xl text-sm font-semibold transition-all text-zinc-600 border border-white/[0.05] hover:border-red-500/20 hover:text-red-400 disabled:opacity-50"
+                    >
+                      {isLoading ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : "Cancelar suscripción"}
+                    </button>
+                  ) : (
+                    <Link
+                      href="/dashboard"
+                      className="block text-center w-full py-3 rounded-2xl text-sm font-semibold transition-all text-zinc-600 border border-white/[0.05] hover:border-white/[0.10] hover:text-zinc-400"
+                    >
+                      {t("goToDashboard")}
+                    </Link>
+                  )
+                ) : hasPaidPlan ? (
+                  // Switch between paid plans
+                  <button
+                    onClick={() => handleSwitchPlan(k)}
+                    disabled={!!loadingPlan}
+                    className="flex items-center justify-center gap-2 w-full py-3 rounded-2xl text-sm font-bold transition-all disabled:opacity-60 disabled:cursor-not-allowed"
+                    style={
+                      k === "go"
+                        ? {
+                            background: "linear-gradient(135deg, #7c3aed, #6d28d9)",
+                            color: "#fff",
+                            boxShadow: "0 0 28px rgba(139,92,246,0.50)",
+                          }
+                        : {
+                            background: "rgba(255,255,255,0.03)",
+                            color: "rgba(226,232,240,0.85)",
+                            border: "1px solid rgba(148,163,184,0.14)",
+                          }
+                    }
                   >
-                    {t("goToDashboard")}
-                  </Link>
+                    {isLoading ? (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : (
+                      <>
+                        {currentPlan === "free" || PLANS.findIndex(p => p.planKey === k) > PLANS.findIndex(p => p.planKey === currentPlan)
+                          ? "Subir" : "Bajar"} a {plan.name} <ArrowRight className="w-3.5 h-3.5" />
+                      </>
+                    )}
+                  </button>
                 ) : (
+                  // New subscriber — use checkout
                   <button
                     onClick={() => handleCheckout(k, k === "go" && flash.active)}
                     disabled={!!loadingPlan}

@@ -107,7 +107,7 @@
       "ctaFree": "Probarlo gratis",
       "ctaDashboard": "Ir al dashboard",
       "step3Message": "Mensaje generado:",
-      "step3Preview": "\"Me dedico al diseño web y vi que tienen 47 reseñas pero no tienen página...\"",
+      "step3Preview": "\"Hola! Vi el local en Google. ¿Atienden sin cita o hay que reservar?\"",
       "call": "Llamar"
     },
     "audience": {
@@ -180,7 +180,8 @@
       ],
       "disabledFeatures": [
         "Guardar negocios en Mi Cartera",
-        "Historial de búsquedas"
+        "Historial de búsquedas",
+        "Demos instantáneas (landing + link para el cliente)"
       ]
     },
     "go": {
@@ -193,6 +194,7 @@
         "WhatsApp y llamada con un clic",
         "Guardar negocios en Mi Cartera",
         "Historial completo de búsquedas",
+        "10 demos/mes — landing personalizada + link para WhatsApp",
         "Soporte prioritario",
         "Acceso a nuevas funciones primero"
       ]
@@ -204,6 +206,7 @@
       "features": [
         "250 búsquedas al mes",
         "Todo lo del plan Go",
+        "Demos ilimitadas por lead",
         "Soporte prioritario",
         "Acceso a nuevas funciones primero"
       ]
@@ -307,14 +310,30 @@
       "paywallPopular": "Más popular",
       "paywallEasiest": "Más fácil para empezar",
       "scanning": "Rastreando Zona...",
-      "extractLeads": "Extraer Leads",
+      "extractLeads": "Descubrir clientes",
       "remaining": "({count} restantes)"
     },
     "results": {
       "businessesFound": "{count} negocios encontrados",
+      "opportunitiesFound": "{count} oportunidades de venta",
       "reviewResults": "Revisa los resultados abajo",
+      "reviewResultsWithTotal": "{count} sin web de {total} negocios en la zona",
       "noResultsTitle": "Sin resultados en esa zona.",
       "noResultsTip": "Prueba con un barrio más concreto o un nicho diferente.",
+      "noLeadsTitle": "Sin posibles clientes aquí",
+      "noLeadsSub": "No encontramos negocios reales — no te cobramos esta búsqueda.",
+      "weakToastTitle": "0 oportunidades verdes en esta zona",
+      "weakToastSub": "Huntly sí encontró negocios — mira el resumen y prueba otro nicho sugerido.",
+      "weakResultsTitle": "En este nicho casi todos tienen web",
+      "weakResultsBody": "Analizamos {total} negocios: {withWeb} ya tienen página, {noPhone} sin teléfono y {inactive} inactivos. No está roto — aquí el mercado ya está muy digitalizado.",
+      "weakResultsExplore": "Abajo tienes {count} en naranja para explorar, pero otro nicho suele ir mejor.",
+      "suggestNichesTitle": "Probar otro nicho en la misma ciudad",
+      "suggestSameCity": "Un clic y lanzamos la búsqueda con el mismo barrio",
+      "changeZone": "Cambiar barrio o ciudad",
+      "exploreOpportunities": "Para explorar",
+      "withWebSection": "Ver negocios que ya tienen web ({count})",
+      "hideWithWeb": "Ocultar negocios con web",
+      "toastDismiss": "Cerrar aviso",
       "emptyTitle": "Encuentra tus primeros clientes potenciales",
       "emptyTip": "Elige un nicho y una zona para descubrir oportunidades de venta.",
       "emptyFirstTitle": "Encuentra tus primeros clientes potenciales",
@@ -335,9 +354,16 @@
       "callDirect": "Llamar Directo",
       "savePro": "🔒 Guardar (Pro)",
       "saveToPortfolio": "Guardar en mi cartera",
+      "demoCreate": "Crear demo",
+      "demoCopyLink": "Copiar link demo",
+      "demoGenerating": "Generando…",
+      "demoCopied": "¡Copiado!",
+      "demoOpen": "Abrir demo",
       "dismiss": "Borrar",
       "messageHint": "Mensaje con IA — exclusivo del plan Go",
-      "messageUnlock": "Plan Go — Desbloquear"
+      "messageUnlock": "Plan Go — Desbloquear",
+      "messageSeeMore": "Ver más",
+      "messageSeeLess": "Ver menos"
     },
     "upgrade": {
       "planActivated": "¡Plan {plan} activado!",
@@ -391,6 +417,35 @@
     "valueCalloutTitle": "recuperas la inversión con tu primera venta web.",
     "valueCalloutBody": "Los usuarios de Huntly pagan $9 al mes. Una sola web vale 200€ o más. Cierra uno y el plan está pagado 20 veces."
   },
+  "referral": {
+    "claim": {
+      "title": "¿Te ha invitado un amigo?",
+      "desc": "Pega su código o el enlace de invitación. Cuando pagues tu primer plan, los dos recibís 50 búsquedas extra.",
+      "placeholder": "Código o enlace",
+      "submit": "Vincular invitación",
+      "skip": "No, continuar sin código",
+      "hint": "También puedes pegar el enlace completo (huntly.app/api/ref/…)",
+      "success": "¡Listo! Invitación vinculada.",
+      "errorInvalid": "Código o enlace no válido.",
+      "errorAlready": "Ya tienes una invitación vinculada.",
+      "errorSelf": "No puedes usar tu propio código."
+    },
+    "invite": {
+      "title": "50 búsquedas extra por amigo",
+      "desc": "Comparte tu enlace o tu código. Cuando se registre y pague un plan, los dos recibís 50 búsquedas bonus.",
+      "copyLinkLabel": "Enlace de invitación",
+      "copyCodeLabel": "Código de invitación",
+      "copyLink": "Copiar enlace",
+      "copyCode": "Copiar código",
+      "copied": "Copiado",
+      "linkedNote": "Invitación vinculada. Al pagar tu primer plan, ambos recibís el bonus.",
+      "statInvited": "Invitados",
+      "statPending": "Pendientes",
+      "statRewarded": "Premiados",
+      "bonusBalance": "Tienes {count} búsquedas bonus de referidos",
+      "finePrint": "El bonus se usa antes que las de tu plan. Solo cuenta la primera suscripción de pago de cada invitado."
+    }
+  },
   "crm": {
     "title": "Mi Cartera",
     "subtitle": "Gestiona tus oportunidades de venta.",
@@ -401,6 +456,30 @@
     "hasWeb": "Tiene web",
     "noWeb": "Sin web ✓",
     "call": "Llamar",
+    "whatsapp": "WhatsApp",
+    "copyMessage": "Copiar mensaje",
+    "messageCopied": "Mensaje copiado",
+    "defaultWaMessage": "Hola, buenas. Vi {name} en Google. ¿Atienden hoy o hay que pedir cita?",
+    "notes": "Notas",
+    "saveNote": "Guardar",
+    "noteSaved": "Guardada",
+    "moveTo": "Pasar a {status}",
+    "discardLead": "Descartar lead",
+    "restoreLead": "Volver a la lista",
+    "openMaps": "Maps",
+    "demo": "Demo",
+    "createDemo": "Crear demo web",
+    "viewDemo": "Ver demo",
+    "copyDemoLink": "Copiar link",
+    "linkCopied": "Copiado",
+    "demoLocked": "Plan Go",
+    "dragHandle": "Arrastrar",
+    "statTotal": "{count} en cartera",
+    "statPending": "{count} por contactar",
+    "statWon": "{count} cerrados",
+    "emptyPortfolioTitle": "Tu cartera está vacía",
+    "emptyPortfolioDesc": "Guarda leads desde la búsqueda con el icono de carpeta. Aquí harás seguimiento hasta cerrarlos.",
+    "emptyInterested": "Mueve aquí los que respondan con interés",
     "columnPending": "En lista",
     "columnContacted": "Contactados",
     "columnInterested": "Interesados",
@@ -417,7 +496,7 @@
     "labelInterested": "Interesado",
     "labelClosed": "Cerrado",
     "labelDiscarded": "Descartado",
-    "searchLeads": "+ Buscar leads",
+    "searchLeads": "Buscar leads",
     "leadsCount": "{total} leads guardados · {pending} pendientes de contactar",
     "emptyColumn": "Sin leads en esta columna",
     "emptyColumnShort": "Sin leads",
@@ -432,6 +511,32 @@
     "unlockTitle": "Desbloquea la cartera",
     "unlockDesc": "Guarda leads, cambia su estado y haz seguimiento real con un plan de pago. Todo en un tablero visual.",
     "priceFrom": "Desde $9/mes · cancela cuando quieras"
+  },
+  "featureGate": {
+    "ctaSecondary": "Seguir buscando leads",
+    "priceAnchor": "Un solo cliente lo amortiza.",
+    "priceFrom": "Desde {price}/mes",
+    "crm": {
+      "title": "Tu pipeline, sin Excel ni caos",
+      "ctaPrimary": "Desbloquear cartera",
+      "benefit1": "Tablero Kanban por estado",
+      "benefit2": "Notas y seguimiento por lead",
+      "benefit3": "Sincronizado con tus búsquedas"
+    },
+    "history": {
+      "title": "Vuelve a cualquier búsqueda en un clic",
+      "ctaPrimary": "Desbloquear historial",
+      "benefit1": "Todas tus búsquedas guardadas",
+      "benefit2": "Recupera resultados al instante",
+      "benefit3": "Sin repetir ni gastar créditos"
+    },
+    "demos": {
+      "title": "Cierra más con una demo en 30 segundos",
+      "ctaPrimary": "Probar plan Go",
+      "benefit1": "Link listo para WhatsApp",
+      "benefit2": "Plantilla por nicho",
+      "benefit3": "Generada en segundos"
+    }
   },
   "historyPage": {
     "title": "Historial",
@@ -449,6 +554,7 @@
     "subtitle": "Gestiona tu cuenta, plan y preferencias.",
     "sectionAccount": "Cuenta",
     "sectionPlan": "Plan",
+    "sectionReferral": "Invita y gana",
     "sectionSupport": "Soporte",
     "sectionSession": "Sesión",
     "upgradeLabel": "Actualizar a Go",
@@ -484,17 +590,46 @@
   },
   "mobileNav": {
     "search": "Buscar",
-    "dashboard": "Dashboard",
+    "dashboard": "Inicio",
     "history": "Historial",
+    "demos": "Demos",
     "portfolio": "Cartera",
     "account": "Cuenta"
   },
   "mapPicker": {
-    "title": "Elegir zona en el mapa",
-    "hint": "Haz clic en cualquier zona para seleccionarla",
+    "title": "Explorar zona",
+    "subtitle": "Clic en el mapa o prueba un destino al azar",
+    "hint": "Haz clic en el mapa para marcar",
     "detecting": "Detectando ciudad...",
-    "noCity": "No hay ciudad en este punto, prueba otra zona",
-    "error": "Error al detectar, inténtalo de nuevo"
+    "teleporting": "Viajando a {city}…",
+    "noCity": "No detectamos ciudad aquí — prueba otro punto",
+    "error": "Error al detectar, inténtalo de nuevo",
+    "confirm": "Usar esta zona",
+    "cancel": "Cancelar",
+    "random": "Destino aleatorio"
+  },
+  "demosPage": {
+    "title": "Tus páginas demo",
+    "subtitle": "Landing lista para WhatsApp · no se pueden eliminar",
+    "createCta": "Crear demo",
+    "quotaMonthly": "{used} de {limit} demos este mes",
+    "quotaUnlimited": "Demos ilimitadas",
+    "quotaReset": "Se renueva con tu plan el {date}",
+    "noDeleteNote": "Cada demo cuenta en tu cupo mensual y no se puede borrar para liberar hueco.",
+    "emptyTitle": "Sin demos todavía",
+    "emptyDesc": "Ve a Buscar, encuentra un lead y pulsa ✦ para generar su demo al instante.",
+    "emptyCta": "Ir a buscar leads",
+    "copied": "Copiado",
+    "copyLink": "Copiar link",
+    "preview": "Preview",
+    "limitReachedTitle": "Límite de demos alcanzado",
+    "limitReachedBody": "Tu plan Go incluye {limit} demos al mes. Se renueva el {date}. Las demos ya creadas siguen activas."
+  },
+  "demosQuota": {
+    "limitReachedTitle": "Sin demos este ciclo",
+    "limitReachedSub": "Tu plan Go incluye {limit} demos. Se renueva el {date}.",
+    "existingTitle": "Link copiado",
+    "existingSub": "Ya tenías una demo de este negocio — no gastaste otra."
   },
   "dashboardHome": {
     "radar": "Tu radar de prospección.",
