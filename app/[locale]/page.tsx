@@ -390,7 +390,7 @@ export default async function LandingPage() {
                   style={{ boxShadow: "0 0 0 1px rgba(139,92,246,0.08), 0 24px 48px rgba(0,0,0,0.5)" }}
                 >
                   <video className="w-full bg-black brightness-110" autoPlay loop muted playsInline
-                    src="https://res.cloudinary.com/dufnkxsfm/video/upload/v1777248069/minidemo_kzfinl.mp4"
+                    src="https://res.cloudinary.com/dkdzun2xd/video/upload/v1783957970/demo_huntly_gdszbm.mp4"
                   />
                 </div>
               </Reveal>
