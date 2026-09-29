@@ -4,8 +4,6 @@ import { randomUUID } from "crypto";
 import { db } from "./db";
 import { PLAN_LIMITS } from "./plans";
 import { trackEvent } from "./events";
-import { sendWelcomeEmail } from "./email";
-import { supabase } from "./supabase";
 
 function generateReferralCode(): string {
   return randomUUID().replace(/-/g, "").slice(0, 8).toUpperCase();
@@ -23,7 +21,7 @@ export async function getOrCreateUser(
 
   if (!user) {
     // If the caller didn't pass the profile, fetch it from Clerk so we
-    // always have the email at creation time (needed for the welcome email).
+    // always have the email at creation time for billing and account recovery.
     let email = clerkProfile?.email ?? null;
     let name = clerkProfile?.name ?? null;
     if (!email) {
@@ -35,7 +33,7 @@ export async function getOrCreateUser(
         const lastName = clerkUser.lastName ?? "";
         name = name ?? (firstName || lastName ? `${firstName} ${lastName}`.trim() : null);
       } catch {
-        // Non-fatal — user still gets created, email just won't be sent now
+        // Non-fatal — user still gets created.
       }
     }
 
@@ -57,8 +55,7 @@ export async function getOrCreateUser(
       }
     }
 
-    // Race condition guard: if two requests arrive simultaneously for a new user,
-    // only the one that actually inserts the row should send the welcome email.
+    // Race condition guard for simultaneous requests from a new user.
     let isNew = false;
     try {
       user = await db.user.create({
@@ -81,10 +78,6 @@ export async function getOrCreateUser(
 
     if (isNew) {
       await trackEvent(user.id, "user_signed_up");
-      if (user.email) {
-        await trackEvent(user.id, "welcome_email_sent");
-        sendWelcomeEmail(user.email, user.name).catch(() => {});
-      }
       // Create referral record if user came via a referral link
       if (referredBy) {
         await db.referral.create({ referrerUserId: referredBy, referredUserId: user.id }).catch(() => {});
@@ -102,7 +95,6 @@ export async function getOrCreateUser(
   }
 
   // Sync missing email/name from Clerk
-  const hadEmail = !!user.email;
   const needsSync =
     (clerkProfile?.email && !user.email) ||
     (clerkProfile?.name && !user.name);
@@ -133,23 +125,6 @@ export async function getOrCreateUser(
       where: { clerkId: clerkUserId },
       data: syncPatch,
     });
-  }
-
-  // If email was missing at creation and just got synced, send welcome email now.
-  // Guard via product_events to prevent duplicates if multiple requests race here.
-  if (!hadEmail && user.email) {
-    const { data: alreadySent } = await supabase
-      .from("product_events")
-      .select("id")
-      .eq("user_id", user.id)
-      .eq("event", "welcome_email_sent")
-      .limit(1)
-      .maybeSingle();
-
-    if (!alreadySent) {
-      await trackEvent(user.id, "welcome_email_sent");
-      sendWelcomeEmail(user.email, user.name).catch(() => {});
-    }
   }
 
   return user;

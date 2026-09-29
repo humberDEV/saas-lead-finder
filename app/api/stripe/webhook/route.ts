@@ -3,12 +3,24 @@ import { headers } from "next/headers";
 import { stripe, STRIPE_PLANS } from "@/lib/stripe";
 import { db, PLAN_LIMITS } from "@/lib/db";
 import { trackEvent } from "@/lib/events";
+import { sendPaymentFailedEmail, sendPaymentReceiptEmail } from "@/lib/email";
 import type Stripe from "stripe";
 
 export const runtime = "nodejs";
 
 // Disable body parsing so we can verify the raw Stripe signature
 export const dynamic = "force-dynamic";
+
+function getInvoiceSubscriptionId(invoice: Stripe.Invoice) {
+  const legacySubscription = (
+    invoice as Stripe.Invoice & {
+      subscription?: string | Stripe.Subscription | null;
+    }
+  ).subscription;
+  const subscription =
+    legacySubscription ?? invoice.parent?.subscription_details?.subscription;
+  return typeof subscription === "string" ? subscription : subscription?.id ?? null;
+}
 
 async function upgradeUser(clerkId: string, planKey: string, subscriptionId: string) {
   const planConfig = STRIPE_PLANS[planKey];
@@ -44,6 +56,10 @@ async function upgradeUser(clerkId: string, planKey: string, subscriptionId: str
 async function downgradeUser(stripeCustomerId: string) {
   const user = await db.user.findByStripeCustomerId(stripeCustomerId);
   if (!user) return;
+
+  // The third-failure handler downgrades immediately. The later Stripe
+  // subscription.deleted webhook must therefore be a no-op.
+  if (user.plan === "free" && !user.stripeSubscriptionId) return;
 
   const previousPlan = user.plan;
 
@@ -134,7 +150,7 @@ export async function POST(request: Request) {
         // Subscription renewed successfully → reset tokens to plan limit
         const invoice = event.data.object as Stripe.Invoice;
         // Only act on subscription invoices (not one-off charges)
-        if (!("subscription" in invoice) || !invoice.subscription) break;
+        if (!getInvoiceSubscriptionId(invoice)) break;
 
         const user = await db.user.findByStripeCustomerId(invoice.customer as string);
         if (!user) break;
@@ -151,13 +167,152 @@ export async function POST(request: Request) {
           },
         });
         await trackEvent(user.id, "tokens_reset", { plan: user.plan, tokens: limit }).catch(() => {});
+        await trackEvent(user.id, "payment_recovered", {
+          invoiceId: invoice.id,
+          amountPaid: invoice.amount_paid,
+          currency: invoice.currency,
+        }).catch(() => {});
+
+        const email = invoice.customer_email ?? user.email;
+        if (email && invoice.hosted_invoice_url) {
+          const amount = new Intl.NumberFormat("es-ES", {
+            style: "currency",
+            currency: invoice.currency.toUpperCase(),
+          }).format(invoice.amount_paid / 100);
+          const sent = await sendPaymentReceiptEmail(email, {
+            name: user.name,
+            amount,
+            invoiceUrl: invoice.hosted_invoice_url,
+            invoicePdfUrl: invoice.invoice_pdf,
+            invoiceId: invoice.id,
+          });
+          if (sent) {
+            await trackEvent(user.id, "payment_receipt_email_sent", {
+              stripeEventId: event.id,
+              invoiceId: invoice.id,
+            }).catch(() => {});
+          }
+        }
         break;
       }
 
       case "invoice.payment_failed": {
-        // Optional: log or notify. Don't downgrade immediately on first failure.
         const invoice = event.data.object as Stripe.Invoice;
-        console.warn("[stripe/webhook] Payment failed for customer:", invoice.customer);
+        const customerId =
+          typeof invoice.customer === "string" ? invoice.customer : invoice.customer?.id;
+        if (!customerId) break;
+
+        const user = await db.user.findByStripeCustomerId(customerId);
+        if (!user) {
+          console.warn("[stripe/webhook] Payment failed for unknown customer:", customerId);
+          break;
+        }
+
+        const attemptCount = invoice.attempt_count ?? 1;
+        await trackEvent(user.id, "payment_failed", {
+          stripeEventId: event.id,
+          invoiceId: invoice.id,
+          attemptCount,
+          amountDue: invoice.amount_due,
+          currency: invoice.currency,
+          nextPaymentAttempt: invoice.next_payment_attempt,
+        }).catch(() => {});
+
+        // Stripe can retry the webhook. Resend's key prevents duplicate emails
+        // for the same invoice attempt while allowing a later failed attempt.
+        // One reminder per invoice, exactly on the second failed attempt. Later
+        // retries are still tracked but don't consume email quota.
+        if (attemptCount === 2) {
+          const email = invoice.customer_email ?? user.email;
+          const paymentUrl = invoice.hosted_invoice_url ?? `${process.env.NEXT_PUBLIC_APP_URL ?? "https://tryhuntly.com"}/es/settings`;
+          if (email) {
+            const amount = new Intl.NumberFormat("es-ES", {
+              style: "currency",
+              currency: invoice.currency.toUpperCase(),
+            }).format(invoice.amount_due / 100);
+            const sent = await sendPaymentFailedEmail(email, {
+              name: user.name,
+              paymentUrl,
+              amount,
+              attemptCount,
+              invoiceId: invoice.id,
+            });
+            if (sent) {
+              await trackEvent(user.id, "payment_failed_email_sent", {
+                stripeEventId: event.id,
+                invoiceId: invoice.id,
+                attemptCount,
+              }).catch(() => {});
+            }
+          }
+        }
+
+        if (attemptCount >= 3) {
+          const subscriptionId = getInvoiceSubscriptionId(invoice);
+          if (subscriptionId) {
+            await stripe.subscriptions.cancel(
+              subscriptionId,
+              {},
+              { idempotencyKey: `cancel-after-third-failure/${invoice.id}` }
+            );
+            await downgradeUser(customerId);
+            await trackEvent(user.id, "subscription_cancelled_nonpayment", {
+              stripeEventId: event.id,
+              invoiceId: invoice.id,
+              subscriptionId,
+              attemptCount,
+            }).catch(() => {});
+          }
+        }
+        break;
+      }
+
+      case "charge.dispute.created":
+      case "charge.dispute.closed": {
+        const dispute = event.data.object as Stripe.Dispute;
+        const chargeId = typeof dispute.charge === "string" ? dispute.charge : dispute.charge?.id;
+        if (!chargeId) break;
+        const charge = await stripe.charges.retrieve(chargeId);
+        const customerId = typeof charge.customer === "string" ? charge.customer : charge.customer?.id;
+        if (!customerId) break;
+        const user = await db.user.findByStripeCustomerId(customerId);
+        if (!user) break;
+        await trackEvent(
+          user.id,
+          event.type === "charge.dispute.created" ? "dispute_opened" : "dispute_closed",
+          {
+            stripeEventId: event.id,
+            disputeId: dispute.id,
+            chargeId,
+            paymentIntentId:
+              typeof dispute.payment_intent === "string"
+                ? dispute.payment_intent
+                : dispute.payment_intent?.id,
+            reason: dispute.reason,
+            status: dispute.status,
+            amount: dispute.amount,
+            currency: dispute.currency,
+            evidenceDueBy: dispute.evidence_details?.due_by ?? null,
+          }
+        ).catch(() => {});
+        break;
+      }
+
+      case "radar.early_fraud_warning.created": {
+        const warning = event.data.object as Stripe.Radar.EarlyFraudWarning;
+        const chargeId = typeof warning.charge === "string" ? warning.charge : warning.charge.id;
+        const charge = await stripe.charges.retrieve(chargeId);
+        const customerId = typeof charge.customer === "string" ? charge.customer : charge.customer?.id;
+        if (!customerId) break;
+        const user = await db.user.findByStripeCustomerId(customerId);
+        if (!user) break;
+        await trackEvent(user.id, "early_fraud_warning", {
+          stripeEventId: event.id,
+          warningId: warning.id,
+          chargeId,
+          actionable: warning.actionable,
+          fraudType: warning.fraud_type,
+        }).catch(() => {});
         break;
       }
 
