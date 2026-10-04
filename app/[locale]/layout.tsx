@@ -11,6 +11,7 @@ import CookieBanner from "@/components/CookieBanner";
 import { UTMTracker } from "@/components/UTMTracker";
 import "./globals.css";
 import "leaflet/dist/leaflet.css";
+import "maplibre-gl/dist/maplibre-gl.css";
 
 const inter = Inter({ subsets: ["latin"] });
 

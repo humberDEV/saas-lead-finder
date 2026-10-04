@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import L from "leaflet";
+import { maplibreGL } from "@maplibre/maplibre-gl-leaflet";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTranslations, useLocale } from "next-intl";
 import { X, Loader2, MapPin, Check, Shuffle, Sparkles } from "lucide-react";
@@ -16,9 +17,7 @@ interface MapPickerModalProps {
 const DEFAULT_CENTER: L.LatLngExpression = [40.4168, -3.7038];
 const DEFAULT_ZOOM = 5;
 
-const TILE_URL = "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png";
-const TILE_ATTRIBUTION =
-  '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/">CARTO</a>';
+const MAP_STYLE_URL = "https://tiles.openfreemap.org/styles/dark";
 
 const NOMINATIM_HEADERS = {
   Accept: "application/json",
@@ -229,11 +228,7 @@ export default function MapPickerModal({ onClose, onSelect }: MapPickerModalProp
       attributionControl: true,
     });
 
-    L.tileLayer(TILE_URL, {
-      attribution: TILE_ATTRIBUTION,
-      subdomains: "abcd",
-      maxZoom: 19,
-    }).addTo(map);
+    maplibreGL({ style: MAP_STYLE_URL }).addTo(map);
 
     L.control.zoom({ position: "bottomright" }).addTo(map);
 
