@@ -29,7 +29,7 @@ export default function MobileNav() {
       <div className="md:hidden shrink-0 h-[60px]" style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }} />
 
       <nav
-        className="md:hidden fixed bottom-0 left-0 right-0 z-50 border-t border-white/[0.06] bg-[#0c0c14]/95 backdrop-blur-xl"
+        className="md:hidden fixed bottom-0 left-0 right-0 z-50 border-t border-[#2d3236] bg-[#090b0d]"
         style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}
       >
         <div className="flex items-stretch h-[60px]">
@@ -39,21 +39,22 @@ export default function MobileNav() {
               <Link
                 key={href}
                 href={href}
-                className={`flex-1 min-w-0 flex flex-col items-center justify-center gap-0.5 px-0.5 transition-colors active:opacity-70 ${
+                aria-current={active ? "page" : undefined}
+                className={`flex-1 min-w-0 flex flex-col items-center justify-center gap-1 px-0.5 transition-colors active:opacity-70 ${
                   active
-                    ? "text-indigo-400"
-                    : "text-zinc-600 hover:text-zinc-400"
+                    ? "text-violet-300"
+                    : "text-zinc-500 hover:text-zinc-100"
                 }`}
               >
                 <div className="relative">
                   <Icon className="w-5 h-5" strokeWidth={active ? 2.2 : 1.75} />
                   {active && (
-                    <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-indigo-400" />
+                    <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 h-0.5 w-4 bg-violet-400" />
                   )}
                 </div>
                 <span
-                  className={`text-[8px] font-bold tracking-tight truncate max-w-[3.25rem] ${
-                    active ? "text-indigo-400" : ""
+                  className={`max-w-[4rem] truncate text-[10px] font-medium tracking-tight ${
+                    active ? "text-violet-300" : ""
                   }`}
                 >
                   {label}

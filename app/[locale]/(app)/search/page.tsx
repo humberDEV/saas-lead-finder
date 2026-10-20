@@ -4,9 +4,9 @@ import { useState, useEffect, useRef, lazy, Suspense, type ReactNode } from "rea
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import {
-  Copy, MapPin, Star, CopyCheck, Sparkles, Phone,
+  MapPin, Star, Sparkles, Phone, MessageCircle,
   Search, Clock, PartyPopper, Map, MapPin as MapPinIcon, X,
-  BookmarkPlus, Trash2,
+  BookmarkPlus, Trash2, ChevronDown,
 } from "lucide-react";
 import { usePickerWheel, RadarPickButton, PickerWheelOverlay } from "@/components/gacha";
 import {
@@ -49,12 +49,7 @@ function CardIconAction({
   className?: string;
 }) {
   const base =
-    "relative group/tip p-2.5 rounded-lg text-zinc-500 hover:text-white bg-neutral-800/40 hover:bg-neutral-800/70 border border-transparent hover:border-neutral-700/50 transition-all";
-  const tip = (
-    <span className="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 text-[10px] font-medium text-white bg-neutral-900 border border-neutral-700 rounded-md whitespace-nowrap opacity-0 group-hover/tip:opacity-100 transition-opacity z-20 shadow-lg">
-      {label}
-    </span>
-  );
+    "inline-flex h-9 items-center justify-center gap-1.5 rounded-md border border-neutral-800 px-3 text-xs font-medium text-zinc-400 hover:border-neutral-600 hover:text-white transition-colors";
 
   if (href) {
     return (
@@ -66,8 +61,8 @@ function CardIconAction({
         aria-label={label}
         className={`${base} ${className}`}
       >
-        {tip}
         {children}
+        <span>{label}</span>
       </a>
     );
   }
@@ -80,39 +75,10 @@ function CardIconAction({
       aria-label={label}
       className={`${base} ${className}`}
     >
-      {tip}
       {children}
+      <span>{label}</span>
     </button>
   );
-}
-
-function leadTempStyles(temperature: string) {
-  switch (temperature) {
-    case "🟢":
-      return {
-        chip: "bg-emerald-500/10 text-emerald-400 border-emerald-500/25",
-        dot: "bg-emerald-400",
-        border: "border-emerald-500/40",
-      };
-    case "🟡":
-      return {
-        chip: "bg-amber-500/10 text-amber-400 border-amber-500/25",
-        dot: "bg-amber-400",
-        border: "border-amber-500/40",
-      };
-    case "🟠":
-      return {
-        chip: "bg-orange-500/10 text-orange-400 border-orange-500/25",
-        dot: "bg-orange-400",
-        border: "border-orange-500/40",
-      };
-    default:
-      return {
-        chip: "bg-red-500/10 text-red-400 border-red-500/25",
-        dot: "bg-red-400",
-        border: "border-red-500/30",
-      };
-  }
 }
 
 function useTimeAgo() {
@@ -380,9 +346,9 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [results, setResults] = useState<Place[]>([]);
-  const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
   const [hiddenIndexes, setHiddenIndexes] = useState<number[]>([]);
   const [expandedMessageIndexes, setExpandedMessageIndexes] = useState<number[]>([]);
+  const [expandedCardIndexes, setExpandedCardIndexes] = useState<number[]>([]);
   const [searchFeedback, setSearchFeedback] = useState<SearchFeedback | null>(null);
   const [resultInsights, setResultInsights] = useState<SearchResultInsights | null>(null);
   const [suggestedNiches, setSuggestedNiches] = useState<string[]>([]);
@@ -712,13 +678,10 @@ export default function Dashboard() {
 
   const copyAndAction = (
     text: string,
-    index: number,
     phone: string | null,
     action: "whatsapp" | "call" | "copy"
   ) => {
     navigator.clipboard.writeText(text);
-    setCopiedIndex(index);
-    setTimeout(() => setCopiedIndex(null), 2000);
     if (phone) {
       const cleanPhone = phone.replace(/[^0-9+]/g, "");
       if (action === "whatsapp") {
@@ -826,47 +789,22 @@ export default function Dashboard() {
         <button
           type="button"
           onClick={() => triggerPaywall("message")}
-          className="relative w-full mb-4 rounded-xl border border-neutral-800/80 bg-black/30 overflow-hidden text-left group/msg"
+          className="w-full text-left text-sm text-indigo-300 hover:text-white transition-colors"
         >
-          <p
-            className="text-sm text-slate-400 px-3 pt-2.5 pb-7 leading-snug line-clamp-2 select-none pointer-events-none"
-            style={{ filter: "blur(2.5px)", userSelect: "none" }}
-          >
-            {place.suggestedMessage}
-          </p>
-          <div className="absolute inset-x-0 bottom-0 h-10 bg-gradient-to-t from-neutral-950 via-neutral-950/85 to-transparent pointer-events-none" />
-          <span className="absolute bottom-2 left-3 inline-flex items-center gap-1 text-[11px] font-semibold text-indigo-400 group-hover/msg:text-indigo-300 transition-colors">
-            <Sparkles className="w-3 h-3" />
-            {tResults("messageSeeMore")}
-          </span>
+          {tResults("messageUnlock")}
         </button>
       );
     }
 
     return (
-      <div className="mb-4">
-        <div
-          className={`relative rounded-xl border border-neutral-800/80 bg-black/25 overflow-hidden transition-all ${
-            expanded
-              ? "focus-within:border-indigo-500/50 focus-within:shadow-[0_0_12px_rgba(99,102,241,0.12)]"
-              : ""
-          }`}
-        >
-          <p
-            className={`text-sm text-slate-300 px-3 py-2.5 leading-snug ${
-              expanded ? "max-h-40 overflow-y-auto" : "line-clamp-2"
-            }`}
-          >
-            {place.suggestedMessage}
-          </p>
-          {!expanded && (
-            <div className="absolute inset-x-0 bottom-0 h-9 bg-gradient-to-t from-[#0c0c10] via-[#0c0c10]/90 to-transparent pointer-events-none" />
-          )}
-        </div>
+      <div>
+        <p className={`text-sm leading-relaxed text-zinc-300 ${expanded ? "" : "line-clamp-2"}`}>
+          {place.suggestedMessage}
+        </p>
         <button
           type="button"
           onClick={() => toggleMessageExpand(index)}
-          className="mt-1.5 text-[11px] font-semibold text-indigo-400 hover:text-indigo-300 transition-colors"
+          className="mt-2 text-xs font-medium text-indigo-300 hover:text-white transition-colors"
         >
           {expanded ? tResults("messageSeeLess") : tResults("messageSeeMore")}
         </button>
@@ -877,146 +815,76 @@ export default function Dashboard() {
   const renderPlaceCard = (place: Place, index: number, isTop: boolean, animDelay: number) => {
     if (hiddenIndexes.includes(index)) return null;
 
-    const temp = leadTempStyles(place.temperature);
-    const isFeatured = isTop && index === 0;
     const primaryInsight = place.scoreExplanation.split(" • ")[0];
     const showContact = (place.score >= 40 || !place.has_website) && place.phone;
+    const expanded = expandedCardIndexes.includes(index);
 
     return (
       <motion.div
         key={index}
-        initial={{ opacity: 0, y: 16 }}
+        initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.35, delay: animDelay, ease: "easeOut" }}
-        className={`flex flex-col relative overflow-hidden rounded-2xl border backdrop-blur-xl ${
-          isFeatured
-            ? "border-indigo-500/30 bg-neutral-900/50 shadow-[0_0_30px_rgba(99,102,241,0.12)] hover:border-indigo-500/50 hover:shadow-[0_0_40px_rgba(99,102,241,0.18)]"
-            : isTop
-            ? "border-indigo-500/20 bg-neutral-900/40 shadow-[0_0_20px_rgba(99,102,241,0.06)] hover:border-indigo-500/40 hover:shadow-[0_0_30px_rgba(99,102,241,0.1)]"
-            : "border-neutral-800/60 bg-neutral-900/15 hover:border-neutral-700/80"
-        } p-6 transition-all group`}
+        transition={{ duration: 0.22, delay: Math.min(animDelay, 0.24), ease: "easeOut" }}
+        className="group rounded-lg border border-neutral-800 bg-[#141719] px-4 py-4 transition-colors hover:border-neutral-700 sm:px-5 sm:py-5"
       >
-        {isFeatured && (
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-1 bg-gradient-to-r from-transparent via-indigo-500 to-transparent opacity-50" />
-        )}
-
-        {/* Header: name gets full width; chip below */}
-        <div className="mb-3">
-          <div className="flex items-start gap-2">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between lg:gap-6">
+          <div className="min-w-0 flex-1">
+            <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1.5">
             {isTop && index < 5 && (
-              <span className="text-[10px] font-bold text-indigo-400/80 tabular-nums shrink-0 mt-0.5">
-                #{index + 1}
+              <span className="shrink-0 font-mono text-[11px] tabular-nums text-zinc-600">
+                {String(index + 1).padStart(2, "0")}
               </span>
             )}
             <h2
-              className="text-[15px] font-bold text-slate-100 leading-snug line-clamp-2 break-words flex-1 min-w-0"
+              className="min-w-0 text-base font-semibold leading-snug text-zinc-100"
               title={place.name}
             >
               {place.name}
             </h2>
-          </div>
-          <div className="flex flex-wrap items-center gap-2 mt-2 ml-0">
-            <span
-              className={`inline-flex items-center gap-1.5 text-[10px] font-semibold px-2 py-1 rounded-full border ${temp.chip}`}
-            >
-              <span className={`w-1.5 h-1.5 rounded-full ${temp.dot}`} />
+            <span className={`shrink-0 rounded border px-1.5 py-0.5 text-[11px] font-medium ${isTop ? "border-indigo-500/30 bg-indigo-500/10 text-indigo-300" : "border-neutral-700 text-zinc-400"}`}>
               {place.scoreLabel}
             </span>
-          </div>
-          <p className="text-xs text-slate-500 line-clamp-2 mt-1.5 leading-relaxed" title={place.address}>
-            {place.address}
-          </p>
-        </div>
-
-        {/* Compact meta row */}
-        <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1 text-xs text-slate-400 mb-3.5">
-          <span className="inline-flex items-center gap-1">
-            <Star className="w-3.5 h-3.5 text-amber-400/90 shrink-0" />
-            <span className="text-slate-300 font-medium">{place.rating}</span>
-            <span className="text-slate-600">
-              ({place.user_ratings_total} {tResults("reviews")})
-            </span>
-          </span>
-          {place.phone && (
-            <>
-              <span className="text-neutral-700 select-none">·</span>
-              <span className="text-slate-300">{place.phone}</span>
-            </>
-          )}
-          <span className="text-neutral-700 select-none">·</span>
-          {place.has_website ? (
-            <span className="text-slate-500 truncate max-w-[140px]">
-              {place.website || tResults("hasWeb")}
-            </span>
-          ) : (
-            <span className="text-emerald-400 font-semibold">{tResults("noWeb")}</span>
-          )}
-        </div>
-
-        {/* One-line AI insight (replaces heavy score box) */}
-        {primaryInsight && (
-          <p
-            className={`text-xs leading-relaxed text-slate-500 line-clamp-2 pl-2.5 mb-4 border-l ${temp.border}`}
-          >
-            {primaryInsight}
-          </p>
-        )}
-
-        {showContact && (
-          <div className="mt-auto pt-5 border-t border-neutral-800/40">
-            <p className="flex items-center gap-1.5 text-[10px] font-semibold text-indigo-400/80 uppercase tracking-wider mb-2.5">
-              <Sparkles className="w-3 h-3 shrink-0" />
-              {tResults("openingMessage")}
-            </p>
-
-            {renderOpeningMessage(place, index)}
-
-            {/* Primary actions — flex-wrap leaves room for demo/slug button (other PR) */}
-            <div className="flex flex-wrap items-stretch gap-2.5 mb-4">
-              {place.has_whatsapp && (
-                <button
-                  onClick={() => {
-                    if (plan === "free") {
-                      const cleanPhone = place.phone!.replace(/[^0-9+]/g, "");
-                      window.open(`https://wa.me/${cleanPhone}`, "_blank");
-                    } else {
-                      copyAndAction(place.suggestedMessage, index, place.phone, "whatsapp");
-                    }
-                  }}
-                  className="inline-flex flex-1 min-w-[130px] items-center justify-center gap-1.5 px-4 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-black text-xs font-bold rounded-xl transition-all shadow-[0_0_20px_rgba(16,185,129,0.2)] hover:shadow-[0_0_30px_rgba(16,185,129,0.4)]"
-                >
-                  {copiedIndex === index ? <CopyCheck className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
-                  {tResults("waDirect")}
-                </button>
-              )}
-              <button
-                onClick={() => copyAndAction(place.suggestedMessage, index, place.phone, "call")}
-                className="inline-flex flex-1 min-w-[140px] items-center justify-center gap-2 px-5 py-2.5 bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-100 border border-indigo-500/35 text-xs font-bold rounded-xl transition-all shadow-[0_0_16px_rgba(99,102,241,0.12)] hover:shadow-[0_0_24px_rgba(99,102,241,0.2)] hover:border-indigo-400/50"
-              >
-                <Phone className="w-4 h-4 shrink-0" />
-                {tResults("callDirect")}
-              </button>
             </div>
+            <p className="mt-2 flex items-start gap-1.5 text-xs leading-relaxed text-zinc-500" title={place.address}>
+              <MapPin className="mt-0.5 h-3 w-3 shrink-0" />
+              <span className="line-clamp-2">{place.address}</span>
+            </p>
+            <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-zinc-400">
+              <span className="inline-flex items-center gap-1.5"><Star className="h-3.5 w-3.5 text-zinc-500" /><strong className="font-medium text-zinc-200">{place.rating}</strong> <span className="text-zinc-500">({place.user_ratings_total} {tResults("reviews")})</span></span>
+              <span className={place.has_website ? "text-zinc-500" : "font-medium text-indigo-300"}>
+                {place.has_website ? tResults("hasWeb") : tResults("noWeb")}
+              </span>
+              {place.phone && <span><span className="text-zinc-600">Tel. </span>{place.phone}</span>}
+            </div>
+            {primaryInsight && <p className="mt-3 max-w-3xl border-l-2 border-indigo-500/60 pl-3 text-xs leading-relaxed text-zinc-300"><span className="mr-1.5 font-medium text-zinc-500">{tResults("whyOpportunity")}</span>{primaryInsight}</p>}
+          </div>
+          <div className="flex shrink-0 flex-wrap items-center gap-2 lg:max-w-[225px] lg:justify-end">
+            {place.has_whatsapp && place.phone && <button type="button" onClick={() => {
+              if (plan === "free") window.open(`https://wa.me/${place.phone!.replace(/[^0-9+]/g, "")}`, "_blank");
+              else copyAndAction(place.suggestedMessage, place.phone, "whatsapp");
+            }} className="inline-flex h-9 items-center gap-1.5 rounded-md bg-indigo-500 px-3 text-xs font-semibold text-white hover:bg-indigo-400 transition-colors">
+              <MessageCircle className="h-3.5 w-3.5" />{tResults("waDirect")}
+            </button>}
+            {place.phone && <a href={`tel:${place.phone.replace(/[^0-9+]/g, "")}`} className="inline-flex h-9 items-center gap-1.5 rounded-md border border-neutral-700 px-3 text-xs font-medium text-zinc-200 hover:border-neutral-500 hover:text-white transition-colors">
+              <Phone className="h-3.5 w-3.5" />{tResults("callDirect")}
+            </a>}
+            <button type="button" onClick={() => plan === "free" ? triggerPaywall("message") : handleSaveLead(index, place)} className="inline-flex h-9 items-center gap-1.5 rounded-md border border-neutral-700 px-3 text-xs font-medium text-zinc-300 hover:border-neutral-500 hover:text-white transition-colors">
+              <BookmarkPlus className="h-3.5 w-3.5" />{tResults("saveShort")}
+            </button>
+            <button type="button" onClick={() => setExpandedCardIndexes((prev) => expanded ? prev.filter((i) => i !== index) : [...prev, index])} aria-expanded={expanded} aria-label={expanded ? tResults("messageSeeLess") : tResults("details")} className="inline-flex h-9 items-center gap-1 rounded-md px-2 text-xs font-medium text-zinc-400 hover:text-white transition-colors">
+              <span>{tResults("details")}</span><ChevronDown className={`h-4 w-4 transition-transform ${expanded ? "rotate-180" : ""}`} />
+            </button>
+          </div>
+        </div>
 
-            <div className="flex items-center justify-end gap-1 pt-4 border-t border-neutral-800/30">
-              {plan === "free" ? (
-                <CardIconAction
-                  label={tResults("savePro")}
-                  onClick={() => triggerPaywall("message")}
-                  className="text-indigo-400 hover:text-indigo-300 hover:bg-indigo-500/15 hover:border-indigo-500/25"
-                >
-                  <Sparkles className="w-4 h-4" />
-                </CardIconAction>
-              ) : (
-                <CardIconAction
-                  label={tResults("saveToPortfolio")}
-                  onClick={() => handleSaveLead(index, place)}
-                  className="text-indigo-400 hover:text-indigo-300 hover:bg-indigo-500/15 hover:border-indigo-500/25"
-                >
-                  <BookmarkPlus className="w-4 h-4" />
-                </CardIconAction>
-              )}
+        {expanded && (
+          <div className="mt-4 border-t border-neutral-800 pt-4 sm:pl-[30px]">
+            {showContact && <div className="mb-4 max-w-2xl">
+              <p className="mb-2 text-[11px] font-medium text-zinc-500">{tResults("openingMessage")}</p>
+              {renderOpeningMessage(place, index)}
+            </div>}
 
+            <div className="flex flex-wrap items-center gap-2 border-t border-neutral-800 pt-3">
               {/* Demo button */}
               {plan !== "free" ? (() => {
                 const demoState = demoMap[index];
@@ -1034,13 +902,10 @@ export default function Dashboard() {
                               : tResults("demoCreate")
                       }
                       onClick={() => handleCreateDemo(index, place)}
-                      className={slug || demoState === "copied"
-                        ? "text-violet-400 hover:text-violet-300 hover:bg-violet-500/15 hover:border-violet-500/25 border-violet-500/20 bg-violet-500/10"
-                        : "text-zinc-400 hover:text-violet-300 hover:bg-violet-500/10 hover:border-violet-500/20"
-                      }
+                      className={slug || demoState === "copied" ? "text-indigo-300" : ""}
                     >
                       {demoState === "loading" ? (
-                        <div className="w-4 h-4 border-2 border-zinc-600 border-t-violet-400 rounded-full animate-spin" />
+                        <div className="w-4 h-4 border-2 border-zinc-600 border-t-indigo-400 rounded-full animate-spin" />
                       ) : demoState === "copied" ? (
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} className="w-4 h-4 text-emerald-400"><path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg>
                       ) : (
@@ -1053,12 +918,10 @@ export default function Dashboard() {
                         target="_blank"
                         rel="noopener noreferrer"
                         title={tResults("demoOpen")}
-                        className="relative group/tip p-2.5 rounded-lg text-violet-400 hover:text-violet-200 bg-violet-500/10 hover:bg-violet-500/20 border border-violet-500/20 transition-all"
+                        className="inline-flex h-9 items-center gap-1.5 rounded-md border border-neutral-800 px-3 text-xs font-medium text-indigo-300 hover:border-neutral-600 hover:text-white transition-colors"
                       >
-                        <span className="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 text-[10px] font-medium text-white bg-neutral-900 border border-neutral-700 rounded-md whitespace-nowrap opacity-0 group-hover/tip:opacity-100 transition-opacity z-20 shadow-lg">
-                          {tResults("demoOpen")}
-                        </span>
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-4 h-4"><path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" /></svg>
+                        {tResults("demoOpen")}
                       </a>
                     )}
                   </div>
@@ -1067,7 +930,7 @@ export default function Dashboard() {
                 <CardIconAction
                   label="Demo (plan Go)"
                   onClick={() => triggerPaywall("message")}
-                  className="text-zinc-600 cursor-not-allowed"
+                  className="text-zinc-500"
                 >
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-4 h-4"><path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" /></svg>
                 </CardIconAction>
@@ -1082,7 +945,7 @@ export default function Dashboard() {
               <CardIconAction
                 label={tResults("dismiss")}
                 onClick={() => handleDismiss(index, place)}
-                className="hover:text-red-300 hover:bg-red-500/10 hover:border-red-500/20"
+                className="hover:text-red-300"
               >
                 <Trash2 className="w-4 h-4" />
               </CardIconAction>
@@ -1162,7 +1025,7 @@ export default function Dashboard() {
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.96, y: 8 }}
               transition={{ duration: 0.25, ease: "easeOut" }}
-              className="relative w-full max-w-lg rounded-2xl border border-neutral-800 bg-[#0d0d14] shadow-[0_0_80px_rgba(0,0,0,0.8)] overflow-hidden"
+              className="relative w-full max-w-lg rounded-2xl border border-neutral-800 bg-[#121619] shadow-[0_0_80px_rgba(0,0,0,0.8)] overflow-hidden"
             >
               {/* Top accent line */}
               <div className="h-px bg-gradient-to-r from-transparent via-indigo-500/60 to-transparent" />
@@ -1503,7 +1366,7 @@ export default function Dashboard() {
 
           {primeOpportunities.length > 0 && (
             <motion.div
-              className={`mb-12 ${showFoundGlow ? "animate-pulse-once" : ""}`}
+              className="mb-12"
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
             >
@@ -1514,11 +1377,8 @@ export default function Dashboard() {
                   </span>{" "}
                   {tResults("salesOpportunities")}
                 </h2>
-                <span className="text-[10px] font-medium text-emerald-500/70 uppercase tracking-widest shrink-0">
-                  live
-                </span>
               </div>
-              <div className="grid md:grid-cols-2 gap-4 lg:gap-5">
+              <div className="space-y-3">
                 {primeOpportunities.map((place, index) =>
                   renderPlaceCard(place, results.indexOf(place), true, index * 0.06)
                 )}
@@ -1535,7 +1395,7 @@ export default function Dashboard() {
                 </h2>
                 <div className="h-px bg-neutral-800/80 flex-1" />
               </div>
-              <div className="grid md:grid-cols-2 gap-4">
+              <div className="space-y-3">
                 {exploreOpportunities.map((place, index) =>
                   renderPlaceCard(place, results.indexOf(place), false, (primeOpportunities.length + index) * 0.06)
                 )}
@@ -1555,7 +1415,7 @@ export default function Dashboard() {
                   : tResults("withWebSection", { count: withWebLeads.length })}
               </button>
               {showWithWebLeads ? (
-                <div className="mt-4 grid md:grid-cols-2 gap-4 opacity-60">
+                <div className="mt-4 space-y-3 opacity-70">
                   {withWebLeads.map((place, index) =>
                     renderPlaceCard(
                       place,

@@ -7,6 +7,7 @@ export type ProductEvent =
   | "free_limit_reached"
   | "paywall_viewed"
   | "checkout_started"
+  | "checkout_completed"
   | "subscription_started"
   | "subscription_cancelled"
   | "plan_changed"

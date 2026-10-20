@@ -68,3 +68,22 @@ export async function sendPaymentReceiptEmail(
     `payment-receipt/${details.invoiceId}`
   );
 }
+
+/** Optional internal alert; never includes card details or customer PII. */
+export async function sendAdminRiskAlertEmail(
+  kind: "dispute" | "early_fraud_warning",
+  stripeEventId: string,
+  referenceId: string,
+  live: boolean
+) {
+  const to = process.env.DISPUTE_ALERT_EMAIL;
+  if (!to) return false;
+
+  const isDispute = kind === "dispute";
+  const title = isDispute ? "Nueva disputa en Stripe" : "Alerta temprana de fraude en Stripe";
+  const href = isDispute
+    ? `https://dashboard.stripe.com/${live ? "" : "test/"}disputes/${encodeURIComponent(referenceId)}`
+    : `https://dashboard.stripe.com/${live ? "" : "test/"}`;
+  const html = `<p>${title}. Revisa el caso y su fecha límite en Stripe.</p><p>Referencia: ${referenceId}</p><p><a href="${href}">Abrir Stripe</a></p>`;
+  return send(to, `${title} — Huntly`, html, `risk-alert/${stripeEventId}`);
+}

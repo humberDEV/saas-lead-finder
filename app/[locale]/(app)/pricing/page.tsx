@@ -8,10 +8,10 @@ import { useSidebar } from "../SidebarContext";
 import { useFlashOffer, FLASH_COUPON } from "@/hooks/useFlashOffer";
 
 const BG = {
-  base: "#0e0b1e",
-  deep: "#0b0917",
-  mid:  "#120f26",
-  alt:  "#100d22",
+  base: "#08090b",
+  deep: "#0b0d0f",
+  mid:  "#0e1012",
+  alt:  "#0d0f11",
 };
 
 export default function Pricing() {
@@ -143,13 +143,13 @@ export default function Pricing() {
         {/* 20× value callout */}
         <div
           className="rounded-2xl border border-violet-500/20 mb-8 max-w-2xl"
-          style={{ background: "linear-gradient(135deg, rgba(139,92,246,0.10) 0%, rgba(11,9,23,1) 100%)" }}
+          style={{ background: "#141719" }}
         >
           {/* Mobile: compact horizontal strip */}
           <div className="flex md:hidden items-center gap-3 px-4 py-3">
             <span
-              className="font-black text-transparent bg-clip-text shrink-0 leading-none"
-              style={{ fontSize: 28, backgroundImage: "linear-gradient(135deg, #a78bfa, #e879f9)" }}
+              className="font-bold text-violet-300 shrink-0 leading-none"
+              style={{ fontSize: 28 }}
             >
               20×
             </span>
@@ -161,8 +161,8 @@ export default function Pricing() {
           <div className="hidden md:flex items-center gap-4 p-5">
             <div className="shrink-0 leading-none">
               <span
-                className="font-black text-transparent bg-clip-text"
-                style={{ fontSize: "clamp(40px, 5vw, 56px)", backgroundImage: "linear-gradient(135deg, #a78bfa, #e879f9)" }}
+                className="font-bold text-violet-300"
+                style={{ fontSize: "clamp(40px, 5vw, 56px)" }}
               >
                 20×
               </span>
@@ -235,25 +235,9 @@ export default function Pricing() {
             return (
               <div
                 key={plan.name}
-                className={`group relative rounded-3xl flex flex-col p-6 h-full transition-all duration-200 hover:-translate-y-0.5 ${isFree ? "hidden md:flex" : "flex"}`}
-                style={{ background: card.bg, boxShadow: card.shadow }}
+                className={`group relative rounded-3xl flex flex-col p-6 h-full border transition-colors duration-200 hover:border-[#454554] ${isFree ? "hidden md:flex" : "flex"}`}
+                style={{ background: k === "go" ? "#191d20" : "#141719", borderColor: k === "go" ? "rgba(167,139,250,0.55)" : "#2d3236" }}
               >
-                {/* Hover shadow swap (free + pro only) */}
-                {k !== "go" && (
-                  <div
-                    className="absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none"
-                    style={{ boxShadow: card.hoverShadow }}
-                  />
-                )}
-
-                {/* Decorative top line */}
-                {card.topLine && (
-                  <div
-                    className="absolute top-0 left-8 right-8 h-px"
-                    style={{ background: card.topLine }}
-                  />
-                )}
-
                 {/* Card header */}
                 <div className="flex items-center justify-between gap-2 mb-5">
                   <span className={`text-[10px] font-mono uppercase tracking-widest ${card.nameColor}`}>
@@ -371,9 +355,8 @@ export default function Pricing() {
                     style={
                       k === "go"
                         ? {
-                            background: "linear-gradient(135deg, #7c3aed, #6d28d9)",
+                            background: "#7c3aed",
                             color: "#fff",
-                            boxShadow: "0 0 28px rgba(139,92,246,0.50)",
                           }
                         : {
                             background: "rgba(255,255,255,0.03)",
@@ -400,15 +383,13 @@ export default function Pricing() {
                     style={
                       k === "go" && flash.active
                         ? {
-                            background: "linear-gradient(135deg, #f59e0b, #fbbf24)",
+                            background: "#f59e0b",
                             color: "#0d0d14",
-                            boxShadow: "0 0 24px rgba(245,158,11,0.35)",
                           }
                         : k === "go"
                         ? {
-                            background: "linear-gradient(135deg, #7c3aed, #6d28d9)",
+                            background: "#7c3aed",
                             color: "#fff",
-                            boxShadow: "0 0 28px rgba(139,92,246,0.50)",
                           }
                         : {
                             background: "rgba(255,255,255,0.03)",

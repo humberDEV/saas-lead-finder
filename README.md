@@ -37,3 +37,8 @@ Una herramienta simple para encontrar negocios (ej. barberías, clínicas) en Go
 - \`lib/message.ts\`: Generación automática de cold outreach adaptado para negocios con web y sin web.
 - \`types/index.ts\`: Tipos y metadata.
 - **Estilos:** Tailwind CSS sin dashboard complejo, fácil de entender.
+
+## Operación de disputas
+
+Consulta [la guía de disputas](docs/disputes.md) para configurar el acceso administrativo,
+revisar avisos de Stripe y preparar evidencia verificable sin almacenar datos de tarjeta.

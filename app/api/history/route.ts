@@ -10,7 +10,7 @@ export async function GET() {
   try {
     const user = await getOrCreateUser(userId);
     if (user.plan === "free") return NextResponse.json([]);
-    const history = await db.searchHistory.findByUser({ userId: user.id, limit: 40 });
+    const history = await db.searchHistory.findByUser({ userId: user.id, limit: 100 });
     return NextResponse.json(history);
   } catch {
     return NextResponse.json([]);

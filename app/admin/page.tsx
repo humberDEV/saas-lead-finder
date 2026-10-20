@@ -1,5 +1,6 @@
 import { supabase } from "@/lib/supabase";
 import { PLANS } from "@/lib/plans";
+import { requireAdmin } from "@/lib/admin-auth";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -208,29 +209,8 @@ async function fetchStats() {
 
 // ─── component ────────────────────────────────────────────────────────────────
 
-export default async function AdminPage({
-  searchParams,
-}: {
-  searchParams: { key?: string };
-}) {
-  const secret = process.env.ADMIN_SECRET;
-  if (!secret || searchParams.key !== secret) {
-    return (
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          height: "100vh",
-          fontSize: 14,
-          color: "#64748b",
-        }}
-      >
-        401 Unauthorized
-      </div>
-    );
-  }
-
+export default async function AdminPage() {
+  await requireAdmin();
   const stats = await fetchStats();
   const now = new Date().toUTCString();
 
@@ -241,6 +221,9 @@ export default async function AdminPage({
         <h1 style={{ margin: 0, fontSize: 22, fontWeight: 700, color: "#f1f5f9" }}>
           Huntly Admin
         </h1>
+        <a href="/admin/disputes" style={{ color: "#a5b4fc", fontSize: 13 }}>
+          Disputas y evidencias →
+        </a>
         <p style={{ margin: "4px 0 0", fontSize: 12, color: "#64748b" }}>
           {now}
         </p>

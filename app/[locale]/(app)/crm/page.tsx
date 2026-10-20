@@ -1,399 +1,224 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { useTranslations } from "next-intl";
-import { motion, AnimatePresence } from "framer-motion";
-import {
-  DndContext,
-  DragOverlay,
-  PointerSensor,
-  TouchSensor,
-  useSensor,
-  useSensors,
-  closestCenter,
-  useDraggable,
-  useDroppable,
-  type DragStartEvent,
-  type DragEndEvent,
-} from "@dnd-kit/core";
-import { CSS } from "@dnd-kit/utilities";
-import { XCircle, Plus } from "lucide-react";
+import { useLocale, useTranslations } from "next-intl";
+import { ArrowUpRight, ChevronRight, Plus, Search, SlidersHorizontal } from "lucide-react";
 import { useSidebar } from "../SidebarContext";
 import { FeatureUnlockScreen } from "@/components/FeatureUnlockScreen";
 import { AppToast } from "@/components/ui/AppToast";
-import { CrmLeadCard } from "@/components/crm/CrmLeadCard";
+import { CrmLeadDetail } from "@/components/crm/CrmLeadDetail";
 import { useTimedToast } from "@/hooks/useTimedToast";
 import { useUserDemosByKey } from "@/hooks/useUserDemosByKey";
 import {
-  type Lead,
-  type Status,
-  STATUSES,
-  ACTIVE_STATUSES,
-  normalizeStatus,
-  STATUS_VISUAL,
-  STATUS_COLUMN_KEYS,
-  STATUS_EMPTY_KEYS,
+  ACTIVE_STATUSES, normalizeStatus, STATUS_LABEL_KEYS,
+  type Lead, type Status,
 } from "@/components/crm/crm-constants";
 
-function DroppableColumn({ status, children }: { status: Status; children: React.ReactNode }) {
-  const { setNodeRef, isOver } = useDroppable({ id: status });
-  return (
-    <div
-      ref={setNodeRef}
-      className={`min-h-[120px] space-y-3 rounded-xl p-2 -mx-2 transition-colors duration-200 ${
-        isOver ? "bg-indigo-500/[0.06] ring-1 ring-indigo-500/25" : ""
-      }`}
-    >
-      {children}
-    </div>
-  );
-}
+type Filter = "ALL" | Status;
+type Sort = "newest" | "oldest" | "score" | "name";
 
-function DraggableLead({
-  lead,
-  isBeingDragged,
-  children,
-}: {
-  lead: Lead;
-  isBeingDragged: boolean;
-  children: (dragHandleProps: Record<string, unknown>) => React.ReactNode;
-}) {
-  const { attributes, listeners, setNodeRef, transform } = useDraggable({ id: lead.id });
-  const style = transform ? { transform: CSS.Translate.toString(transform) } : undefined;
-
-  return (
-    <motion.div
-      layout
-      initial={{ opacity: 0, y: 8 }}
-      animate={{ opacity: isBeingDragged ? 0.35 : 1, y: 0 }}
-      exit={{ opacity: 0, scale: 0.98 }}
-      transition={{ duration: 0.2 }}
-      ref={setNodeRef}
-      style={style}
-      className={isBeingDragged ? "pointer-events-none" : ""}
-    >
-      {children({ ...attributes, ...listeners })}
-    </motion.div>
-  );
-}
+const FILTERS: Filter[] = ["ALL", ...ACTIVE_STATUSES, "DESCARTADO"];
 
 export default function CRM() {
   const t = useTranslations("crm");
   const tResults = useTranslations("dashboard.results");
+  const locale = useLocale();
   const { plan } = useSidebar();
   const { toast: demoToast, show: showDemoToast, dismiss: dismissDemoToast } = useTimedToast();
-  const { getSlug: getDemoSlug, rememberSlug: rememberDemoSlug } = useUserDemosByKey(
-    plan !== "free"
-  );
+  const { getSlug: getDemoSlug, rememberSlug: rememberDemoSlug } = useUserDemosByKey(plan !== "free");
   const [leads, setLeads] = useState<Lead[]>([]);
   const [loading, setLoading] = useState(true);
-  const [copiedId, setCopiedId] = useState<string | null>(null);
-  const [activeId, setActiveId] = useState<string | null>(null);
-  const [mobileTab, setMobileTab] = useState<Status>("PENDIENTE");
-  const [showDiscarded, setShowDiscarded] = useState(false);
-
-  const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
-    useSensor(TouchSensor, { activationConstraint: { delay: 200, tolerance: 10 } })
-  );
+  const [error, setError] = useState(false);
+  const [query, setQuery] = useState("");
+  const [filter, setFilter] = useState<Filter>("ALL");
+  const [sort, setSort] = useState<Sort>("newest");
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [mobileDetailOpen, setMobileDetailOpen] = useState(false);
 
   useEffect(() => {
     if (plan === "free") {
       setLoading(false);
       return;
     }
-    fetch("/api/leads")
-      .then((r) => r.json())
-      .then((d) => {
-        if (Array.isArray(d)) {
-          setLeads(d.map((l: Lead) => ({ ...l, status: normalizeStatus(l.status) })));
-        }
-        setLoading(false);
+    const controller = new AbortController();
+    fetch("/api/leads", { signal: controller.signal })
+      .then((response) => { if (!response.ok) throw new Error("load_failed"); return response.json(); })
+      .then((data) => {
+        if (!Array.isArray(data)) throw new Error("invalid_data");
+        setLeads(data.map((lead: Lead) => ({ ...lead, status: normalizeStatus(lead.status) })));
+        setError(false);
       })
-      .catch(() => setLoading(false));
+      .catch((reason) => { if (reason.name !== "AbortError") setError(true); })
+      .finally(() => { if (!controller.signal.aborted) setLoading(false); });
+    return () => controller.abort();
   }, [plan]);
 
-  if (plan === "free") return <FeatureUnlockScreen feature="crm" />;
+  useEffect(() => {
+    if (!mobileDetailOpen) return;
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setMobileDetailOpen(false);
+    };
+    const closeOnDesktop = () => {
+      if (window.innerWidth >= 1280) setMobileDetailOpen(false);
+    };
+    window.addEventListener("keydown", closeOnEscape);
+    window.addEventListener("resize", closeOnDesktop);
+    return () => {
+      window.removeEventListener("keydown", closeOnEscape);
+      window.removeEventListener("resize", closeOnDesktop);
+    };
+  }, [mobileDetailOpen]);
 
-  const patchStatus = (id: string, status: string) =>
-    fetch("/api/leads", {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ leadId: id, status }),
-    });
+  const counts = useMemo(() => {
+    const next = { ALL: leads.length, PENDIENTE: 0, CONTACTADO: 0, INTERESADO: 0, CERRADO: 0, DESCARTADO: 0 };
+    leads.forEach((lead) => { next[normalizeStatus(lead.status)] += 1; });
+    return next;
+  }, [leads]);
 
-  const patchNote = (id: string, notes: string) => {
-    setLeads((prev) => prev.map((l) => (l.id === id ? { ...l, notes } : l)));
-    fetch("/api/leads", {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ leadId: id, notes }),
-    });
-  };
+  const visibleLeads = useMemo(() => {
+    const needle = query.trim().toLocaleLowerCase(locale);
+    return leads
+      .filter((lead) => filter === "ALL" ? normalizeStatus(lead.status) !== "DESCARTADO" : normalizeStatus(lead.status) === filter)
+      .filter((lead) => !needle || [lead.name, lead.address, lead.phone, lead.notes].some((value) => value?.toLocaleLowerCase(locale).includes(needle)))
+      .sort((a, b) => {
+        if (sort === "score") return b.score - a.score || a.name.localeCompare(b.name, locale);
+        if (sort === "name") return a.name.localeCompare(b.name, locale);
+        const diff = new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+        return sort === "oldest" ? -diff : diff;
+      });
+  }, [leads, filter, query, sort, locale]);
+
+  const selectedLead = leads.find((lead) => lead.id === selectedId) ?? null;
 
   const setStatus = (id: string, status: Status) => {
-    setLeads((prev) => prev.map((l) => (l.id === id ? { ...l, status } : l)));
-    patchStatus(id, status);
+    setLeads((current) => current.map((lead) => lead.id === id ? { ...lead, status } : lead));
+    fetch("/api/leads", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ leadId: id, status }) }).catch(() => {});
+  };
+
+  const saveNote = (id: string, notes: string) => {
+    setLeads((current) => current.map((lead) => lead.id === id ? { ...lead, notes } : lead));
+    fetch("/api/leads", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ leadId: id, notes }) }).catch(() => {});
   };
 
   const deleteLead = (id: string) => {
-    setLeads((prev) => prev.filter((l) => l.id !== id));
-    fetch("/api/leads", {
-      method: "DELETE",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ leadId: id }),
-    });
+    setLeads((current) => current.filter((lead) => lead.id !== id));
+    setSelectedId(null);
+    setMobileDetailOpen(false);
+    fetch("/api/leads", { method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ leadId: id }) }).catch(() => {});
   };
 
-  const copyMessage = (lead: Lead) => {
-    const text =
-      lead.suggestedMessage?.trim() ||
-      lead.notes?.trim() ||
-      t("defaultWaMessage", { name: lead.name });
-    navigator.clipboard.writeText(text);
-    setCopiedId(lead.id);
-    setTimeout(() => setCopiedId(null), 2000);
+  const openLead = (id: string) => {
+    setSelectedId(id);
+    setMobileDetailOpen(window.matchMedia("(max-width: 1279px)").matches);
   };
+  const detail = selectedLead && <CrmLeadDetail
+    key={selectedLead.id}
+    lead={selectedLead}
+    onClose={() => { setSelectedId(null); setMobileDetailOpen(false); }}
+    onSetStatus={setStatus}
+    onSaveNote={saveNote}
+    onDelete={deleteLead}
+    onDemoToast={showDemoToast}
+    existingDemoSlug={getDemoSlug(selectedLead.name, selectedLead.address)}
+    onDemoSlugKnown={(slug) => rememberDemoSlug(selectedLead.name, selectedLead.address, slug)}
+  />;
 
-  const handleDragStart = (e: DragStartEvent) => setActiveId(e.active.id as string);
-
-  const handleDragEnd = (e: DragEndEvent) => {
-    setActiveId(null);
-    const targetStatus = e.over?.id as Status | undefined;
-    if (!targetStatus || !(STATUSES as readonly string[]).includes(targetStatus)) return;
-    const lead = leads.find((l) => l.id === e.active.id);
-    if (!lead || normalizeStatus(lead.status) === targetStatus) return;
-    setStatus(e.active.id as string, targetStatus);
-  };
-
-  const activeLead = leads.find((l) => l.id === activeId);
-  const discardedLeads = leads.filter((l) => normalizeStatus(l.status) === "DESCARTADO");
-  const pendingCount = leads.filter((l) => normalizeStatus(l.status) === "PENDIENTE").length;
-  const closedCount = leads.filter((l) => normalizeStatus(l.status) === "CERRADO").length;
-
-  const cardProps = {
-    copiedId,
-    plan: plan ?? "free",
-    onCopy: copyMessage,
-    onSetStatus: setStatus,
-    onSaveNote: patchNote,
-    onDelete: deleteLead,
-    onDemoToast: showDemoToast,
-  };
-
-  const renderColumn = (status: Status, colLeads: Lead[]) => {
-    const visual = STATUS_VISUAL[status];
-    const emptyKey = STATUS_EMPTY_KEYS[status];
-    return (
-      <DroppableColumn status={status}>
-        <AnimatePresence mode="popLayout">
-          {colLeads.map((lead) => (
-            <DraggableLead key={lead.id} lead={lead} isBeingDragged={activeId === lead.id}>
-              {(dragHandleProps) => (
-                <CrmLeadCard
-                  lead={lead}
-                  dragHandleProps={dragHandleProps}
-                  existingDemoSlug={getDemoSlug(lead.name, lead.address)}
-                  onDemoSlugKnown={(slug) => rememberDemoSlug(lead.name, lead.address, slug)}
-                  {...cardProps}
-                />
-              )}
-            </DraggableLead>
-          ))}
-        </AnimatePresence>
-        {colLeads.length === 0 && (
-          <div className="rounded-xl border border-dashed border-white/[0.08] bg-white/[0.02] px-4 py-10 text-center">
-            <p className="text-xs font-semibold text-zinc-500 mb-1">{t("emptyColumnShort")}</p>
-            {emptyKey ? (
-              <p className="text-[11px] text-zinc-600 leading-relaxed">{t(emptyKey)}</p>
-            ) : null}
-          </div>
-        )}
-      </DroppableColumn>
-    );
-  };
+  if (plan === "free") return <FeatureUnlockScreen feature="crm" />;
 
   return (
-    <>
-      <AppToast
-        toast={demoToast}
-        onDismiss={dismissDemoToast}
-        dismissLabel={tResults("toastDismiss")}
-      />
-    <div className="h-full overflow-y-auto">
-      <main className="max-w-[1400px] mx-auto w-full px-4 sm:px-6 md:px-8 py-6 md:py-8 pb-28">
-        <header className="mb-8 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+    <div className="h-full overflow-y-auto bg-[#0b0d0f]">
+      <AppToast toast={demoToast} onDismiss={dismissDemoToast} dismissLabel={tResults("toastDismiss")} />
+      <main className="mx-auto w-full max-w-[1600px] px-4 pb-20 pt-7 sm:px-6 lg:px-8">
+        <header className="mb-7 flex flex-wrap items-end justify-between gap-4">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">{t("title")}</h1>
-            <p className="text-zinc-500 text-sm mt-1 max-w-lg">{t("subtitle")}</p>
-            {!loading && leads.length > 0 ? (
-              <div className="flex flex-wrap gap-2 mt-4">
-                <span className="text-[11px] font-bold px-2.5 py-1 rounded-full bg-white/[0.06] text-zinc-300 border border-white/[0.08]">
-                  {t("statTotal", { count: leads.length })}
-                </span>
-                <span className="text-[11px] font-bold px-2.5 py-1 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/25">
-                  {t("statPending", { count: pendingCount })}
-                </span>
-                <span className="text-[11px] font-bold px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/25">
-                  {t("statWon", { count: closedCount })}
-                </span>
-              </div>
-            ) : null}
+            <p className="mb-2 font-mono text-[11px] uppercase tracking-[0.16em] text-indigo-300">Huntly / CRM</p>
+            <h1 className="text-2xl font-semibold tracking-tight text-white sm:text-3xl">{t("title")}</h1>
+            <p className="mt-1 text-sm text-zinc-500">{t("subtitle")}</p>
           </div>
-          <Link
-            href="/search"
-            className="inline-flex items-center justify-center gap-2 px-5 py-3 bg-white text-black hover:bg-slate-200 text-sm font-bold rounded-xl transition-colors shrink-0"
-          >
-            <Plus className="w-4 h-4" />
-            {t("searchLeads")}
-          </Link>
+          <Link href="/search" className="inline-flex min-h-10 items-center gap-2 rounded-md border border-neutral-700 bg-[#1e2225] px-4 text-sm font-medium text-zinc-100 hover:border-neutral-500"><Plus className="h-4 w-4" />{t("searchLeads")}</Link>
         </header>
 
-        {loading ? (
-          <div className="text-zinc-500 text-center py-24">{t("loading")}</div>
+        {loading ? <p className="py-24 text-center text-sm text-zinc-500">{t("loading")}</p> : error ? (
+          <div className="rounded-md border border-neutral-800 p-8 text-center text-sm text-zinc-400">{t("loadError")}</div>
         ) : leads.length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-white/10 bg-white/[0.02] px-6 py-16 text-center max-w-lg mx-auto">
-            <p className="text-lg font-bold text-white mb-2">{t("emptyPortfolioTitle")}</p>
-            <p className="text-sm text-zinc-500 mb-6">{t("emptyPortfolioDesc")}</p>
-            <Link
-              href="/search"
-              className="inline-flex items-center gap-2 px-5 py-3 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-bold rounded-xl"
-            >
-              {t("searchLeads")}
-            </Link>
-          </div>
+          <section className="max-w-xl rounded-lg border border-neutral-800 bg-[#141719] p-8">
+            <h2 className="text-lg font-semibold text-white">{t("emptyPortfolioTitle")}</h2>
+            <p className="mt-2 text-sm leading-relaxed text-zinc-400">{t("emptyPortfolioDesc")}</p>
+            <Link href="/search" className="mt-5 inline-flex min-h-10 items-center gap-2 rounded-md bg-indigo-500 px-4 text-sm font-medium text-white hover:bg-indigo-400"><Plus className="h-4 w-4" />{t("searchLeads")}</Link>
+          </section>
         ) : (
-          <DndContext
-            sensors={sensors}
-            collisionDetection={closestCenter}
-            onDragStart={handleDragStart}
-            onDragEnd={handleDragEnd}
-          >
-            {/* Móvil */}
-            <div className="md:hidden">
-              <div className="flex gap-1.5 overflow-x-auto pb-2 mb-4 scrollbar-none">
-                {ACTIVE_STATUSES.map((s) => {
-                  const visual = STATUS_VISUAL[s];
-                  const count = leads.filter((l) => normalizeStatus(l.status) === s).length;
-                  const isActive = mobileTab === s;
-                  return (
-                    <button
-                      key={s}
-                      type="button"
-                      onClick={() => setMobileTab(s)}
-                      className={`shrink-0 flex items-center gap-2 px-3 py-2.5 rounded-xl text-xs font-bold border transition-all ${
-                        isActive
-                          ? `${visual.bg} ${visual.color} ${visual.border}`
-                          : "border-white/[0.06] text-zinc-500 bg-white/[0.02]"
-                      }`}
-                    >
-                      <visual.Icon className="w-3.5 h-3.5" />
-                      <span className="whitespace-nowrap">{t(STATUS_COLUMN_KEYS[s])}</span>
-                      <span
-                        className={`tabular-nums px-1.5 py-0.5 rounded-md text-[10px] ${
-                          isActive ? "bg-black/20" : "bg-neutral-800"
-                        }`}
-                      >
-                        {count}
-                      </span>
-                    </button>
-                  );
-                })}
+          <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_390px]">
+            <section className="min-w-0" aria-label={t("portfolioList")}>
+              <div className="mb-4 flex flex-wrap gap-x-5 gap-y-2 border-b border-neutral-800 text-sm">
+                {FILTERS.map((item) => (
+                  <button key={item} type="button" onClick={() => setFilter(item)} aria-pressed={filter === item} className={`-mb-px inline-flex min-h-10 items-center gap-2 border-b-2 pb-2 pt-1 transition-colors ${filter === item ? "border-indigo-400 font-medium text-white" : "border-transparent text-zinc-500 hover:text-zinc-200"}`}>
+                    {item === "ALL" ? t("allActive") : t(STATUS_LABEL_KEYS[item])}
+                    <span className="font-mono text-[11px] text-zinc-600">{item === "ALL" ? counts.ALL - counts.DESCARTADO : counts[item]}</span>
+                  </button>
+                ))}
               </div>
-              <div className="space-y-3">
-                {leads
-                  .filter((l) => normalizeStatus(l.status) === mobileTab)
-                  .map((lead) => (
-                    <CrmLeadCard key={lead.id} lead={lead} {...cardProps} />
-                  ))}
-                {leads.filter((l) => normalizeStatus(l.status) === mobileTab).length === 0 ? (
-                  <div className="rounded-xl border border-dashed border-white/[0.08] bg-white/[0.02] px-4 py-10 text-center">
-                    <p className="text-xs font-semibold text-zinc-500">{t("emptyColumnShort")}</p>
-                    {STATUS_EMPTY_KEYS[mobileTab] ? (
-                      <p className="text-[11px] text-zinc-600 mt-1">{t(STATUS_EMPTY_KEYS[mobileTab]!)}</p>
-                    ) : null}
-                  </div>
-                ) : null}
-              </div>
-            </div>
 
-            {/* Desktop kanban */}
-            <div className="hidden md:grid md:grid-cols-4 gap-4 items-start">
-              {ACTIVE_STATUSES.map((status) => {
-                const visual = STATUS_VISUAL[status];
-                const colLeads = leads.filter((l) => normalizeStatus(l.status) === status);
-                return (
-                  <section
-                    key={status}
-                    className={`rounded-2xl border ${visual.border} bg-white/[0.02] flex flex-col min-h-[320px]`}
-                  >
-                    <div
-                      className={`flex items-center gap-2 px-4 py-3 border-b ${visual.border} ${visual.bg} rounded-t-2xl`}
-                    >
-                      <visual.Icon className={`w-4 h-4 ${visual.color}`} />
-                      <h2 className={`text-xs font-black uppercase tracking-wider ${visual.color}`}>
-                        {t(STATUS_COLUMN_KEYS[status])}
-                      </h2>
-                      <span
-                        className={`ml-auto text-xs font-bold tabular-nums px-2 py-0.5 rounded-full bg-black/20 ${visual.color}`}
-                      >
-                        {colLeads.length}
-                      </span>
-                    </div>
-                    <div className="p-3 flex-1">{renderColumn(status, colLeads)}</div>
-                  </section>
-                );
-              })}
-            </div>
-
-            {discardedLeads.length > 0 ? (
-              <div className="mt-10">
-                <button
-                  type="button"
-                  onClick={() => setShowDiscarded((o) => !o)}
-                  className="flex items-center gap-2 text-xs font-bold text-zinc-500 hover:text-zinc-300 transition-colors mb-4"
-                >
-                  <XCircle className="w-3.5 h-3.5" />
-                  {showDiscarded
-                    ? t("hideDiscarded", { count: discardedLeads.length })
-                    : t("showDiscarded", { count: discardedLeads.length })}
-                </button>
-                <AnimatePresence>
-                  {showDiscarded ? (
-                    <motion.div
-                      initial={{ opacity: 0, height: 0 }}
-                      animate={{ opacity: 1, height: "auto" }}
-                      exit={{ opacity: 0, height: 0 }}
-                      className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3 overflow-hidden"
-                    >
-                      {discardedLeads.map((lead) => (
-                        <CrmLeadCard key={lead.id} lead={lead} {...cardProps} />
-                      ))}
-                    </motion.div>
-                  ) : null}
-                </AnimatePresence>
-              </div>
-            ) : null}
-
-            <DragOverlay dropAnimation={{ duration: 150, easing: "ease-out" }}>
-              {activeLead ? (
-                <div className="rotate-1 scale-[1.02] opacity-95 shadow-2xl max-w-sm">
-                  <CrmLeadCard
-                    lead={activeLead}
-                    existingDemoSlug={getDemoSlug(activeLead.name, activeLead.address)}
-                    onDemoSlugKnown={(slug) =>
-                      rememberDemoSlug(activeLead.name, activeLead.address, slug)
-                    }
-                    {...cardProps}
-                  />
+              <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                <label className="relative block min-w-0 flex-1 sm:max-w-sm">
+                  <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-600" />
+                  <span className="sr-only">{t("searchPortfolio")}</span>
+                  <input type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder={t("searchPortfolio")} className="h-10 w-full rounded-md border border-neutral-800 bg-[#1b1f22] pl-9 pr-3 text-sm text-zinc-100 placeholder:text-zinc-600 focus:border-indigo-400 focus:outline-none" />
+                </label>
+                <div className="flex items-center gap-3">
+                  <p className="text-xs text-zinc-500">{t("visibleCount", { count: visibleLeads.length })}</p>
+                  <label className="relative ml-auto inline-flex items-center gap-2 text-xs text-zinc-500">
+                    <SlidersHorizontal className="h-3.5 w-3.5" />
+                    <span className="sr-only">{t("sortLabel")}</span>
+                    <select value={sort} onChange={(event) => setSort(event.target.value as Sort)} className="h-9 rounded-md border border-neutral-800 bg-[#1b1f22] px-2 text-xs text-zinc-300 focus:border-indigo-400 focus:outline-none">
+                      <option value="newest">{t("sortNewest")}</option>
+                      <option value="oldest">{t("sortOldest")}</option>
+                      <option value="score">{t("sortScore")}</option>
+                      <option value="name">{t("sortName")}</option>
+                    </select>
+                  </label>
                 </div>
-              ) : null}
-            </DragOverlay>
-          </DndContext>
+              </div>
+
+              {visibleLeads.length === 0 ? <div className="rounded-lg border border-neutral-800 bg-[#141719] px-5 py-14 text-center text-sm text-zinc-500">{t("noMatches")}</div> : <>
+                <div className="hidden overflow-hidden rounded-lg border border-neutral-800 bg-[#141719] lg:block">
+                  <table className="w-full table-fixed text-left">
+                    <thead className="border-b border-neutral-800 bg-[#1b1f22] text-[11px] font-medium uppercase tracking-wide text-zinc-500">
+                      <tr><th className="w-[38%] px-4 py-3 font-medium">{t("businessColumn")}</th><th className="w-[20%] px-3 py-3 font-medium">{t("stage")}</th><th className="w-[22%] px-3 py-3 font-medium">{t("signalColumn")}</th><th className="w-[20%] px-3 py-3 font-medium">{t("contactColumn")}</th></tr>
+                    </thead>
+                    <tbody className="divide-y divide-neutral-800">
+                      {visibleLeads.map((lead) => (
+                        <tr key={lead.id} className={selectedId === lead.id ? "bg-indigo-500/[0.08]" : "hover:bg-white/[0.025]"}>
+                          <td className="px-4 py-3"><button type="button" onClick={() => openLead(lead.id)} className="block w-full text-left"><span className="block truncate text-sm font-medium text-zinc-100">{lead.name}</span><span className="mt-1 block truncate text-xs text-zinc-500">{lead.address}</span></button></td>
+                          <td className="px-3 py-3"><span className="inline-flex rounded border border-neutral-700 px-2 py-1 text-xs text-zinc-300">{t(STATUS_LABEL_KEYS[normalizeStatus(lead.status)])}</span></td>
+                          <td className="px-3 py-3"><span className="block truncate text-xs font-medium text-zinc-300">{lead.scoreLabel || "—"}</span><span className="mt-1 block truncate text-[11px] text-zinc-500">{lead.hasWebsite ? t("hasWeb") : t("noWeb")}{lead.rating > 0 ? ` · ${lead.rating.toFixed(1)} (${lead.reviewCount})` : ""}</span></td>
+                          <td className="px-3 py-3"><button type="button" onClick={() => openLead(lead.id)} className="flex w-full items-center justify-between gap-1 text-left text-xs text-zinc-400 hover:text-white"><span className="truncate">{lead.phone || "—"}</span><ChevronRight className="h-4 w-4 shrink-0 text-zinc-600" /></button></td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+                <div className="space-y-2 lg:hidden">
+                  {visibleLeads.map((lead) => <button key={lead.id} type="button" onClick={() => openLead(lead.id)} className="block w-full rounded-md border border-neutral-800 bg-[#141719] px-4 py-3 text-left">
+                    <span className="flex items-start justify-between gap-2"><span className="min-w-0 text-sm font-medium text-zinc-100">{lead.name}</span><ArrowUpRight className="h-4 w-4 shrink-0 text-zinc-600" /></span>
+                    <span className="mt-1 block truncate text-xs text-zinc-500">{lead.address}</span>
+                    <span className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs"><span className="text-indigo-300">{t(STATUS_LABEL_KEYS[normalizeStatus(lead.status)])}</span><span className="text-zinc-500">{lead.scoreLabel || (lead.hasWebsite ? t("hasWeb") : t("noWeb"))}</span><span className="text-zinc-500">{lead.phone}</span></span>
+                  </button>)}
+                </div>
+              </>}
+            </section>
+
+            <div className="hidden h-[min(780px,calc(100vh-120px))] overflow-hidden rounded-lg border border-neutral-800 xl:sticky xl:top-5 xl:block">
+              {selectedLead && !mobileDetailOpen ? detail : <div className="flex h-full flex-col items-center justify-center px-8 text-center"><p className="text-sm font-medium text-zinc-300">{t("selectLead")}</p><p className="mt-2 text-xs leading-relaxed text-zinc-500">{t("selectLeadHint")}</p></div>}
+            </div>
+          </div>
         )}
       </main>
+
+      {selectedLead && mobileDetailOpen && <div className="fixed inset-0 z-50 xl:hidden">
+        <button type="button" aria-label={t("closeDetails")} onClick={() => setMobileDetailOpen(false)} className="absolute inset-0 bg-black/70" />
+        <div role="dialog" aria-modal="true" aria-label={t("leadDetails")} className="absolute inset-y-0 right-0 w-full max-w-[430px] border-l border-neutral-800 shadow-2xl">{detail}</div>
+      </div>}
     </div>
-    </>
   );
 }

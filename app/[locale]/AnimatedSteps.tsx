@@ -70,31 +70,23 @@ export default function AnimatedSteps({ steps }: { steps: Step[] }) {
       `}</style>
 
       {/* ── Step headers ── */}
-      <div className="grid md:grid-cols-3 gap-4">
+      <div className="grid gap-0 border-y border-[#34343f] md:grid-cols-3 md:divide-x md:divide-[#34343f]">
         {steps.map((step, i) => (
           <div
             key={i}
-            className="flex flex-col gap-3 rounded-2xl p-5"
-            style={{
-              background: "rgba(139,92,246,0.04)",
-              boxShadow: "0 0 0 1px rgba(139,92,246,0.10)",
-            }}
+            className="flex flex-col gap-3 border-b border-[#34343f] px-1 py-5 last:border-b-0 md:border-b-0 md:px-6 md:py-6 md:first:pl-0"
           >
             <span
-              className="font-black leading-none text-transparent bg-clip-text"
-              style={{
-                fontSize: "clamp(28px, 3vw, 40px)",
-                backgroundImage: "linear-gradient(135deg, #a78bfa, #e879f9)",
-              }}
+              className="font-mono text-[11px] font-medium leading-none text-violet-300"
             >
               {step.n}
             </span>
 
             <div>
-              <h3 className="text-sm font-bold mb-1.5 text-white">
+              <h3 className="text-base font-semibold mb-1.5 text-white">
                 {step.title}
               </h3>
-              <p className="text-xs leading-relaxed" style={{ color: "rgba(196,181,253,0.7)" }}>
+              <p className="text-xs leading-relaxed text-[#aaa9b5]">
                 {step.desc}
               </p>
             </div>
@@ -104,22 +96,18 @@ export default function AnimatedSteps({ steps }: { steps: Step[] }) {
 
       {/* ── Mock UI panel ── */}
       <div
-        className="rounded-2xl overflow-hidden"
+        className="rounded-md overflow-hidden"
         style={{
-          background: "rgba(10,8,22,0.95)",
-          border: "1px solid rgba(139,92,246,0.14)",
-          boxShadow: "0 0 0 1px rgba(139,92,246,0.06), 0 24px 48px rgba(0,0,0,0.45)",
+          background: "#141719",
+          border: "1px solid #34343f",
         }}
       >
         {/* Window chrome */}
         <div
-          className="flex items-center gap-2 px-4 py-3 border-b border-violet-500/[0.08]"
-          style={{ background: "rgba(139,92,246,0.04)" }}
+          className="flex items-center gap-2 px-4 py-3 border-b border-[#34343f]"
+          style={{ background: "#1b1f22" }}
         >
-          <div className="w-2.5 h-2.5 rounded-full bg-red-500/35" />
-          <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/35" />
-          <div className="w-2.5 h-2.5 rounded-full bg-green-500/35" />
-          <span className="ml-3 text-[10px] font-mono text-violet-400/40 tracking-wider">
+          <span className="text-[10px] font-mono text-[#aaa9b5] tracking-wider">
             huntly.app · dashboard
           </span>
         </div>
@@ -157,7 +145,7 @@ export default function AnimatedSteps({ steps }: { steps: Step[] }) {
                     <div
                       className="absolute top-full left-0 right-0 mt-1 rounded-xl overflow-hidden z-10 fade-up"
                       style={{
-                        background: "rgba(16,13,34,0.98)",
+                        background: "#1b1f22",
                         border: "1px solid rgba(139,92,246,0.22)",
                         boxShadow: "0 12px 32px rgba(0,0,0,0.6)",
                       }}

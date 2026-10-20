@@ -1,19 +1,16 @@
 "use client";
 
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
-/** idle → rolling (rueda) → locked (frenada final) */
+/** idle → scanning (desplazamiento) → locked (selección) */
 export type PickerPhase = "idle" | "scanning" | "locked";
 
-/** Misma altura que `searchFieldClass` (py-3 + text-sm) */
 export const PICKER_WINDOW_HEIGHT = 46;
-/** 3 filas lógicas dentro del mismo alto del campo */
-export const PICKER_ITEM_HEIGHT = Math.round(PICKER_WINDOW_HEIGHT / 3);
-export const PICKER_VISIBLE_ROWS = 3;
+export const PICKER_ITEM_HEIGHT = PICKER_WINDOW_HEIGHT;
+export const PICKER_VISIBLE_ROWS = 1;
 
-const TAIL_PADDING_ROWS = 2;
-const ROLL_DURATION_MS = 520;
-const LOCK_DURATION_MS = 80;
+const ROLL_DURATION_MS = 680;
+const LOCK_DURATION_MS = 120;
 
 export interface UsePickerWheelOptions<T> {
   pool: T[];
@@ -23,20 +20,6 @@ export interface UsePickerWheelOptions<T> {
   sequenceLength?: number;
 }
 
-/** Curva acelerar → frenar, escalada a ~520ms en total */
-function buildTickDelays(stepCount: number, totalMs: number, minMs = 6, maxMs = 42): number[] {
-  if (stepCount <= 1) return [];
-  const raw: number[] = [];
-  for (let i = 0; i < stepCount - 1; i++) {
-    const t = stepCount === 2 ? 0 : i / (stepCount - 2);
-    const wave = Math.sin(Math.PI * t);
-    raw.push(maxMs - (maxMs - minMs) * wave);
-  }
-  const sum = raw.reduce((a, b) => a + b, 0);
-  if (sum <= 0) return raw.map(() => Math.floor(totalMs / (stepCount - 1)));
-  return raw.map((d) => Math.max(4, Math.round((d / sum) * totalMs)));
-}
-
 function buildSequence<T>(
   options: T[],
   final: T,
@@ -44,21 +27,14 @@ function buildSequence<T>(
   format: (v: T) => string
 ): { labels: string[]; stopIndex: number } {
   const labels: string[] = [];
-  const randomCount = Math.max(coreLength - 1, 1);
+  const randomCount = Math.max(Math.min(coreLength - 1, 10), 4);
 
   for (let i = 0; i < randomCount; i++) {
     const pick = options[Math.floor(Math.random() * options.length)]!;
     labels.push(format(pick));
   }
   labels.push(format(final));
-  const stopIndex = labels.length - 1;
-
-  for (let i = 0; i < TAIL_PADDING_ROWS; i++) {
-    const pick = options[Math.floor(Math.random() * options.length)]!;
-    labels.push(format(pick));
-  }
-
-  return { labels, stopIndex };
+  return { labels, stopIndex: labels.length - 1 };
 }
 
 export function usePickerWheel<T>({
@@ -66,18 +42,22 @@ export function usePickerWheel<T>({
   exclude,
   onComplete,
   format = (v) => String(v),
-  sequenceLength = 38,
+  sequenceLength = 10,
 }: UsePickerWheelOptions<T>) {
   const [phase, setPhase] = useState<PickerPhase>("idle");
   const [wheelLabels, setWheelLabels] = useState<string[]>([]);
   const [wheelIndex, setWheelIndex] = useState(0);
-  const [stepDurationMs, setStepDurationMs] = useState(50);
+  const [stepDurationMs, setStepDurationMs] = useState(ROLL_DURATION_MS);
   const timersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
+  const frameRef = useRef<number | null>(null);
 
   const clearTimers = () => {
     timersRef.current.forEach(clearTimeout);
     timersRef.current = [];
+    if (frameRef.current !== null) cancelAnimationFrame(frameRef.current);
   };
+
+  useEffect(() => clearTimers, []);
 
   const roll = useCallback(() => {
     if (phase !== "idle" || pool.length === 0) return;
@@ -89,40 +69,30 @@ export function usePickerWheel<T>({
     clearTimers();
 
     const final = options[Math.floor(Math.random() * options.length)]!;
-    const coreLength = Math.max(sequenceLength, 20);
-    const { labels, stopIndex } = buildSequence(options, final, coreLength, format);
-    const delays = buildTickDelays(stopIndex + 1, ROLL_DURATION_MS);
+    const { labels, stopIndex } = buildSequence(options, final, sequenceLength, format);
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    if (reducedMotion) {
+      onComplete(final);
+      return;
+    }
 
     setWheelLabels(labels);
     setWheelIndex(0);
-    setStepDurationMs(Math.max(20, Math.min(delays[0] ?? 50, 55)));
+    setStepDurationMs(ROLL_DURATION_MS);
     setPhase("scanning");
-
-    let tick = 0;
-
-    const step = () => {
-      setWheelIndex(tick);
-      tick++;
-
-      if (tick <= stopIndex) {
-        const delay = delays[tick - 1] ?? 40;
-        setStepDurationMs(Math.max(18, Math.min(delay * 0.95, 55)));
-        const id = setTimeout(step, delay);
-        timersRef.current.push(id);
-      } else {
-        setPhase("locked");
-        setStepDurationMs(LOCK_DURATION_MS);
-        const id = setTimeout(() => {
-          onComplete(final);
-          setPhase("idle");
-          setWheelIndex(0);
-        }, LOCK_DURATION_MS);
-        timersRef.current.push(id);
-      }
-    };
-
-    const id = setTimeout(step, delays[0] ?? 12);
-    timersRef.current.push(id);
+    // A single transform, rather than dozens of React-rendered ticks.
+    frameRef.current = requestAnimationFrame(() => {
+      frameRef.current = requestAnimationFrame(() => setWheelIndex(stopIndex));
+    });
+    timersRef.current.push(setTimeout(() => {
+      setPhase("locked");
+      timersRef.current.push(setTimeout(() => {
+        onComplete(final);
+        setPhase("idle");
+        setWheelIndex(0);
+      }, LOCK_DURATION_MS));
+    }, ROLL_DURATION_MS));
   }, [pool, exclude, onComplete, format, phase, sequenceLength]);
 
   return {

@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { ClerkProvider } from "@clerk/nextjs";
 import { routing } from "@/i18n/routing";
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { DM_Sans, IBM_Plex_Mono } from "next/font/google";
 import Script from "next/script";
 import { Suspense } from "react";
 import CookieBanner from "@/components/CookieBanner";
@@ -13,7 +13,8 @@ import "./globals.css";
 import "leaflet/dist/leaflet.css";
 import "maplibre-gl/dist/maplibre-gl.css";
 
-const inter = Inter({ subsets: ["latin"] });
+const dmSans = DM_Sans({ subsets: ["latin"], variable: "--font-dm-sans" });
+const plexMono = IBM_Plex_Mono({ subsets: ["latin"], weight: ["400", "500"], variable: "--font-plex-mono" });
 
 type Props = {
   params: { locale: string };
@@ -105,7 +106,7 @@ export default async function LocaleLayout({
           `}</Script>
         </head>
         <body
-          className={`${inter.className} min-h-screen bg-[#0A0A0A] text-slate-100 selection:bg-indigo-500/30`}
+          className={`${dmSans.className} ${plexMono.variable} min-h-screen bg-[#08090b] text-slate-100 selection:bg-violet-500/30`}
         >
           <NextIntlClientProvider messages={messages}>
             <Suspense fallback={null}>

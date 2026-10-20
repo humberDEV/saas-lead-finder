@@ -23,10 +23,10 @@ export const metadata: Metadata = {
 };
 
 const BG = {
-  base: "#0e0b1e",
-  deep: "#0b0917",
-  mid: "#120f26",
-  alt: "#100d22",
+  base: "#08090b",
+  deep: "#090b0d",
+  mid: "#0e1012",
+  alt: "#0d0f11",
 };
 
 export default function GuiaConseguirClientesWeb() {
@@ -51,7 +51,7 @@ export default function GuiaConseguirClientesWeb() {
       {/* NAV */}
       <nav
         className="fixed top-0 inset-x-0 z-50 h-14 backdrop-blur-md border-b border-violet-500/[0.08]"
-        style={{ background: "rgba(14,11,30,0.92)" }}
+        style={{ background: "rgba(13,19,26,0.96)" }}
       >
         <div className="max-w-6xl mx-auto px-6 h-full flex items-center justify-between">
           <Link href="/es" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
@@ -297,7 +297,7 @@ export default function GuiaConseguirClientesWeb() {
             {/* CTA section */}
             <section
               className="rounded-2xl p-8 md:p-10 text-center border border-violet-500/20"
-              style={{ background: "linear-gradient(135deg, rgba(139,92,246,0.10) 0%, rgba(11,9,23,1) 100%)" }}
+              style={{ background: "#141719" }}
             >
               <h2 className="font-black tracking-tighter text-white mb-3" style={{ fontSize: "clamp(18px, 2.5vw, 28px)" }}>
                 Empieza a prospectar hoy.

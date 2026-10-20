@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { Sparkles, Zap, LayoutDashboard } from "lucide-react";
+import { Zap, LayoutDashboard } from "lucide-react";
 import { useUser } from "@clerk/nextjs";
 import { useSidebar } from "./SidebarContext";
 import { PLAN_LIMITS } from "@/lib/plans";
@@ -11,6 +11,7 @@ import { PLAN_LIMITS } from "@/lib/plans";
 export default function MobileHeader() {
   const pathname = usePathname();
   const t = useTranslations("mobileNav");
+  const tSidebar = useTranslations("sidebar");
   const { user } = useUser();
   const { credits, bonusTokens, plan } = useSidebar();
   const onDashboard = pathname.includes("/dashboard");
@@ -24,22 +25,19 @@ export default function MobileHeader() {
   const displayName = user?.firstName || user?.username || "User";
 
   return (
-    <header className="md:hidden h-12 shrink-0 flex items-center justify-between px-4 bg-[#0c0c14] border-b border-white/[0.05]">
+    <header className="md:hidden h-12 shrink-0 flex items-center justify-between px-4 bg-[#090b0d] border-b border-[#2d3236]">
       <div className="flex items-center gap-2 min-w-0">
         <Link href="/search" className="flex items-center gap-2 shrink-0">
-          <Sparkles className="w-4 h-4 text-indigo-500" />
-          <span className="font-black text-white text-sm tracking-tight">
-            Hunt<span className="text-indigo-400">ly</span>
-          </span>
+          <span className="text-sm font-semibold tracking-tight text-zinc-100">Huntly<span className="text-indigo-400">.</span></span>
         </Link>
         <Link
           href="/dashboard"
           aria-label={t("dashboard")}
           title={t("dashboard")}
-          className={`flex items-center justify-center w-9 h-9 rounded-xl border transition-colors shrink-0 ${
+          className={`flex items-center justify-center w-9 h-9 rounded-md border transition-colors shrink-0 ${
             onDashboard
-              ? "bg-indigo-500/20 border-indigo-500/35 text-indigo-300"
-              : "bg-white/[0.04] border-white/[0.06] text-zinc-500 hover:text-zinc-300 hover:bg-white/[0.07]"
+              ? "bg-violet-500/10 border-violet-500/40 text-violet-300"
+              : "bg-transparent border-[#2d3236] text-zinc-500 hover:text-zinc-100 hover:bg-[#1e2225]"
           }`}
         >
           <LayoutDashboard className="w-4 h-4" strokeWidth={onDashboard ? 2.2 : 1.75} />
@@ -50,16 +48,15 @@ export default function MobileHeader() {
         {/* Credits pill */}
         {credits !== null && (
           <span
-            className={`text-[10px] font-black tabular-nums px-2 py-0.5 rounded-full ${
+            className={`text-[11px] font-medium tabular-nums px-2 py-0.5 ${
               outOfCredits
-                ? "bg-red-500/15 text-red-400 border border-red-500/20"
+                ? "text-red-400"
                 : isLow
-                ? "bg-amber-500/15 text-amber-400 border border-amber-500/20"
-                : "bg-indigo-500/15 text-indigo-300 border border-indigo-500/20"
+                ? "text-amber-400"
+                : "text-zinc-400"
             }`}
           >
-            {planCredits}
-            {bonusTokens > 0 ? `+${bonusTokens}` : ""}/{planLimit}
+            {planCredits}/{planLimit}{bonusTokens > 0 ? ` +${bonusTokens}` : ""}
           </span>
         )}
 
@@ -67,10 +64,10 @@ export default function MobileHeader() {
         {plan === "free" && (
           <Link
             href="/pricing"
-            className="flex items-center gap-1 text-[10px] font-bold text-amber-400 bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded-full hover:bg-amber-500/20 transition-colors"
+            className="flex items-center gap-1 border-l border-[#2d3236] pl-2 text-[11px] font-medium text-indigo-300 transition-colors"
           >
             <Zap className="w-2.5 h-2.5" />
-            Upgrade
+            {tSidebar("upgrade")}
           </Link>
         )}
 
@@ -79,10 +76,10 @@ export default function MobileHeader() {
           <img
             src={user.imageUrl}
             alt={displayName}
-            className="w-6 h-6 rounded-full ring-1 ring-white/10 object-cover"
+            className="h-6 w-6 rounded-full object-cover"
           />
         ) : (
-          <div className="w-6 h-6 rounded-full bg-indigo-700 flex items-center justify-center ring-1 ring-white/10">
+          <div className="w-6 h-6 rounded-full bg-violet-600 flex items-center justify-center">
             <span className="text-[10px] font-black text-white">{displayName[0]?.toUpperCase()}</span>
           </div>
         )}

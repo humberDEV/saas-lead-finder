@@ -14,7 +14,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   }, []);
 
   return (
-    <div className="flex h-dvh overflow-hidden bg-[#050508]">
+    <div className="huntly-app flex h-dvh overflow-hidden bg-[#060708] text-zinc-100">
       {/* Desktop sidebar */}
       <div className="hidden md:block shrink-0">
         <Sidebar
@@ -23,14 +23,12 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
         />
       </div>
 
-      {/* Área principal — tono distinto + margen/canvas en desktop */}
-      <div className="flex flex-col flex-1 min-w-0 overflow-hidden bg-[#0a0a10] md:border-l md:border-neutral-900/80 md:shadow-[-12px_0_40px_rgba(0,0,0,0.45)]">
+      {/* Área principal */}
+      <div className="flex flex-col flex-1 min-w-0 overflow-hidden bg-[#08090b] md:border-l md:border-[#2d3236]">
         <MobileHeader />
 
-        <div className="flex-1 min-h-0 overflow-hidden md:p-3">
-          <div
-            className="h-full min-h-0 overflow-hidden md:rounded-2xl md:border md:border-white/[0.06] md:bg-[#0c0c12] bg-[radial-gradient(ellipse_75%_60%_at_50%_-12%,rgba(99,102,241,0.07),transparent)]"
-          >
+        <div className="flex-1 min-h-0 overflow-hidden md:p-2">
+          <div className="h-full min-h-0 overflow-hidden md:rounded-md md:border md:border-[#2d3236] md:bg-[#0b0d0f]">
             {children}
           </div>
         </div>

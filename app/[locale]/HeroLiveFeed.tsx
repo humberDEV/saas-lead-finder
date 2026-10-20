@@ -37,10 +37,8 @@ export default function HeroLiveFeed() {
         opacity: visible ? 1 : 0,
         transform: visible ? "translateY(0)" : "translateY(6px)",
         transition: "opacity 0.35s ease, transform 0.35s ease",
-        background: "linear-gradient(150deg, rgba(20,14,40,0.95) 0%, rgba(12,9,28,0.98) 100%)",
-        borderColor: "rgba(139,92,246,0.20)",
-        boxShadow: "0 0 40px rgba(139,92,246,0.08), 0 0 0 1px rgba(139,92,246,0.10)",
-        backdropFilter: "blur(16px)",
+        background: "#141719",
+        borderColor: "#3a3e43",
       }}
     >
       {/* Header */}

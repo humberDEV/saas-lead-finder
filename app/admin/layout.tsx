@@ -1,13 +1,18 @@
-export default function AdminLayout({
+import { requireAdmin } from "@/lib/admin-auth";
+
+export default async function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  // Fail closed: the old ?key= URL secret is intentionally no longer accepted.
+  await requireAdmin();
+
   return (
     <html lang="en">
       <head>
         <title>Huntly Admin</title>
-        <meta name="robots" content="noindex,nofollow" />
+        <meta name="robots" content="noindex,nofollow,noarchive" />
       </head>
       <body
         style={{

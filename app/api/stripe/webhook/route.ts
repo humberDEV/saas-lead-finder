@@ -3,7 +3,7 @@ import { headers } from "next/headers";
 import { stripe, STRIPE_PLANS } from "@/lib/stripe";
 import { db, PLAN_LIMITS } from "@/lib/db";
 import { trackEvent } from "@/lib/events";
-import { sendPaymentFailedEmail, sendPaymentReceiptEmail } from "@/lib/email";
+import { sendAdminRiskAlertEmail, sendPaymentFailedEmail, sendPaymentReceiptEmail } from "@/lib/email";
 import type Stripe from "stripe";
 
 export const runtime = "nodejs";
@@ -98,8 +98,12 @@ export async function POST(request: Request) {
 
   try {
     switch (event.type) {
-      case "checkout.session.completed": {
+      case "checkout.session.completed":
+      case "checkout.session.async_payment_succeeded": {
         const session = event.data.object as Stripe.Checkout.Session;
+        // Completing Checkout is not proof that a delayed payment has settled.
+        // Grant access and referral credit only after Stripe marks it paid.
+        if (session.payment_status !== "paid") break;
         const clerkId = session.metadata?.clerkId;
         const planKey = session.metadata?.planKey;
         const subscriptionId = session.subscription as string;
@@ -109,6 +113,18 @@ export async function POST(request: Request) {
 
           // Referral reward: +50 bonus tokens to both sides, only on first payment
           const paidUser = await db.user.findUnique({ where: { clerkId } });
+          if (paidUser) {
+            await trackEvent(paidUser.id, "checkout_completed", {
+              stripeEventId: event.id,
+              checkoutSessionId: session.id,
+              stripeCustomerId: typeof session.customer === "string" ? session.customer : session.customer?.id,
+              subscriptionId,
+              planKey,
+              paymentStatus: session.payment_status,
+              amountTotal: session.amount_total,
+              currency: session.currency,
+            }).catch(() => {});
+          }
           if (paidUser?.referredBy) {
             const referral = await db.referral.findUnpaidByReferredUser(paidUser.id).catch(() => null);
             if (referral && referral.referrerUserId !== paidUser.id) {
@@ -270,6 +286,9 @@ export async function POST(request: Request) {
       case "charge.dispute.created":
       case "charge.dispute.closed": {
         const dispute = event.data.object as Stripe.Dispute;
+        if (event.type === "charge.dispute.created") {
+          await sendAdminRiskAlertEmail("dispute", event.id, dispute.id, dispute.livemode);
+        }
         const chargeId = typeof dispute.charge === "string" ? dispute.charge : dispute.charge?.id;
         if (!chargeId) break;
         const charge = await stripe.charges.retrieve(chargeId);
@@ -300,6 +319,7 @@ export async function POST(request: Request) {
 
       case "radar.early_fraud_warning.created": {
         const warning = event.data.object as Stripe.Radar.EarlyFraudWarning;
+        await sendAdminRiskAlertEmail("early_fraud_warning", event.id, warning.id, warning.livemode);
         const chargeId = typeof warning.charge === "string" ? warning.charge : warning.charge.id;
         const charge = await stripe.charges.retrieve(chargeId);
         const customerId = typeof charge.customer === "string" ? charge.customer : charge.customer?.id;

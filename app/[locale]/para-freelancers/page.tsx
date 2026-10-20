@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { SignedIn, SignedOut, SignInButton } from "@clerk/nextjs";
-import { ArrowRight, CheckCircle, Sparkles } from "lucide-react";
+import { ArrowRight, CheckCircle } from "lucide-react";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -22,10 +22,10 @@ export const metadata: Metadata = {
 };
 
 const BG = {
-  base: "#0e0b1e",
-  deep: "#0b0917",
-  mid: "#120f26",
-  alt: "#100d22",
+  base: "#08090b",
+  deep: "#090b0d",
+  mid: "#0e1012",
+  alt: "#0d0f11",
 };
 
 const NICHES = [
@@ -73,7 +73,7 @@ const FAQS = [
 
 export default function ParaFreelancersPage() {
   return (
-    <div className="min-h-screen text-white antialiased" style={{ background: BG.base }}>
+    <div className="huntly-landing min-h-screen text-white antialiased" style={{ background: BG.base }}>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -91,12 +91,11 @@ export default function ParaFreelancersPage() {
 
       {/* NAV */}
       <nav
-        className="fixed top-0 inset-x-0 z-50 h-14 backdrop-blur-md border-b border-violet-500/[0.08]"
-        style={{ background: "rgba(14,11,30,0.92)" }}
+        className="fixed top-0 inset-x-0 z-50 h-14 border-b border-[#282831]"
+        style={{ background: BG.base }}
       >
         <div className="max-w-6xl mx-auto px-6 h-full flex items-center justify-between">
           <Link href="/es" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
-            <Sparkles className="w-4 h-4 text-violet-400" />
             <span className="font-bold tracking-tight">
               Hunt<span className="text-violet-400">ly</span>
             </span>
@@ -111,7 +110,7 @@ export default function ParaFreelancersPage() {
               <SignInButton mode="modal">
                 <button
                   className="flex items-center gap-1.5 text-sm font-bold px-5 py-2 rounded-lg text-white"
-                  style={{ background: "linear-gradient(135deg, #7c3aed, #a855f7)" }}
+                  style={{ background: "#7c3aed" }}
                 >
                   Empezar gratis <ArrowRight className="w-3.5 h-3.5" />
                 </button>
@@ -130,9 +129,6 @@ export default function ParaFreelancersPage() {
 
         {/* HERO */}
         <section className="relative px-6 py-20 md:py-32 text-center" style={{ background: BG.base }}>
-          <div aria-hidden className="absolute inset-0 pointer-events-none"
-            style={{ background: "radial-gradient(ellipse 70% 60% at 50% 0%, rgba(139,92,246,0.12) 0%, transparent 100%)" }}
-          />
           <div className="relative max-w-3xl mx-auto">
             <div className="inline-flex items-center gap-2 bg-violet-500/[0.10] border border-violet-500/25 rounded-full px-4 py-1.5 mb-8">
               <span className="text-xs text-violet-200 tracking-wide">Para freelancers web</span>
@@ -145,7 +141,7 @@ export default function ParaFreelancersPage() {
               <br />
               diseño web sin perder
               <br />
-              <span className="bg-gradient-to-br from-violet-400 via-fuchsia-400 to-purple-300 bg-clip-text text-transparent">
+              <span className="text-violet-300">
                 horas en Google Maps.
               </span>
             </h1>
@@ -156,7 +152,6 @@ export default function ParaFreelancersPage() {
               <SignInButton mode="modal">
                 <button
                   className="inline-flex items-center gap-2.5 px-8 py-4 bg-white text-[#0e0b1e] font-bold text-[15px] rounded-2xl hover:bg-violet-50 transition-all"
-                  style={{ boxShadow: "0 0 60px rgba(139,92,246,0.15)" }}
                 >
                   Empezar gratis — 3 búsquedas sin tarjeta
                   <ArrowRight className="w-4 h-4" />
@@ -344,7 +339,6 @@ export default function ParaFreelancersPage() {
         <footer className="border-t border-violet-500/[0.07] py-8 px-6" style={{ background: BG.base }}>
           <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
             <Link href="/es" className="flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-violet-600" />
               <span className="text-sm font-semibold text-violet-400/75">Huntly</span>
             </Link>
             <div className="flex flex-wrap items-center gap-4 text-sm text-violet-400/75">

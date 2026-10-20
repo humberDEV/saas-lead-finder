@@ -2,103 +2,45 @@
 
 import { useState } from "react";
 import { useUser, useClerk } from "@clerk/nextjs";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
-import {
-  CreditCard, LogOut, MessageCircle, ChevronRight,
-  Zap, CheckCircle, User,
-} from "lucide-react";
-import { motion } from "framer-motion";
+import { ArrowUpRight, CreditCard, LogOut, Mail, Settings2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useSidebar } from "../SidebarContext";
 import { ReferralCard } from "@/components/settings/ReferralCard";
 
-const PLAN_LABELS: Record<string, { label: string; color: string; bg: string }> = {
-  free:    { label: "Free",    color: "text-zinc-400",   bg: "bg-zinc-800" },
-  go:      { label: "Go",      color: "text-indigo-300", bg: "bg-indigo-500/20" },
-  pro:     { label: "Pro",     color: "text-violet-300", bg: "bg-violet-500/20" },
-};
-
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3 }}
-      className="mb-6"
-    >
-      <p className="text-[10px] font-black text-zinc-600 uppercase tracking-widest mb-2 px-1">{title}</p>
-      <div className="bg-neutral-900/60 border border-neutral-800 rounded-2xl overflow-hidden divide-y divide-neutral-800/60">
-        {children}
-      </div>
-    </motion.div>
-  );
-}
-
-function Row({
-  icon,
-  label,
-  sub,
-  right,
-  onClick,
-  href,
-  danger,
-}: {
-  icon: React.ReactNode;
-  label: string;
-  sub?: string;
-  right?: React.ReactNode;
-  onClick?: () => void;
-  href?: string;
-  danger?: boolean;
-}) {
-  const inner = (
-    <div className={`flex items-center gap-4 px-5 py-4 transition-colors ${
-      onClick || href
-        ? danger
-          ? "hover:bg-red-500/8 cursor-pointer"
-          : "hover:bg-white/[0.03] cursor-pointer"
-        : ""
-    }`}>
-      <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${
-        danger ? "bg-red-500/15" : "bg-white/5"
-      }`}>
-        <span className={danger ? "text-red-400" : "text-zinc-400"}>{icon}</span>
-      </div>
-      <div className="flex-1 min-w-0">
-        <p className={`text-sm font-semibold ${danger ? "text-red-400" : "text-white"}`}>{label}</p>
-        {sub && <p className="text-xs text-zinc-500 mt-0.5">{sub}</p>}
-      </div>
-      {right ?? (onClick || href ? <ChevronRight className="w-4 h-4 text-zinc-700 shrink-0" /> : null)}
-    </div>
-  );
-
-  if (href) return <Link href={href}>{inner}</Link>;
-  if (onClick) return <button onClick={onClick} className="w-full text-left">{inner}</button>;
-  return inner;
+  return <section>
+    <h2 className="mb-3 font-mono text-[11px] font-medium uppercase tracking-[0.14em] text-zinc-500">{title}</h2>
+    <div className="overflow-hidden rounded-lg border border-neutral-800 bg-[#141719]">{children}</div>
+  </section>;
 }
 
 export default function SettingsPage() {
   const t = useTranslations("settings");
   const { user } = useUser();
   const { signOut } = useClerk();
-  const { plan, credits } = useSidebar();
-  const router = useRouter();
+  const { plan, credits, bonusTokens } = useSidebar();
   const [loadingPortal, setLoadingPortal] = useState(false);
+  const [portalError, setPortalError] = useState(false);
   const [signingOut, setSigningOut] = useState(false);
 
-  const planMeta = PLAN_LABELS[plan] ?? PLAN_LABELS.free;
   const displayName = user?.firstName
     ? `${user.firstName}${user.lastName ? " " + user.lastName : ""}`
     : user?.username ?? "User";
   const email = user?.emailAddresses?.[0]?.emailAddress ?? "";
+  const currentPlan = ({ free: "Free", go: "Go", pro: "Pro", agency: "Agency" } as Record<string, string>)[plan] ?? plan;
 
   const handleManagePlan = async () => {
+    setPortalError(false);
     setLoadingPortal(true);
     try {
-      const res = await fetch("/api/stripe/portal", { method: "POST" });
-      const data = await res.json();
-      if (data.url) window.location.href = data.url;
+      const response = await fetch("/api/stripe/portal", { method: "POST" });
+      if (!response.ok) throw new Error("portal_failed");
+      const data = await response.json();
+      if (!data.url) throw new Error("portal_missing_url");
+      window.location.href = data.url;
+    } catch {
+      setPortalError(true);
     } finally {
       setLoadingPortal(false);
     }
@@ -106,125 +48,58 @@ export default function SettingsPage() {
 
   const handleSignOut = async () => {
     setSigningOut(true);
-    await signOut({ redirectUrl: "/" });
+    try { await signOut({ redirectUrl: "/" }); }
+    catch { setSigningOut(false); }
   };
 
-  return (
-    <div className="h-full overflow-y-auto">
-      <main className="max-w-lg mx-auto px-5 pt-10 pb-28 md:px-10 md:pt-14">
+  return <div className="h-full overflow-y-auto bg-[#0b0d0f]">
+    <main className="mx-auto w-full max-w-5xl px-4 pb-24 pt-7 sm:px-6 lg:px-8">
+      <header className="mb-8">
+        <p className="mb-2 font-mono text-[11px] uppercase tracking-[0.16em] text-indigo-300">Huntly / {t("title")}</p>
+        <h1 className="text-2xl font-semibold tracking-tight text-white sm:text-3xl">{t("title")}</h1>
+        <p className="mt-1 text-sm text-zinc-500">{t("subtitle")}</p>
+      </header>
 
-        {/* Header */}
-        <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.25 }} className="mb-8">
-          <h1 className="text-2xl font-black text-white tracking-tight">{t("title")}</h1>
-          <p className="text-zinc-500 text-sm mt-1">{t("subtitle")}</p>
-        </motion.div>
-
-        {/* Account */}
-        <Section title={t("sectionAccount")}>
-          <div className="flex items-center gap-4 px-5 py-4">
-            <div className="shrink-0">
-              {user?.imageUrl ? (
-                <img
-                  src={user.imageUrl}
-                  alt={displayName}
-                  className="w-10 h-10 rounded-full ring-2 ring-white/10 object-cover"
-                />
-              ) : (
-                <div className="w-10 h-10 rounded-full bg-indigo-700 flex items-center justify-center ring-2 ring-white/10">
-                  <span className="text-sm font-black text-white">{displayName[0]?.toUpperCase()}</span>
-                </div>
-              )}
+      <div className="grid items-start gap-7 lg:grid-cols-[minmax(0,1fr)_300px]">
+        <div className="space-y-7">
+          <Section title={t("sectionAccount")}>
+            <div className="flex items-center gap-4 px-5 py-5">
+              {user?.imageUrl ? <img src={user.imageUrl} alt="" className="h-11 w-11 shrink-0 rounded-full object-cover" /> : <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#2d3236] text-sm font-medium text-zinc-200">{displayName.charAt(0).toUpperCase()}</span>}
+              <div className="min-w-0 flex-1"><p className="truncate text-sm font-semibold text-zinc-100">{displayName}</p><p className="mt-0.5 truncate text-xs text-zinc-500">{email}</p></div>
+              <span className="rounded border border-neutral-700 px-2 py-1 text-xs font-medium text-zinc-300">{currentPlan}</span>
             </div>
-            <div className="min-w-0 flex-1">
-              <p className="text-sm font-bold text-white truncate">{displayName}</p>
-              <p className="text-xs text-zinc-500 truncate">{email}</p>
+          </Section>
+
+          <Section title={t("sectionPlan")}>
+            <div className="border-b border-neutral-800 px-5 py-5">
+              <p className="text-sm font-semibold text-zinc-100">{t("currentPlan", { plan: currentPlan })}</p>
+              {credits !== null && <p className="mt-1 text-xs text-zinc-500">{t("remainingSearches", { count: credits })}{bonusTokens > 0 ? ` · +${bonusTokens} ${t("bonusCredits")}` : ""}</p>}
             </div>
-            <span className={`text-[10px] font-black uppercase px-2 py-1 rounded-lg ${planMeta.bg} ${planMeta.color}`}>
-              {planMeta.label}
-            </span>
-          </div>
-        </Section>
+            <Link href="/pricing" className="flex min-h-12 items-center gap-3 border-b border-neutral-800 px-5 text-sm text-zinc-300 transition-colors hover:bg-[#1e2225] hover:text-white">
+              <Settings2 className="h-4 w-4 text-zinc-500" /><span className="flex-1">{plan === "free" ? t("upgradeLabel") : t("changePlan")}</span><ArrowUpRight className="h-4 w-4 text-zinc-600" />
+            </Link>
+            {plan !== "free" && <button type="button" onClick={handleManagePlan} disabled={loadingPortal} className="flex min-h-12 w-full items-center gap-3 px-5 text-left text-sm text-zinc-300 transition-colors hover:bg-[#1e2225] hover:text-white disabled:opacity-50">
+              <CreditCard className="h-4 w-4 text-zinc-500" /><span className="flex-1">{loadingPortal ? t("managePlanLoading") : t("billingLabel")}</span><ArrowUpRight className="h-4 w-4 text-zinc-600" />
+            </button>}
+            {portalError && <p role="alert" className="border-t border-neutral-800 px-5 py-3 text-xs text-red-300">{t("portalError")}</p>}
+          </Section>
 
-        {/* Plan */}
-        <Section title={t("sectionPlan")}>
-          {plan === "free" ? (
-            <>
-              <Row
-                icon={<Zap className="w-4 h-4" />}
-                label={t("upgradeLabel")}
-                sub={t("upgradeSub")}
-                href="/pricing"
-              />
-              <Row
-                icon={<CheckCircle className="w-4 h-4" />}
-                label={t("viewPlansLabel")}
-                sub={t("viewPlansSub")}
-                href="/pricing"
-              />
-            </>
-          ) : (
-            <>
-              <Row
-                icon={<CreditCard className="w-4 h-4" />}
-                label="Cambiar plan"
-                sub={`Plan actual: ${planMeta.label} · ${credits ?? "—"} búsquedas restantes`}
-                href="/pricing"
-              />
-              <Row
-                icon={<CreditCard className="w-4 h-4" />}
-                label={loadingPortal ? t("managePlanLoading") : "Facturación y tarjeta"}
-                sub="Facturas, cancelar, cambiar método de pago"
-                onClick={handleManagePlan}
-                right={
-                  loadingPortal ? (
-                    <div className="w-4 h-4 border-2 border-zinc-600 border-t-zinc-300 rounded-full animate-spin" />
-                  ) : undefined
-                }
-              />
-            </>
-          )}
-        </Section>
+          <Section title={t("sectionReferral")}><ReferralCard /></Section>
+        </div>
 
-        {/* Referrals */}
-        <Section title={t("sectionReferral")}>
-          <ReferralCard />
-        </Section>
-
-        {/* Support */}
-        <Section title={t("sectionSupport")}>
-          <Row
-            icon={<MessageCircle className="w-4 h-4" />}
-            label={t("feedbackLabel")}
-            sub={t("feedbackSub")}
-            href="mailto:huntly@outlook.es?subject=Feedback%20Huntly"
-          />
-        </Section>
-
-        {/* Session */}
-        <Section title={t("sectionSession")}>
-          <Row
-            icon={<User className="w-4 h-4" />}
-            label={t("connectedLabel")}
-            sub={email}
-            right={<span className="text-xs text-zinc-600">Clerk</span>}
-          />
-          <Row
-            icon={<LogOut className="w-4 h-4" />}
-            label={signingOut ? t("signOutLoading") : t("signOutLabel")}
-            sub={t("signOutSub")}
-            onClick={handleSignOut}
-            danger
-            right={
-              signingOut ? (
-                <div className="w-4 h-4 border-2 border-red-500/30 border-t-red-400 rounded-full animate-spin" />
-              ) : undefined
-            }
-          />
-        </Section>
-
-        <p className="text-center text-xs text-zinc-700 mt-8">Huntly · tryhuntly.com</p>
-
-      </main>
-    </div>
-  );
+        <div className="space-y-7">
+          <Section title={t("sectionSupport")}>
+            <a href="mailto:huntly@outlook.es?subject=Feedback%20Huntly" className="flex min-h-14 items-center gap-3 px-5 text-sm text-zinc-300 transition-colors hover:bg-[#1e2225] hover:text-white">
+              <Mail className="h-4 w-4 text-zinc-500" /><span className="flex-1"><span className="block font-medium">{t("feedbackLabel")}</span><span className="mt-0.5 block text-xs text-zinc-500">{t("feedbackSub")}</span></span><ArrowUpRight className="h-4 w-4 text-zinc-600" />
+            </a>
+          </Section>
+          <Section title={t("sectionSession")}>
+            <button type="button" onClick={handleSignOut} disabled={signingOut} className="flex min-h-12 w-full items-center gap-3 px-5 text-left text-sm text-zinc-400 transition-colors hover:bg-[#1e2225] hover:text-red-300 disabled:opacity-50">
+              <LogOut className="h-4 w-4" /><span>{signingOut ? t("signOutLoading") : t("signOutLabel")}</span>
+            </button>
+          </Section>
+        </div>
+      </div>
+    </main>
+  </div>;
 }

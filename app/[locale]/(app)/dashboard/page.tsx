@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import {
   Search, Target, Phone, ArrowRight,
@@ -35,44 +35,10 @@ interface IntelligenceData {
   recentSearches: RecentSearch[];
 }
 
-// ── Typewriter greeting ───────────────────────────────────────────────────────
-function Typewriter({ text, speed = 28 }: { text: string; speed?: number }) {
-  const [displayed, setDisplayed] = useState("");
-  const [done, setDone] = useState(false);
-  const iRef = useRef(0);
-
-  useEffect(() => {
-    if (!text) return;
-    iRef.current = 0;
-    setDisplayed("");
-    setDone(false);
-
-    const tick = setInterval(() => {
-      iRef.current++;
-      setDisplayed(text.slice(0, iRef.current));
-      if (iRef.current >= text.length) {
-        clearInterval(tick);
-        setTimeout(() => setDone(true), 700);
-      }
-    }, speed);
-
-    return () => clearInterval(tick);
-  }, [text, speed]);
-
-  return (
-    <span>
-      {displayed}
-      {!done && (
-        <span className="inline-block w-[2px] h-[1.1em] bg-indigo-400 ml-0.5 align-middle animate-pulse" />
-      )}
-    </span>
-  );
-}
-
 // ── Shared panel chrome (aligned with /search) ───────────────────────────────
 const panelClass =
-  "relative overflow-hidden rounded-2xl border border-neutral-800/70 bg-neutral-900/35 backdrop-blur-xl";
-const panelHover = "transition-all hover:border-indigo-500/25 hover:shadow-[0_0_24px_rgba(99,102,241,0.06)]";
+  "relative overflow-hidden rounded-2xl border border-[#2d3236] bg-[#141719]";
+const panelHover = "transition-colors hover:border-violet-500/30";
 
 // ── Activity bar chart ────────────────────────────────────────────────────────
 const CHART_H = 72;
@@ -203,7 +169,7 @@ function ProgressRing({ used, limit }: { used: number; limit: number }) {
 
   return (
     <svg width="38" height="38" className="-rotate-90">
-      <circle cx="19" cy="19" r={r} fill="none" stroke="#1e1e2e" strokeWidth="3" />
+      <circle cx="19" cy="19" r={r} fill="none" stroke="#2d3236" strokeWidth="3" />
       <circle
         cx="19" cy="19" r={r}
         fill="none"
@@ -420,7 +386,7 @@ export default function DashboardHome() {
           <div className="min-w-0 flex-1">
             <p className="text-sm text-slate-500 capitalize mb-2">{monthLabel}</p>
             <h1 className="text-2xl md:text-[1.75rem] font-bold text-white tracking-tight leading-snug min-h-[2.25rem]">
-              {greetingText ? <Typewriter text={greetingText} /> : "\u00A0"}
+              {greetingText || "\u00A0"}
             </h1>
             <p className="text-sm text-slate-500 mt-2">{t("radar")}</p>
           </div>
@@ -451,7 +417,6 @@ export default function DashboardHome() {
                 transition={{ duration: 0.3, delay: 0.06 }}
                 className={`${panelClass} border-indigo-500/25 bg-neutral-900/50 p-5 shadow-[0_0_28px_rgba(99,102,241,0.08)]`}
               >
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-2/3 h-px bg-gradient-to-r from-transparent via-indigo-500/60 to-transparent" />
                 <div className="w-9 h-9 rounded-xl bg-indigo-500/15 border border-indigo-500/20 flex items-center justify-center mb-4">
                   <Building2 className="w-4 h-4 text-indigo-400" />
                 </div>
@@ -633,7 +598,7 @@ export default function DashboardHome() {
                     key={i}
                     className={`${panelClass} border-indigo-500/20 pl-0 pr-5 py-4 flex items-start gap-4`}
                   >
-                    <div className="w-1 self-stretch rounded-full bg-gradient-to-b from-indigo-400/80 to-indigo-600/20 shrink-0 ml-0" />
+                    <div className="w-1 self-stretch rounded-sm bg-violet-500 shrink-0 ml-0" />
                     <div className="flex-1 min-w-0 py-0.5">
                       <p className="text-sm text-slate-300 leading-relaxed">{rec.text}</p>
                       {rec.niche && (

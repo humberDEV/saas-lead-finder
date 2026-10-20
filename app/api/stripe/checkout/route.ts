@@ -50,8 +50,11 @@ export async function POST(request: Request) {
 
   const session = await stripe.checkout.sessions.create({
     customer: stripeCustomerId,
+    client_reference_id: userId,
     mode: "subscription",
     line_items: [{ price: planConfig.priceId, quantity: 1 }],
+    billing_address_collection: "auto",
+    customer_update: { name: "auto", address: "auto" },
     ...(coupon ? { discounts: [{ coupon }] } : { allow_promotion_codes: true }),
     success_url: `${baseUrl}/dashboard?upgraded=1`,
     cancel_url: `${baseUrl}/pricing`,
@@ -71,7 +74,11 @@ export async function POST(request: Request) {
     where: { clerkId: userId },
     data: { checkout_started_at: new Date().toISOString() },
   }).catch(() => {});
-  await trackEvent(user.id, "checkout_started", { planKey }).catch(() => {});
+  await trackEvent(user.id, "checkout_started", {
+    planKey,
+    checkoutSessionId: session.id,
+    stripeCustomerId,
+  }).catch(() => {});
 
   return NextResponse.json({ url: session.url });
 }

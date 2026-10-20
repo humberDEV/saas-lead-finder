@@ -42,7 +42,7 @@ export function ReferralClaimModal({ open, onClose, onClaimed }: ReferralClaimMo
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 16, scale: 0.98 }}
             transition={{ duration: 0.25, ease: "easeOut" }}
-            className="relative w-full max-w-md rounded-2xl border border-neutral-800 bg-[#0d0d14] shadow-[0_0_80px_rgba(0,0,0,0.85)] overflow-hidden"
+            className="relative w-full max-w-md rounded-2xl border border-neutral-800 bg-[#141719] shadow-[0_0_80px_rgba(0,0,0,0.85)] overflow-hidden"
             role="dialog"
             aria-modal="true"
             aria-labelledby="referral-claim-title"
